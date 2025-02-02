@@ -1,0 +1,1 @@
+console.log("utility function to remove background from an image");
