@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { removeBackground } from "@imgly/background-removal";
+import { Button } from "@/components/ui/button"
 
 const Page = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -34,7 +35,9 @@ const Page = () => {
   };
 
   return (
+
     <div className="flex flex-col items-center justify-center p-6">
+      <h1>hjfhbhj</h1>
       <input 
         type="file" 
         accept="image/*" 
@@ -42,12 +45,12 @@ const Page = () => {
         onChange={handleFileChange} 
         className="hidden"
       />
-      <button 
+      <Button 
         className="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4"
         onClick={() => fileInputRef.current?.click()}
       >
         Upload Image
-      </button>
+      </Button>
 
       {selectedImage && (
         <>
