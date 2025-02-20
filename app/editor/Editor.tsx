@@ -1,36 +1,791 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import BgRemover from "../components/BgRemover";
+import React, { useState, useRef, useEffect } from 'react';
+import Cropper from 'react-easy-crop';
+import { GiphyFetch } from '@giphy/js-fetch-api';
+import { Grid } from '@giphy/react-components';
+import {
+  Type,
+  Palette,
+  ImagePlus,
+  Undo,
+  Redo,
+  Download,
+  Crop,
+  Wand2,
+  SlidersHorizontal,
+  Brush,
+  Eraser,
+  Shapes,
+  Layers,
+  PanelLeftClose,
+  PanelRightClose,
+  Sparkles,
+  Image as ImageIcon,
+  Sticker,
+  Filter,
+  X,
+  Check,
+  Loader
+} from 'lucide-react';
+import { removeBg } from '../utils/removeBg';
+import LoaderComp from '../components/LoaderComp.';
 
-export default function Editor() {
-  const [bgImage, setBgImage] = useState<string | null>(null);
-  const [frontImage, setFrontImage] = useState<string | null>(null);
-  const [text, setText] = useState("");
+type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
+type Sticker = { id: number; src: string; x: number; y: number; };
+
+// Initialize GIPHY API
+const giphykey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
+const gf = new GiphyFetch(giphykey as string);
+
+function Editor() {
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
+  const [selectedTool, setSelectedTool] = useState<Tool>('none');
+  const [showStickers, setShowStickers] = useState(false);
+  const [stickers, setStickers] = useState<Sticker[]>([]);
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+  const [bgremovedImage, setBgremovedImage] = useState<string | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [isCropping, setIsCropping] = useState(false);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [draggedSticker, setDraggedSticker] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeLoader, setactiveLoader] = useState(false);
+  const [isDraggable, setIsDraggable] = useState(true);
+  const [imgWidth, setImgWidth] = useState(true);
+  const [imgHeight, setImgHeight] = useState(true);
+  const [brushColor, setBrushColor] = useState("#000000");  // Default black
+  const [brushSize, setBrushSize] = useState(5);  // Default size
+
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+  const [aspect, setAspect] = useState(1);
+
+  const [croppingModeOn, setCroppingModeOn] = useState(false)
+
+  // Initialize canvas
+  useEffect(() => {
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.lineCap = 'round';
+        context.strokeStyle = 'black';
+        context.lineWidth = 5;
+        contextRef.current = context;
+      }
+    }
+  }, []);
+
+
+
+
+  // Handle tool selection
+  const handleToolClick = (tool: Tool) => {
+    setSelectedTool(tool);
+    if (tool === 'sticker') {
+      setShowStickers(true);
+    } else if (tool === 'crop' && backgroundImage && !bgremovedImage) {
+      setIsCropping(true);
+      // setRightSidebarOpen(false);
+      setCroppingModeOn(true)
+    } else {
+      setShowStickers(false);
+    }
+  };
+
+  // Handle sticker movement
+  const handleStickerMouseDown = (e: React.MouseEvent, id: number) => {
+    if (selectedTool !== 'none') return;
+    setDraggedSticker(id);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (draggedSticker === null) return;
+
+    const container = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - container.left - 32; // Half of sticker width
+    const y = e.clientY - container.top - 32; // Half of sticker height
+
+    setStickers(prev => prev.map(sticker =>
+      sticker.id === draggedSticker
+        ? { ...sticker, x, y }
+        : sticker
+    ));
+  };
+
+  const handleMouseUp = () => {
+    setDraggedSticker(null);
+  };
+
+  // Handle sticker selection from GIPHY
+  const handleGiphySelect = (gif: any) => {
+    setStickers(prev => [...prev, {
+      id: Date.now(),
+      src: gif.images.fixed_height.url,
+      x: Math.random() * 300,
+      y: Math.random() * 300
+    }]);
+    setShowStickers(false);
+  };
+
+  // Handle drawing
+  const startDrawing = (e: React.MouseEvent) => {
+    if (selectedTool !== 'brush' && selectedTool !== 'eraser') return;
+
+    const canvas = canvasRef.current;
+    if (!canvas || !contextRef.current) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // Canvas scaling values to maintain accuracy
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    setIsDrawing(true);
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(x, y);
+
+    // **Directly set brush size based on original brush size**
+    contextRef.current.lineWidth = brushSize;  // Keep brush size fixed
+
+    contextRef.current.strokeStyle = brushColor;
+    contextRef.current.lineCap = "round";
+    contextRef.current.lineJoin = "round";
+
+    if (selectedTool === "eraser") {
+      contextRef.current.globalCompositeOperation = "destination-out";
+      contextRef.current.lineWidth = brushSize * 1.5;  // Eraser a little bigger
+    } else {
+      contextRef.current.globalCompositeOperation = "source-over";
+    }
+};
+
+
+
+  const draw = (e: React.MouseEvent) => {
+    if (!isDrawing || !contextRef.current || !canvasRef.current) return;
+
+    console.log('yooo')
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    contextRef.current.lineTo(x, y);
+    contextRef.current.stroke();
+  };
+
+
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  // Handle image drop
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setBackgroundImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+
+  const clickHandler = () => {
+
+    if (backgroundImage || showStickers) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = (event) => {
+      // const file = event.target.files[0];
+      const file = (event.target as HTMLInputElement)?.files?.[0];
+      if (file) {
+        console.log("Selected Image:", file);
+        setBackgroundImage(URL.createObjectURL(file)); // ⬅️ Image preview ke liye
+      }
+    };
+
+    input.click();
+  }
+
+
+  const applyBgRemover = async () => {
+    try {
+      if (backgroundImage && !bgremovedImage) {
+        setactiveLoader(true);
+        const removed = await removeBg(backgroundImage);
+        setactiveLoader(false)
+        setBgremovedImage(removed)
+        setIsDraggable(false);
+
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+
+  }
+
+
+
+
+  // Handle crop complete
+  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  // Apply crop
+  const applyCrop = async () => {
+    if (!croppedAreaPixels || !backgroundImage) return;
+
+    const canvas = document.createElement('canvas');
+    const image = new Image();
+    image.src = backgroundImage;
+
+    await new Promise(resolve => {
+      image.onload = resolve;
+    });
+
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    );
+
+    setBackgroundImage(canvas.toDataURL());
+    setCroppingModeOn(false)
+    setIsCropping(false);
+    setSelectedTool('none');
+  };
+
+
+  const cancelCrop = () => {
+    setIsCropping(false)
+    setCroppingModeOn(false)
+  }
+
+
+  
+ 
+
+
 
   return (
-    <div className="flex flex-col items-center p-4 gap-4">
-      <h1 className="text-xl font-bold">Backdrop Editor</h1>
 
-      <div className="flex gap-4">
-        <BgRemover onBgRemove={setFrontImage} />
+
+    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+      {activeLoader && (<LoaderComp />)}
+
+      {/* Left Sidebar - Main Tools */}
+      <div className={`${leftSidebarOpen ? 'w-16 md:w-20' : 'w-0'} transition-all duration-300 bg-gray-800/95 backdrop-blur-sm p-3 flex flex-col gap-4 items-center border-r border-gray-700 relative z-50`}>
+        <button
+          onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+          className="absolute -right-3 top-4 bg-indigo-600 p-1 rounded-full hover:bg-indigo-700 transition-colors  cust-z-index"
+        >
+          <PanelLeftClose size={16} className={`transform transition-transform duration-300 ${!leftSidebarOpen ? 'rotate-180' : ''}`} />
+        </button>
+        {leftSidebarOpen && (
+          <>
+            {[
+              { icon: <ImagePlus size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
+              { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
+              { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
+              { icon: <Shapes size={24} />, tooltip: "Shapes", tool: 'none' as Tool },
+              { icon: <Type size={24} />, tooltip: "Text", tool: 'text' as Tool },
+              { icon: <Sticker size={24} />, tooltip: "Stickers", tool: 'sticker' as Tool },
+              { icon: <Crop size={24} />, tooltip: "Crop", tool: 'crop' as Tool },
+              { icon: <Filter size={24} />, tooltip: "Filters", tool: 'none' as Tool },
+              { icon: <Layers size={24} />, tooltip: "Layers", tool: 'none' as Tool },
+            ].map((item, index) => (
+              <button
+                key={index}
+                onClick={() => handleToolClick(item.tool)}
+                className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110 
+                  ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}`}
+                title={item.tooltip}
+              >
+                {item.icon}
+                <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"  >
+                  {item.tooltip}
+                </span>
+              </button>
+            ))}
+          </>
+        )}
       </div>
 
-      <input type="file" onChange={(e) => setBgImage(URL.createObjectURL(e.target.files![0]))} />
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Toolbar */}
+        <div className="h-16 bg-gray-800/95 backdrop-blur-sm border-b border-gray-700 flex items-center justify-between px-4 md:px-6">
+          <div className="flex gap-2 md:gap-4">
+            <button className="p-2 hover:bg-gray-700 rounded-lg transition-colors group">
+              <Undo size={20} className="group-hover:scale-110 transition-transform" />
+            </button>
+            <button className="p-2 hover:bg-gray-700 rounded-lg transition-colors group">
+              <Redo size={20} className="group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            {isCropping ? (
+              <>
 
-      <input
-        type="text"
-        placeholder="Enter Text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="border p-2"
-      />
+                <button
+                  onClick={cancelCrop}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <X size={20} />
+                  Cancel Crop
+                </button>
 
-      <div className="relative w-[300px] h-[300px] border">
-        {bgImage && <img src={bgImage} className="absolute w-full h-full object-cover" />}
-        {frontImage && <img src={frontImage} className="absolute w-full h-full object-cover mix-blend-multiply" />}
-        {text && <p className="absolute bottom-4 left-4 text-white text-2xl">{text}</p>}
+                <button
+                  onClick={applyCrop}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <Check size={20} />
+                  Apply Crop
+                </button>
+
+              </>
+
+
+            ) :
+
+              (backgroundImage && !bgremovedImage) && (
+                <button
+                  onClick={applyBgRemover}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <Check size={20} />
+                  Text Behind
+                </button>
+              )
+
+
+            }
+
+            <button className="hidden md:flex px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg items-center gap-2 transition-colors">
+              <Sparkles size={18} className="text-yellow-400" />
+              AI Enhance
+            </button>
+            <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center gap-2 transition-colors group">
+              <Download size={20} className="group-hover:translate-y-0.5 transition-transform" />
+              <span className="hidden md:inline">Export</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Canvas Container */}
+        <div className="flex-1 flex min-h-0">
+          <div className="flex-1 bg-[#1a1a1a] p-4 md:p-8 flex items-center justify-center overflow-auto" >
+            <div
+              className="relative w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl flex items-center justify-center text-gray-400 group" style={{ marginTop: '150px' }}
+              onDrop={isDraggable ? handleDrop : undefined}  // 🔥 Disable drag events
+              onDragOver={isDraggable ? handleDragOver : undefined}
+              onMouseMove={isDraggable ? handleMouseMove : undefined}
+              onMouseUp={isDraggable ? handleMouseUp : undefined}
+              onClick={isDraggable ? clickHandler : undefined}
+            >
+              {/* Background Image */}
+              {backgroundImage && !isCropping && (
+                <>
+                  <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {/* Background Image */}
+                      <img
+                        src={backgroundImage}
+                        alt="Background"
+                        className="max-w-full max-h-full object-contain z-10"
+                        onLoad={(e) => {
+                          const img = e.target;
+                          const parent = img.parentElement;
+                          if (parent) {
+                            const parentWidth = parent.clientWidth;
+                            const parentHeight = parent.clientHeight;
+                            const imgRatio = img.naturalWidth / img.naturalHeight;
+                            const parentRatio = parentWidth / parentHeight;
+
+                            if (imgRatio > parentRatio) {
+                              // Fit width-wise
+                              setImgWidth(parentWidth);
+                              setImgHeight(parentWidth / imgRatio);
+                            } else {
+                              // Fit height-wise
+                              setImgWidth(parentHeight * imgRatio);
+                              setImgHeight(parentHeight);
+                            }
+                          }
+                        }}
+                        style={{ width: imgWidth, height: imgHeight }}
+                      />
+
+                      {/* 📌 Fixed: Text Inside Image Boundaries */}
+                      <p
+                        className="absolute flex items-center justify-center text-black text-center break-words z-20"
+                        style={{
+                          maxWidth: imgWidth,
+                          maxHeight: imgHeight,
+                          wordWrap: "break-word",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          padding: '4px',
+                          fontSize: "clamp(12px, 2vw, 20px)",
+                        }}
+                      >
+                        hello Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deserunt
+                        dignissimos suscipit quidem reprehenderit molestiae quisquam magni dicta
+                        provident, temporibus iure, aut reiciendis in!
+                      </p>
+
+                      {/* Foreground Image (Removed BG) */}
+                      {bgremovedImage && (
+                        <img
+                          src={bgremovedImage}
+                          alt="Foreground"
+                          className="absolute z-30"
+                          style={{ width: imgWidth, height: imgHeight, objectFit: "contain" }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+
+
+
+              {/* Crop Tool */}
+              {isCropping && backgroundImage && (
+                <div className="absolute inset-0 z-30">
+                  <Cropper
+                    image={backgroundImage}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={aspect}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+              )}
+
+              {/* Drawing Canvas */}
+              {!isCropping && (
+                <canvas
+                  ref={canvasRef}
+                  className="absolute w-full h-full rounded-xl"
+                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight }}
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                />
+              )}
+
+              {/* Stickers Layer */}
+              {!isCropping && stickers.map(sticker => (
+                <img
+                  key={sticker.id}
+                  src={sticker.src}
+                  alt="Sticker"
+                  className="absolute w-16 h-16 object-contain cursor-move"
+                  style={{
+                    left: sticker.x,
+                    top: sticker.y,
+                    zIndex: 15,
+                    transform: draggedSticker === sticker.id ? 'scale(1.1)' : 'scale(1)',
+                    transition: 'transform 0.2s'
+                  }}
+                  onMouseDown={(e) => handleStickerMouseDown(e, sticker.id)}
+                />
+              ))}
+
+              {/* Upload Prompt */}
+              {!backgroundImage && (
+                <div className="relative z-0">
+                  <ImageIcon size={48} className="opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="text-center">
+                      <p className="text-lg font-medium mb-2" style={{ width: '250px' }}>Drop image or click to upload</p>
+                      <p className="text-sm text-gray-500">Supports JPG, PNG, WebP</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* GIPHY Sticker Selector */}
+              {showStickers && (
+                <div className="absolute top-4 left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="font-semibold">GIPHY Stickers</span>
+                    <button
+                      onClick={() => setShowStickers(false)}
+                      className="p-1 hover:bg-gray-700 rounded-full"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search stickers..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                  <div className="h-64 overflow-y-auto">
+                    <Grid
+                      width={250}
+                      columns={2}
+                      fetchGifs={async (offset: number) => gf.search(searchQuery || "trending", { limit: 50, type: "stickers", offset })}
+                      onGifClick={(gif, e) => {
+                        e.preventDefault(); // ⛔️ Prevent Giphy site from opening
+                        e.stopPropagation(); // ⛔️ Stop click event from bubbling to `<a>` tag
+                        handleGiphySelect(gif); // ✅ Select the GIF properly
+                      }}
+                      noLink={true} // ✅ Disable default link behavior
+                    />
+
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+
+
+
+
+          {/* Right Sidebar - Properties */}
+          {/* Right Sidebar - Properties */}
+          <div
+            className={`${rightSidebarOpen ? 'w-72 md:w-80' : 'w-0'} transition-all duration-300 bg-gray-800/95 backdrop-blur-sm border-l border-gray-700 relative`}
+          >
+            <button
+              onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+              className="absolute -left-3 top-4 bg-indigo-600 p-1 rounded-full hover:bg-indigo-700 transition-colors z-50"
+            >
+              <PanelRightClose size={16} className={`transform transition-transform duration-300 ${!rightSidebarOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+
+            {rightSidebarOpen && (
+              <div className="h-full p-6 overflow-y-auto">
+
+                {
+                  !croppingModeOn ?
+
+                    <div className="space-y-6">
+                      {/* Text Properties */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-lg font-semibold">
+                          <Type size={20} className="text-indigo-400" />
+                          Text Properties
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Enter text..."
+                          className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
+                        <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors">
+                          <option>Arial</option>
+                          <option>Helvetica</option>
+                          <option>Times New Roman</option>
+                          <option>Roboto</option>
+                        </select>
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            placeholder="Size"
+                            className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                          />
+                          <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
+                            Bold
+                          </button>
+                          <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
+                            Italic
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Color Properties */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-lg font-semibold">
+                          <Palette size={20} className="text-indigo-400" />
+                          Color
+                        </div>
+                        <div className="grid grid-cols-6 gap-2">
+                          {['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
+                            '#FFFFFF', '#000000', '#808080', '#FFA500', '#800080', '#008000'].map((color, index) => (
+                              <button
+                                key={index}
+                                className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
+                                style={{ backgroundColor: color }}
+                              />
+                            ))}
+                        </div>
+                        <input
+                          type="color"
+                          className="w-full h-10 bg-gray-700/50 rounded-lg cursor-pointer transition-colors"
+                        />
+                      </div>
+
+                      {/* Effects */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-lg font-semibold">
+                          <Wand2 size={20} className="text-indigo-400" />
+                          Effects
+                        </div>
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span>Brightness</span>
+                              <span className="text-indigo-400">50%</span>
+                            </div>
+                            <input
+                              type="range"
+                              className="w-full accent-indigo-500"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span>Contrast</span>
+                              <span className="text-indigo-400">50%</span>
+                            </div>
+                            <input
+                              type="range"
+                              className="w-full accent-indigo-500"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span>Saturation</span>
+                              <span className="text-indigo-400">50%</span>
+                            </div>
+                            <input
+                              type="range"
+                              className="w-full accent-indigo-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Advanced Settings */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-lg font-semibold">
+                          <SlidersHorizontal size={20} className="text-indigo-400" />
+                          Advanced
+                        </div>
+                        <div className="space-y-2">
+                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
+                            Filters
+                          </button>
+                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
+                            Adjustments
+                          </button>
+                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
+                            Transform
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    :
+
+
+
+                    <div className="space-y-6">
+                      {/* Text Properties */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-lg font-semibold">
+                          <Type size={20} className="text-indigo-400" />
+                          Select Ratio
+                        </div>
+
+                        <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors" onChange={(e) => setAspect(eval(e.target.value))}>
+                          <option value="1/1">1:1 (Square)</option>
+                          <option value="4/3">4:3 (Standard Photo)</option>
+                          <option value="16/9">16:9 (YouTube, Widescreen)</option>
+                          <option value="3/2">3:2 (DSLR Photo)</option>
+                          <option value="5/4">5:4 (Frame Prints)</option>
+                          <option value="9/16">9:16 (Stories, TikTok)</option>
+                          <option value="2/3">2:3 (Portrait Photo)</option>
+                          <option value="21/9">21:9 (Cinematic)</option>
+                        </select>
+
+                        {/* <div style={{textAlign:'center'}}>
+                          or
+                        </div> */}
+
+                        {/* <div className="flex gap-4 justify-center">
+                          <input
+                            type="number"
+                            placeholder="width"
+                            className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                            
+                          />
+                          <input
+                            type="number"
+                            placeholder="height"
+                            className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                          />
+                         
+                        </div> */}
+                      </div>
+
+
+
+                    </div>
+
+
+
+                }
+
+
+
+
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+export default Editor;

@@ -81,3 +81,27 @@ img {
   height: auto;
 }
 
+
+.cust-z-index{
+  /* background-color: pink !important; */
+  
+  z-index: 1000 !important;
+}
+
+.ijpgqP {
+  pointer-events: none !important; 
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.font-semibold{
+  
+}

@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@giphy/react-components": "^9.8.0",
     "@imgly/background-removal": "^1.5.5",
     "@imgly/background-removal-node": "^1.4.5",
+    "@next/env": "^15.1.7",
     "@radix-ui/react-slot": "^1.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -18,6 +20,9 @@
     "next": "15.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-easy-crop": "^5.2.0",
+    "react-spinners": "^0.15.0",
+    "styled-components": "^6.1.15",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
