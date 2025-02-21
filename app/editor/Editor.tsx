@@ -30,6 +30,8 @@ import {
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
+import Image from 'next/image';
+import FontSelector from '../components/Fonts';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -57,8 +59,9 @@ function Editor() {
   const [isDraggable, setIsDraggable] = useState(true);
   const [imgWidth, setImgWidth] = useState(true);
   const [imgHeight, setImgHeight] = useState(true);
-  const [brushColor, setBrushColor] = useState("#000000");  // Default black
-  const [brushSize, setBrushSize] = useState(5);  // Default size
+  const [brushColor, setBrushColor] = useState("rgb(79 70 229");  // Default black
+  const [brushSize, setBrushSize] = useState(1);
+  const [text, setText] = useState("Your Text Here");
 
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -86,6 +89,33 @@ function Editor() {
 
 
 
+  const resetCanvas = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        canvas.width = imgWidth;
+        canvas.height = imgHeight;
+
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = brushColor;
+        ctx.lineWidth = brushSize;
+
+        contextRef.current = ctx;
+      }
+    }
+  };
+
+
+
+  useEffect(() => {
+    if (!isCropping) {
+      resetCanvas(); // Crop apply/cancel hone pe canvas refresh
+    }
+  }, [isCropping, imgWidth, imgHeight, brushColor, brushSize]);
 
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
@@ -152,6 +182,8 @@ function Editor() {
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
+    console.log("Start Drawing at:", x, y); // Debugging
+
     setIsDrawing(true);
     contextRef.current.beginPath();
     contextRef.current.moveTo(x, y);
@@ -169,26 +201,27 @@ function Editor() {
     } else {
       contextRef.current.globalCompositeOperation = "source-over";
     }
-};
-
+  };
 
 
   const draw = (e: React.MouseEvent) => {
     if (!isDrawing || !contextRef.current || !canvasRef.current) return;
 
-    console.log('yooo')
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
+
+    // Canvas scaling values to maintain accuracy
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
+    console.log("Draw at:", x, y); // Debugging
+
     contextRef.current.lineTo(x, y);
     contextRef.current.stroke();
   };
-
 
 
   const stopDrawing = () => {
@@ -267,43 +300,103 @@ function Editor() {
     const image = new Image();
     image.src = backgroundImage;
 
-    await new Promise(resolve => {
-      image.onload = resolve;
-    });
+    await new Promise(resolve => (image.onload = resolve));
 
+    // Set canvas resolution based on cropped area
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
-    const ctx = canvas.getContext('2d');
 
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Draw the cropped image onto the new canvas
     ctx.drawImage(
       image,
-      croppedAreaPixels.x,
-      croppedAreaPixels.y,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height,
-      0,
-      0,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height
+      croppedAreaPixels.x, croppedAreaPixels.y,
+      croppedAreaPixels.width, croppedAreaPixels.height,
+      0, 0,
+      croppedAreaPixels.width, croppedAreaPixels.height
     );
 
+    // Update the background image with the cropped version
     setBackgroundImage(canvas.toDataURL());
-    setCroppingModeOn(false)
+
+    // Reset cropping state
+    setCroppingModeOn(false);
     setIsCropping(false);
     setSelectedTool('none');
+
+    // Reset the main canvas state
+    if (canvasRef.current) {
+      const mainCanvas = canvasRef.current;
+      const mainCtx = mainCanvas.getContext('2d');
+      if (mainCtx) {
+        const dpr = window.devicePixelRatio || 1;
+
+        // Reset canvas resolution and display size
+        mainCanvas.width = croppedAreaPixels.width * dpr;
+        mainCanvas.height = croppedAreaPixels.height * dpr;
+        mainCanvas.style.width = `${croppedAreaPixels.width}px`;
+        mainCanvas.style.height = `${croppedAreaPixels.height}px`;
+
+        // Reset context scaling
+        mainCtx.scale(dpr, dpr);
+
+        // Redraw the cropped image onto the main canvas
+        mainCtx.drawImage(canvas, 0, 0);
+
+        // Update contextRef
+        contextRef.current = mainCtx;
+
+        console.log("Canvas reset after applyCrop:", mainCanvas.width, mainCanvas.height); // Debugging
+      }
+    }
   };
 
-
   const cancelCrop = () => {
-    setIsCropping(false)
-    setCroppingModeOn(false)
-  }
+    setCroppingModeOn(false);
+    setIsCropping(false);
+    setSelectedTool('none');
+
+    // Reset the main canvas state
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const dpr = window.devicePixelRatio || 1;
+
+        // Reset canvas resolution and display size
+        canvas.width = imgWidth * dpr;
+        canvas.height = imgHeight * dpr;
+        canvas.style.width = `${imgWidth}px`;
+        canvas.style.height = `${imgHeight}px`;
+
+        // Reset context scaling
+        ctx.scale(dpr, dpr);
+
+        // Redraw the original background image
+        const image = new Image();
+        image.src = backgroundImage;
+        image.onload = () => {
+          ctx.drawImage(image, 0, 0, imgWidth, imgHeight);
+        };
+
+        // Update contextRef
+        contextRef.current = ctx;
+
+        console.log("Canvas reset after cancelCrop:", canvas.width, canvas.height); // Debugging
+      }
+    }
+  };
+
+  // const cancelCrop = () => {
+  //   setIsCropping(false)
+  //   setCroppingModeOn(false)
+  // }
 
 
-  
- 
+
+
 
 
 
@@ -457,22 +550,24 @@ function Editor() {
                       />
 
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
-                      <p
-                        className="absolute flex items-center justify-center text-black text-center break-words z-20"
-                        style={{
-                          maxWidth: imgWidth,
-                          maxHeight: imgHeight,
-                          wordWrap: "break-word",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          padding: '4px',
-                          fontSize: "clamp(12px, 2vw, 20px)",
-                        }}
-                      >
-                        hello Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deserunt
-                        dignissimos suscipit quidem reprehenderit molestiae quisquam magni dicta
-                        provident, temporibus iure, aut reiciendis in!
-                      </p>
+                      {backgroundImage && bgremovedImage && (
+
+                        <p
+                          className="absolute flex items-center justify-center text-black text-center break-words z-20"
+                          style={{
+                            maxWidth: imgWidth,
+                            maxHeight: imgHeight,
+                            wordWrap: "break-word",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            padding: '4px',
+                            fontSize: "clamp(12px, 2vw, 20px)",
+                          }}
+                        >
+                          {text}
+                        </p>
+                      )}
+
 
                       {/* Foreground Image (Removed BG) */}
                       {bgremovedImage && (
@@ -520,7 +615,7 @@ function Editor() {
 
               {/* Stickers Layer */}
               {!isCropping && stickers.map(sticker => (
-                <img
+                <Image
                   key={sticker.id}
                   src={sticker.src}
                   alt="Sticker"
@@ -621,13 +716,18 @@ function Editor() {
                           type="text"
                           placeholder="Enter text..."
                           className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                          value={backgroundImage && bgremovedImage ? text : ""}
+                          onChange={(e) => setText(e.target.value)}
                         />
-                        <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors">
+                        {/* <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors">
                           <option>Arial</option>
                           <option>Helvetica</option>
                           <option>Times New Roman</option>
                           <option>Roboto</option>
-                        </select>
+                        </select> */}
+
+<FontSelector/>
+
                         <div className="flex gap-2">
                           <input
                             type="number"

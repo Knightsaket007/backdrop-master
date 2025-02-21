@@ -1,0 +1,122 @@
+[
+    {
+      "label": "Inter",
+      "value": "Inter, sans-serif",
+      "premium": false,
+      "description": "A highly readable and versatile sans-serif font, perfect for modern designs."
+    },
+    {
+      "label": "Poppins",
+      "value": "Poppins, sans-serif",
+      "premium": false,
+      "description": "A geometric sans-serif font with a clean and modern look."
+    },
+    {
+      "label": "Lato",
+      "value": "Lato, sans-serif",
+      "premium": false,
+      "description": "A warm and professional sans-serif font, great for both headings and body text."
+    },
+    {
+      "label": "Montserrat",
+      "value": "Montserrat, sans-serif",
+      "premium": false,
+      "description": "A stylish and elegant font inspired by urban typography."
+    },
+    {
+      "label": "Raleway",
+      "value": "Raleway, sans-serif",
+      "premium": false,
+      "description": "A sleek and modern font with a unique geometric design."
+    },
+    {
+      "label": "Open Sans",
+      "value": "Open Sans, sans-serif",
+      "premium": false,
+      "description": "A neutral and highly readable font, ideal for web and mobile interfaces."
+    },
+    {
+      "label": "Playfair Display",
+      "value": "'Playfair Display', serif",
+      "premium": false,
+      "description": "A sophisticated serif font with a classic and elegant feel."
+    },
+    {
+      "label": "Merriweather",
+      "value": "Merriweather, serif",
+      "premium": false,
+      "description": "A serif font designed for readability on screens, with a traditional touch."
+    },
+    {
+      "label": "Avenir Next",
+      "value": "'Avenir Next', sans-serif",
+      "premium": true,
+      "description": "A premium geometric sans-serif font with a clean and futuristic design."
+    },
+    {
+      "label": "Futura",
+      "value": "Futura, sans-serif",
+      "premium": true,
+      "description": "A timeless geometric sans-serif font, known for its modern and minimalist style."
+    },
+    {
+      "label": "Gotham",
+      "value": "Gotham, sans-serif",
+      "premium": true,
+      "description": "A versatile and professional font inspired by urban signage."
+    },
+    {
+      "label": "Proxima Nova",
+      "value": "'Proxima Nova', sans-serif",
+      "premium": true,
+      "description": "A modern and clean sans-serif font, widely used in professional designs."
+    },
+    {
+      "label": "Circular Std",
+      "value": "'Circular Std', sans-serif",
+      "premium": true,
+      "description": "A geometric sans-serif font with a contemporary and balanced design."
+    },
+    {
+      "label": "Helvetica Now",
+      "value": "'Helvetica Now', sans-serif",
+      "premium": true,
+      "description": "A refined version of the classic Helvetica, optimized for modern use."
+    },
+    {
+      "label": "Neue Haas Grotesk",
+      "value": "'Neue Haas Grotesk', sans-serif",
+      "premium": true,
+      "description": "A revival of the original Helvetica, with a timeless and clean aesthetic."
+    },
+    {
+      "label": "Canela",
+      "value": "'Canela', serif",
+      "premium": true,
+      "description": "A premium serif font with a luxurious and editorial feel."
+    },
+    {
+      "label": "GT Walsheim",
+      "value": "'GT Walsheim', sans-serif",
+      "premium": true,
+      "description": "A geometric sans-serif font with a bold and modern personality."
+    },
+    {
+      "label": "FF Meta",
+      "value": "'FF Meta', sans-serif",
+      "premium": true,
+      "description": "A humanist sans-serif font known for its readability and versatility."
+    },
+    {
+      "label": "Tiempos Headline",
+      "value": "'Tiempos Headline', serif",
+      "premium": true,
+      "description": "A premium serif font with a contemporary and editorial style."
+    },
+    {
+      "label": "Apercu",
+      "value": "'Apercu', sans-serif",
+      "premium": true,
+      "description": "A modern and neutral sans-serif font, perfect for branding and UI design."
+    }
+  ]
