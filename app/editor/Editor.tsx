@@ -63,6 +63,7 @@ function Editor() {
   const [brushColor, setBrushColor] = useState("rgb(79 70 229");  // Default black
   const [brushSize, setBrushSize] = useState(1);
   const [text, setText] = useState("Your Text Here");
+  const [showText, setshowText] = useState(false)
 
   const [selectedFont, setSelectedFont] = useState(fonts[0].value); // Control font here
   const isPremiumUser = false;
@@ -125,12 +126,19 @@ console.log("Selected Font:", selectedFont); // Debugging
   const handleToolClick = (tool: Tool) => {
     setSelectedTool(tool);
     if (tool === 'sticker') {
-      setShowStickers(true);
+      setShowStickers(!showStickers);
+      setshowText(false);
+
     } else if (tool === 'crop' && backgroundImage && !bgremovedImage) {
       setIsCropping(true);
       // setRightSidebarOpen(false);
       setCroppingModeOn(true)
-    } else {
+    } 
+    else if (tool === 'text') {
+      setshowText(!showText);
+      setShowStickers(false);
+    } 
+    else {
       setShowStickers(false);
     }
   };
@@ -252,7 +260,7 @@ console.log("Selected Font:", selectedFont); // Debugging
 
   const clickHandler = () => {
 
-    if (backgroundImage || showStickers) return;
+    if (backgroundImage || showStickers || showText) return;
 
     const input = document.createElement("input");
     input.type = "file";
@@ -307,8 +315,8 @@ console.log("Selected Font:", selectedFont); // Debugging
     await new Promise(resolve => (image.onload = resolve));
 
     // Set canvas resolution based on cropped area
-    canvas.width = croppedAreaPixels.width;
-    canvas.height = croppedAreaPixels.height;
+    canvas.width = croppedAreaPixels.width ;
+    canvas.height = croppedAreaPixels.height ;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -683,6 +691,16 @@ console.log("Selected Font:", selectedFont); // Debugging
                     />
 
                   </div>
+                </div>
+              )}
+
+
+              {/* show Text */}
+              {showText && (
+                <div className="absolute  left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
+                  hello
+                 
+                  
                 </div>
               )}
             </div>

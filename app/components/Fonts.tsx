@@ -12,19 +12,6 @@ import {
 
 const FontSelector = ({ selectedFont, setSelectedFont, isPremiumUser = false }) => (
   <>
-    {/* Dynamically load Google Fonts */}
-    {/* <Head>
-      {fonts.map((font) =>
-        font.googleFontLink ? (
-          <link
-            key={font.value}
-            href={font.googleFontLink}
-            rel="stylesheet"
-            crossOrigin="anonymous"
-          />
-        ) : null
-      )}
-    </Head> */}
 
     <Select value={selectedFont} onValueChange={setSelectedFont}>
       <SelectTrigger className="w-full bg-gray-800/80 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 text-white">
