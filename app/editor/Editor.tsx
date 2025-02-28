@@ -32,6 +32,7 @@ import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
 import Image from 'next/image';
 import FontSelector from '../components/Fonts';
+import fonts from '@/app/font/font.json';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -63,10 +64,13 @@ function Editor() {
   const [brushSize, setBrushSize] = useState(1);
   const [text, setText] = useState("Your Text Here");
 
+  const [selectedFont, setSelectedFont] = useState(fonts[0].value); // Control font here
+  const isPremiumUser = false;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [aspect, setAspect] = useState(1);
+  
 
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
@@ -87,7 +91,7 @@ function Editor() {
     }
   }, []);
 
-
+console.log("Selected Font:", selectedFont); // Debugging
 
   const resetCanvas = () => {
     const canvas = canvasRef.current;
@@ -550,7 +554,7 @@ function Editor() {
                       />
 
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
-                      {backgroundImage && bgremovedImage && (
+                      {/* {backgroundImage && bgremovedImage && ( */}
 
                         <p
                           className="absolute flex items-center justify-center text-black text-center break-words z-20"
@@ -561,12 +565,14 @@ function Editor() {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             padding: '4px',
-                            fontSize: "clamp(12px, 2vw, 20px)",
+                            fontSize: "clamp(12px, 2vw, 120px)",
+                            fontFamily: selectedFont,
+                            fontWeight:700,
                           }}
                         >
                           {text}
                         </p>
-                      )}
+                      {/* )} */}
 
 
                       {/* Foreground Image (Removed BG) */}
@@ -726,7 +732,13 @@ function Editor() {
                           <option>Roboto</option>
                         </select> */}
 
-<FontSelector/>
+
+                        <FontSelector
+                          selectedFont={selectedFont}
+                          setSelectedFont={setSelectedFont}
+                          isPremiumUser={isPremiumUser}
+                        />
+
 
                         <div className="flex gap-2">
                           <input

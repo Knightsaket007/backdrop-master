@@ -1,10 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Zeyada&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300..700&family=Orbitron:wght@400..900&family=Pacifico&family=Rajdhani:wght@300;400;500;600;700&family=Shafarik&family=Zeyada&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300..700&family=Orbitron:wght@400..900&family=Pacifico&family=Permanent+Marker&family=Rajdhani:wght@300;400;500;600;700&family=Shadows+Into+Light&family=Shafarik&family=Zeyada&display=swap');
+
+@import url("https://use.typekit.net/gnv0fxf.css");
+@import url("https://use.typekit.net/mhr6gpd.css");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Grape+Nuts&family=Jura:wght@300..700&family=Noto+Sans+TC:wght@100..900&family=Orbitron:wght@400..900&family=Pacifico&family=Permanent+Marker&family=Rajdhani:wght@300;400;500;600;700&family=Righteous&family=Shadows+Into+Light&family=Shafarik&family=Zeyada&display=swap");
+
+
+
+@font-face {
+  font-family: 'UnifontexMono';
+  src: url('/fonts/Unifontexmono-2vrqo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CreamySugar';
+  src: url('/fonts/CreamySugar-gxnGR.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dangernight';
+  src: url('/fonts/Dangernight-vnZ5y.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CrotahFreeVersionItalic';
+  src: url('/fonts/CrotahFreeVersionItalic-z8Ev3.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AndroidInsomniaRegular';
+  src: url('/fonts/AndroidInsomniaRegular-RLxW.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Ava';
+  src: url('/fonts/Ava-zrRWG.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AdamasRegular';
+  src: url('/fonts/AdamasRegular-aM4g.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Adonay';
+  src: url('/fonts/Adonay-lgZdw.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AThemeForMurder';
+  src: url('/fonts/AThemeForMurder-3aPG.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'KingthingsSpikeless';
+  src: url('/fonts/KingthingsSpikeless-lKPZ.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Whoa';
+  src: url('/fonts/Whoa-p3ar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'EgyptienneZierinitialien';
+  src: url('/fonts/EgyptienneZierinitialien-Rpj6.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PatchedPersonalUseOnlyBlack';
+  src: url('/fonts/PatchedPersonalUseOnlyBlack-GOyOG.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RhodeIsland';
+  src: url('/fonts/RhodeIsland-drqRV.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AutumnFlowers';
+  src: url('/fonts/AutumnFlowers-9YVZK.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Futurr';
+  src: url('/fonts/Futurr-xO7V.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HussarPrzerywany';
+  src: url('/fonts/HussarPrzerywany-XRy9.otf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NightPumpkind';
+  src: url('/fonts/NightPumpkind-1GpGv.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ChitongtrialRegular';
+  src: url('/fonts/ChitongtrialRegular-YqGJ2.otf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Osake';
+  src: url('/fonts/Osake-x3oqj.otf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Genjiro';
+  src: url('/fonts/Genjiro-JRymx.otf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NearoRoundedRegular';
+  src: url('/fonts/NearoRoundedRegular-nRq64.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Haloberry';
+  src: url('/fonts/Haloberry-nAdrJ.otf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* @import url('https://fonts.googleapis.com/css2?family=Avenir+Next&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Futura&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gotham&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Proxima+Nova&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Circular+Std&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Helvetica+Now&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Neue+Haas+Grotesk&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Canela&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=GT+Walsheim&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=FF+Meta&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tiempos+Headline&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Apercu&display=swap'); */
+
+
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
 
 @layer base {
   :root {
@@ -107,7 +308,6 @@ input[type="number"] {
 } */
 
 
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -116,3 +316,5 @@ input[type="number"] {
     @apply bg-background text-foreground;
   }
 }
+
+
