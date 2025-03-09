@@ -5,6 +5,31 @@
     "premium": false
   },
   {
+    "label": "Poppins",
+    "value": "Poppins, sans-serif",
+    "premium": false
+  },
+  {
+    "label": "Montserrat",
+    "value": "Montserrat, sans-serif",
+    "premium": false
+  },
+  {
+    "label": "Raleway",
+    "value": "Raleway, sans-serif",
+    "premium": false
+  },
+  {
+    "label": "Open Sans",
+    "value": "Open Sans, sans-serif",
+    "premium": false
+  },
+  {
+    "label": "Playfair Display",
+    "value": "'Playfair Display', serif",
+    "premium": false
+  },
+  {
     "label": "Jura",
     "value": "'Jura', serif",
     "premium": false
@@ -37,31 +62,6 @@
   {
     "label": "Pacifico",
     "value": "'Pacifico', serif",
-    "premium": false
-  },
- {
-    "label": "Poppins",
-    "value": "Poppins, sans-serif",
-    "premium": false
-  },
-  {
-    "label": "Montserrat",
-    "value": "Montserrat, sans-serif",
-    "premium": false
-  },
-  {
-    "label": "Raleway",
-    "value": "Raleway, sans-serif",
-    "premium": false
-  },
-  {
-    "label": "Open Sans",
-    "value": "Open Sans, sans-serif",
-    "premium": false
-  },
-  {
-    "label": "Playfair Display",
-    "value": "'Playfair Display', serif",
     "premium": false
   },
   {

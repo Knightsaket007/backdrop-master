@@ -26,13 +26,18 @@ import {
   Filter,
   X,
   Check,
-  Loader
+  Loader,
+  Plus,
+  Trash2,
+  Trash
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
 import Image from 'next/image';
 import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
+import { Button } from '@/components/ui/button';
+import { toast, Toaster } from 'sonner';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -60,10 +65,16 @@ function Editor() {
   const [isDraggable, setIsDraggable] = useState(true);
   const [imgWidth, setImgWidth] = useState(true);
   const [imgHeight, setImgHeight] = useState(true);
-  const [brushColor, setBrushColor] = useState("rgb(79 70 229");  // Default black
+  const [brushColor, setBrushColor] = useState("rgb(79 70 229)");  // Default black
   const [brushSize, setBrushSize] = useState(1);
-  const [text, setText] = useState("Your Text Here");
   const [showText, setshowText] = useState(false)
+
+  const [text, setText] = useState("Your Text Here");
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string }[]>([
+    { id: Date.now(), content: "Your Text ", fontFamily: 'inter' },
+  ]);
+  const [activeTextId, setActiveTextId] = useState<number>(1);
+
 
   const [selectedFont, setSelectedFont] = useState(fonts[0].value); // Control font here
   const isPremiumUser = false;
@@ -71,9 +82,56 @@ function Editor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [aspect, setAspect] = useState(1);
-  
+
 
   const [croppingModeOn, setCroppingModeOn] = useState(false)
+
+
+
+
+  // -=-=-=-=For text-=-=-=-//
+  // -=-=-=-=For text-=-=-=-//
+  const addText = () => {
+    if (texts.length < 4) {
+      const newText = { id: Date.now(), content: "New Text" };
+      setTexts([...texts, newText]);
+      setActiveTextId(newText.id);
+    } else {
+      // alert("Max 10 text layers allowed!");
+      toast("Maximum 4 text layers allowed!", {
+        description: 'Subscribe for more layers'
+      })
+    }
+  };
+
+  const updateText = (id: number, newContent: string) => {
+    setTexts((prev) =>
+      prev.map((text) => (text.id === id ? { ...text, content: newContent } : text))
+    );
+  };
+
+  const setActive = (id: number) => {
+    setActiveTextId(id);
+    console.log('active text...', activeTextId)
+  };
+
+
+  const deleteText = (id: number) => {
+    console.log('llll090..', texts.length)
+    if (texts.length === 1) {
+      toast('minimum one layer should be there')
+      return;
+    }
+    setTexts((prev) => prev.filter((text) => text.id !== id));
+
+    if (activeTextId === id) {
+      setActiveTextId(texts.length > 1 ? texts[0].id : 0);
+    }
+  };
+
+
+
+
 
   // Initialize canvas
   useEffect(() => {
@@ -92,7 +150,7 @@ function Editor() {
     }
   }, []);
 
-console.log("Selected Font:", selectedFont); // Debugging
+  console.log("Selected Font:", selectedFont); // Debugging
 
   const resetCanvas = () => {
     const canvas = canvasRef.current;
@@ -133,11 +191,11 @@ console.log("Selected Font:", selectedFont); // Debugging
       setIsCropping(true);
       // setRightSidebarOpen(false);
       setCroppingModeOn(true)
-    } 
+    }
     else if (tool === 'text') {
       setshowText(!showText);
       setShowStickers(false);
-    } 
+    }
     else {
       setShowStickers(false);
     }
@@ -315,8 +373,8 @@ console.log("Selected Font:", selectedFont); // Debugging
     await new Promise(resolve => (image.onload = resolve));
 
     // Set canvas resolution based on cropped area
-    canvas.width = croppedAreaPixels.width ;
-    canvas.height = croppedAreaPixels.height ;
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -564,22 +622,22 @@ console.log("Selected Font:", selectedFont); // Debugging
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
                       {/* {backgroundImage && bgremovedImage && ( */}
 
-                        <p
-                          className="absolute flex items-center justify-center text-black text-center break-words z-20"
-                          style={{
-                            maxWidth: imgWidth,
-                            maxHeight: imgHeight,
-                            wordWrap: "break-word",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            padding: '4px',
-                            fontSize: "clamp(12px, 2vw, 120px)",
-                            fontFamily: selectedFont,
-                            fontWeight:700,
-                          }}
-                        >
-                          {text}
-                        </p>
+                      <p
+                        className="absolute flex items-center justify-center text-black text-center break-words z-20"
+                        style={{
+                          maxWidth: imgWidth,
+                          maxHeight: imgHeight,
+                          wordWrap: "break-word",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          padding: '4px',
+                          fontSize: "clamp(12px, 2vw, 120px)",
+                          fontFamily: selectedFont,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {text}
+                      </p>
                       {/* )} */}
 
 
@@ -697,10 +755,25 @@ console.log("Selected Font:", selectedFont); // Debugging
 
               {/* show Text */}
               {showText && (
-                <div className="absolute  left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
-                  hello
-                 
-                  
+                <div className="absolute left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
+                  <h2 className="text-white mb-2">Text Layers</h2>
+
+                  <div className='max-h-96 overflow-y-auto'>
+                    {texts.map((text, index: number) => (
+                      <div
+                        key={text.id}
+                        className={`p-2 rounded cursor-pointer flex justify-between ${activeTextId === text.id ? "bg-slate-500 text-white" : "bg-gray-700 text-gray-300"
+                          }`}
+                        onClick={() => setActive(text.id)}
+                      >
+                        <span>{text.content} {index + 1}</span>
+                        <button className="ml-2 text-red-400" onClick={() => deleteText(text.id)}><Trash2 /></button>
+                      </div>
+                    ))}
+
+                  </div>
+
+                  <Button onClick={addText} className=" mt-2 px-4 rounded-lg transition-all duration-200 group relative hover:scale-110 bg-indigo-600 hover:bg-indigo-700"><Plus /> Add Text</Button>
                 </div>
               )}
             </div>
@@ -914,7 +987,10 @@ console.log("Selected Font:", selectedFont); // Debugging
           </div>
         </div>
       </div>
+
+      <Toaster position='top-center' theme='light' />
     </div>
+
   );
 }
 

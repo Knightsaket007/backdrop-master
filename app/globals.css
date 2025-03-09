@@ -318,3 +318,20 @@ input[type="number"] {
 }
 
 
+::-webkit-scrollbar {
+  width: 6px; 
+}
+
+::-webkit-scrollbar-track {
+  background: #2d2d2d; /* Dark background */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(79 70 229) ; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(144, 141, 204); /* Hover effect */
+}
