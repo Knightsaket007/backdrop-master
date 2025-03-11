@@ -71,21 +71,29 @@ function Editor() {
 
   const [text, setText] = useState("Your Text Here");
   const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string }[]>([
-    { id: Date.now(), content: "Your Text ", fontFamily: 'inter' },
+    { id: Date.now(), content: "Your Text ", fontFamily: 'Inter' },
   ]);
-  const [activeTextId, setActiveTextId] = useState<number>(1);
+  const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
 
-  const [selectedFont, setSelectedFont] = useState(fonts[0].value); // Control font here
+  // const [selectedFont, setSelectedFont] = useState(fonts[0].value); 
+  const [selectedFont, setSelectedFont] = useState(texts[0]?.fontFamily || fonts[0].value);
   const isPremiumUser = false;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [aspect, setAspect] = useState(1);
 
-
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
+
+
+  useEffect(() => {
+    const activeText = texts.find((text) => text.id === activeTextId);
+    if (activeText) {
+      setSelectedFont(activeText.fontFamily);
+    }
+  }, [activeTextId, texts]);
 
 
 
@@ -766,7 +774,12 @@ function Editor() {
                           }`}
                         onClick={() => setActive(text.id)}
                       >
-                        <span>{text.content} {index + 1}</span>
+                        {/* <span>{text.content} {index + 1}</span> */}
+                        <span>
+                          {text.content.length > 20
+                            ? `${index + 1}. ${text.content.substring(0, 20)}...`
+                            : `${index + 1}. ${text.content}`}
+                        </span>
                         <button className="ml-2 text-red-400" onClick={() => deleteText(text.id)}><Trash2 /></button>
                       </div>
                     ))}
@@ -809,13 +822,28 @@ function Editor() {
                           <Type size={20} className="text-indigo-400" />
                           Text Properties
                         </div>
+
+
                         <input
                           type="text"
                           placeholder="Enter text..."
                           className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
-                          value={backgroundImage && bgremovedImage ? text : ""}
-                          onChange={(e) => setText(e.target.value)}
+                          value={
+                            backgroundImage
+                              ? texts.find((text) => text.id === activeTextId)?.content || ""
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const updatedTexts = texts.map((text) =>
+                              text.id === activeTextId
+                                ? { ...text, content: e.target.value } // Active text update hoga
+                                : text
+                            );
+                            setTexts(updatedTexts);
+                          }}
                         />
+
+
                         {/* <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors">
                           <option>Arial</option>
                           <option>Helvetica</option>
@@ -824,11 +852,24 @@ function Editor() {
                         </select> */}
 
 
-                        <FontSelector
+                        {/* <FontSelector
                           selectedFont={selectedFont}
                           setSelectedFont={setSelectedFont}
                           isPremiumUser={isPremiumUser}
-                        />
+                        /> */}
+
+<FontSelector
+  selectedFont={selectedFont}
+  setSelectedFont={(font:string) => {
+    setSelectedFont(font); 
+    setTexts((prevTexts) =>
+      prevTexts.map((text) =>
+        text.id === activeTextId ? { ...text, fontFamily: font } : text
+      )
+    );
+  }}
+  isPremiumUser={isPremiumUser}
+/>
 
 
                         <div className="flex gap-2">

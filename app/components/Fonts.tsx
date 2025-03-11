@@ -16,6 +16,7 @@ const FontSelector = ({ selectedFont, setSelectedFont, isPremiumUser = false }) 
     <Select value={selectedFont} onValueChange={setSelectedFont}>
       <SelectTrigger className="w-full bg-gray-800/80 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 text-white">
         <SelectValue placeholder="Select Font" style={{ fontFamily: selectedFont }} />
+        
       </SelectTrigger>
 
       <SelectContent className="bg-gray-800 border-b-slate-400">
