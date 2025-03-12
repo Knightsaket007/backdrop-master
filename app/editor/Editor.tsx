@@ -71,7 +71,7 @@ function Editor() {
 
   const [text, setText] = useState("Your Text Here");
   const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string }[]>([
-    { id: Date.now(), content: "Your Text ", fontFamily: 'Inter' },
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif" },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -101,7 +101,7 @@ function Editor() {
   // -=-=-=-=For text-=-=-=-//
   const addText = () => {
     if (texts.length < 4) {
-      const newText = { id: Date.now(), content: "New Text" };
+      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif' };
       setTexts([...texts, newText]);
       setActiveTextId(newText.id);
     } else {
@@ -630,22 +630,25 @@ function Editor() {
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
                       {/* {backgroundImage && bgremovedImage && ( */}
 
-                      <p
-                        className="absolute flex items-center justify-center text-black text-center break-words z-20"
-                        style={{
-                          maxWidth: imgWidth,
-                          maxHeight: imgHeight,
-                          wordWrap: "break-word",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          padding: '4px',
-                          fontSize: "clamp(12px, 2vw, 120px)",
-                          fontFamily: selectedFont,
-                          fontWeight: 700,
-                        }}
-                      >
-                        {text}
-                      </p>
+                      {texts.map((text) => (
+                        <p
+                          key={text.id}
+                          className="absolute flex items-center justify-center text-black text-center break-words z-20"
+                          style={{
+                            maxWidth: imgWidth,
+                            maxHeight: imgHeight,
+                            wordWrap: "break-word",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            padding: '4px',
+                            fontSize: "clamp(12px, 3vw, 120px)",
+                            fontFamily: text.fontFamily, // Individual font for each text
+                            fontWeight: 700,
+                          }}
+                        >
+                          {text.content}
+                        </p>
+                      ))}
                       {/* )} */}
 
 
@@ -858,18 +861,18 @@ function Editor() {
                           isPremiumUser={isPremiumUser}
                         /> */}
 
-<FontSelector
-  selectedFont={selectedFont}
-  setSelectedFont={(font:string) => {
-    setSelectedFont(font); 
-    setTexts((prevTexts) =>
-      prevTexts.map((text) =>
-        text.id === activeTextId ? { ...text, fontFamily: font } : text
-      )
-    );
-  }}
-  isPremiumUser={isPremiumUser}
-/>
+                        <FontSelector
+                          selectedFont={selectedFont}
+                          setSelectedFont={(font: string) => {
+                            setSelectedFont(font);
+                            setTexts((prevTexts) =>
+                              prevTexts.map((text) =>
+                                text.id === activeTextId ? { ...text, fontFamily: font } : text
+                              )
+                            );
+                          }}
+                          isPremiumUser={isPremiumUser}
+                        />
 
 
                         <div className="flex gap-2">
