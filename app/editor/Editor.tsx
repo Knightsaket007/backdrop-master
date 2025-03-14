@@ -74,6 +74,8 @@ function Editor() {
   const [brushSize, setBrushSize] = useState(1);
   const [showText, setshowText] = useState(false)
 
+  const [selectedColor, setSelectedColor] = useState()
+
   // const [text, setText] = useState("Your Text Here");
   const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean }[]>([
     { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false },
@@ -990,20 +992,20 @@ function Editor() {
                           className="w-full h-10 bg-gray-700/50 rounded-lg cursor-pointer transition-colors"
                         /> */}
 
-<Popover>
-      <PopoverTrigger asChild>
-        <Button
-          className="w-10 h-9 w-full border-2"
-          // style={{ backgroundColor: selectedColor }}
-        />
-      </PopoverTrigger>
-      <PopoverContent className="p-2 bg-gray-800 border border-gray-700 rounded-lg">
-        <SketchPicker
-          // color={selectedColor}
-          // onChange={(color) => setSelectedColor(color.hex)}
-        />
-      </PopoverContent>
-    </Popover>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              className="h-9 w-full border-2"
+                            // style={{ backgroundColor: selectedColor }}
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent className="p-2 bg-gray-800 border border-gray-700 rounded-lg">
+                            <SketchPicker
+                            // color={selectedColor}
+                            // onChange={(color) => setSelectedColor(color.hex)}
+                            />
+                          </PopoverContent>
+                        </Popover>
 
 
                       </div>
