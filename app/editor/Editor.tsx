@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Cropper from 'react-easy-crop';
+import Cropper, { Area } from 'react-easy-crop';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Grid } from '@giphy/react-components';
 import {
@@ -38,6 +38,7 @@ import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
 import { Button } from '@/components/ui/button';
 import { toast, Toaster } from 'sonner';
+import { text } from 'node:stream/consumers';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -58,20 +59,23 @@ function Editor() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [isCropping, setIsCropping] = useState(false);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  // const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [draggedSticker, setDraggedSticker] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeLoader, setactiveLoader] = useState(false);
   const [isDraggable, setIsDraggable] = useState(true);
-  const [imgWidth, setImgWidth] = useState(true);
-  const [imgHeight, setImgHeight] = useState(true);
+  // const [imgWidth, setImgWidth] = useState(true);
+  // const [imgHeight, setImgHeight] = useState(true);
+  const [imgWidth, setImgWidth] = useState(0);
+  const [imgHeight, setImgHeight] = useState(0);
   const [brushColor, setBrushColor] = useState("rgb(79 70 229)");  // Default black
   const [brushSize, setBrushSize] = useState(1);
   const [showText, setshowText] = useState(false)
 
-  const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif" },
+  // const [text, setText] = useState("Your Text Here");
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -101,7 +105,7 @@ function Editor() {
   // -=-=-=-=For text-=-=-=-//
   const addText = () => {
     if (texts.length < 4) {
-      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif' };
+      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)",', bold: false, italic: false };
       setTexts([...texts, newText]);
       setActiveTextId(newText.id);
     } else {
@@ -366,16 +370,22 @@ function Editor() {
 
 
   // Handle crop complete
-  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+  // const onCropComplete = (croppedArea, croppedAreaPixels) => {
+  //   setCroppedAreaPixels(croppedAreaPixels);
+  // };
+
+  const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
+
 
   // Apply crop
   const applyCrop = async () => {
     if (!croppedAreaPixels || !backgroundImage) return;
 
     const canvas = document.createElement('canvas');
-    const image = new Image();
+    // const image = new Image();
+    const image = new window.Image();
     image.src = backgroundImage;
 
     await new Promise(resolve => (image.onload = resolve));
@@ -455,6 +465,7 @@ function Editor() {
         // Redraw the original background image
         const image = new Image();
         image.src = backgroundImage;
+
         image.onload = () => {
           ctx.drawImage(image, 0, 0, imgWidth, imgHeight);
         };
@@ -641,9 +652,9 @@ function Editor() {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             padding: '4px',
-                            fontSize: "clamp(12px, 3vw, 120px)",
+                            fontSize: text.size,
                             fontFamily: text.fontFamily, // Individual font for each text
-                            fontWeight: 700,
+                            fontWeight: (text.bold) ? 'bold' : '',
                           }}
                         >
                           {text.content}
@@ -878,13 +889,44 @@ function Editor() {
                         <div className="flex gap-2">
                           <input
                             type="number"
-                            placeholder="Size"
+                            placeholder="Size(px)"
                             className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                            // onChange={(e)=>setTexts(texts[activeTextId].size(e.target.value))}
+                            value={
+                              texts.find((text) => text.id === activeTextId)?.size.replace('px', '') || ''
+                            }
+                            onChange={(e) => {
+                              let newSize = parseInt(e.target.value, 10);
+                              if (isNaN(newSize)) return; // Agar invalid number ho toh kuch na kare
+
+                              // Limiting logic
+                              newSize = Math.max(10, Math.min(newSize, 120));
+
+                              // Add 'px' suffix
+                              const newSizeWithPx = `${newSize}px`;
+
+                              console.log('new size is', newSizeWithPx);
+
+                              setTexts((prevTexts) =>
+                                prevTexts.map((text) =>
+                                  text.id === activeTextId ? { ...text, size: newSizeWithPx } : text
+                                )
+                              );
+                            }}
                           />
-                          <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
+                          {/* <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
+                            Bold
+                          </button> */}
+                          <button
+                            className={`flex-1 ${texts[activeTextId]?.bold ? 'bg-gray-600' : 'bg-gray-700/50'} hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors`}
+                            // onClick={}
+                          >
+
                             Bold
                           </button>
-                          <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
+
+
+                          <button className="flex-1 rounded-lg px-3 py-2 transition-colors  bg-gray-700/50 hover:bg-gray-600">
                             Italic
                           </button>
                         </div>
@@ -903,6 +945,7 @@ function Editor() {
                                 key={index}
                                 className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
                                 style={{ backgroundColor: color }}
+
                               />
                             ))}
                         </div>
