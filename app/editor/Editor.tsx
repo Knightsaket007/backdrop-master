@@ -38,7 +38,8 @@ import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
 import { Button } from '@/components/ui/button';
 import { toast, Toaster } from 'sonner';
-import { text } from 'node:stream/consumers';
+import { SketchPicker } from 'react-color';
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -69,7 +70,7 @@ function Editor() {
   // const [imgHeight, setImgHeight] = useState(true);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [brushColor, setBrushColor] = useState("rgb(79 70 229)");  // Default black
+  const [brushColor, setBrushColor] = useState("rgb(79 70 229)");
   const [brushSize, setBrushSize] = useState(1);
   const [showText, setshowText] = useState(false)
 
@@ -485,10 +486,6 @@ function Editor() {
 
 
 
-
-
-
-
   return (
 
 
@@ -653,7 +650,8 @@ function Editor() {
                             textOverflow: "ellipsis",
                             padding: '4px',
                             fontSize: text.size,
-                            fontFamily: text.fontFamily, // Individual font for each text
+                            fontFamily: text.fontFamily,
+                            fontStyle: (text.italic) ? 'italic' : '',
                             fontWeight: (text.bold) ? 'bold' : '',
                           }}
                         >
@@ -918,15 +916,40 @@ function Editor() {
                             Bold
                           </button> */}
                           <button
-                            className={`flex-1 ${texts[activeTextId]?.bold ? 'bg-gray-600' : 'bg-gray-700/50'} hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors`}
-                            // onClick={}
+                            className={`flex-1 ${texts.find((text) => text.id === activeTextId)?.bold
+                              ? 'bg-gray-600'
+                              : 'bg-gray-700/50'} 
+                              hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors`}
+                            onClick={() =>
+                              setTexts((prevTexts) =>
+                                prevTexts.map((text) =>
+                                  text.id === activeTextId
+                                    ? { ...text, bold: !text.bold }
+                                    : text
+                                )
+                              )
+                            }
                           >
 
                             Bold
                           </button>
 
 
-                          <button className="flex-1 rounded-lg px-3 py-2 transition-colors  bg-gray-700/50 hover:bg-gray-600">
+                          <button
+                            className={`flex-1 ${texts.find((text) => text.id === activeTextId)?.italic
+                              ? 'bg-gray-600'
+                              : 'bg-gray-700/50'} 
+                            hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors`}
+                            onClick={() =>
+                              setTexts((prevTexts) =>
+                                prevTexts.map((text) =>
+                                  text.id === activeTextId
+                                    ? { ...text, italic: !text.italic }
+                                    : text
+                                )
+                              )
+                            }
+                          >
                             Italic
                           </button>
                         </div>
@@ -939,8 +962,21 @@ function Editor() {
                           Color
                         </div>
                         <div className="grid grid-cols-6 gap-2">
-                          {['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
-                            '#FFFFFF', '#000000', '#808080', '#FFA500', '#800080', '#008000'].map((color, index) => (
+                          {[
+                            '#E63946', // Red
+                            '#F4A261', // Orange
+                            '#2A9D8F', // Teal
+                            '#264653', // Deep Navy
+                            '#A8DADC', // Aqua
+                            '#457B9D', // Blue
+                            '#1D3557', // Dark Blue
+                            '#F4D35E', // Yellow
+                            '#EE6C4D', // Coral
+                            '#3D405B', // Greyish Blue
+                            '#C56C86', // Rose Pink
+                            '#6A0572'  // Purple
+                          ]
+                            .map((color, index) => (
                               <button
                                 key={index}
                                 className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
@@ -949,10 +985,27 @@ function Editor() {
                               />
                             ))}
                         </div>
-                        <input
+                        {/* <input
                           type="color"
                           className="w-full h-10 bg-gray-700/50 rounded-lg cursor-pointer transition-colors"
-                        />
+                        /> */}
+
+<Popover>
+      <PopoverTrigger asChild>
+        <Button
+          className="w-10 h-9 w-full border-2"
+          // style={{ backgroundColor: selectedColor }}
+        />
+      </PopoverTrigger>
+      <PopoverContent className="p-2 bg-gray-800 border border-gray-700 rounded-lg">
+        <SketchPicker
+          // color={selectedColor}
+          // onChange={(color) => setSelectedColor(color.hex)}
+        />
+      </PopoverContent>
+    </Popover>
+
+
                       </div>
 
                       {/* Effects */}
