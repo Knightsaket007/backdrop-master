@@ -26,10 +26,8 @@ import {
   Filter,
   X,
   Check,
-  Loader,
   Plus,
   Trash2,
-  Trash
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
@@ -38,7 +36,7 @@ import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
 import { Button } from '@/components/ui/button';
 import { toast, Toaster } from 'sonner';
-import { SketchPicker } from 'react-color';
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
@@ -74,11 +72,12 @@ function Editor() {
   const [brushSize, setBrushSize] = useState(1);
   const [showText, setshowText] = useState(false)
 
-  const [selectedColor, setSelectedColor] = useState()
+  const [selectedColor, setSelectedColor] = useState('#000000');
+
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color:string }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color:'#000000' },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -999,11 +998,15 @@ function Editor() {
                             // style={{ backgroundColor: selectedColor }}
                             />
                           </PopoverTrigger>
-                          <PopoverContent className="p-2 bg-gray-800 border border-gray-700 rounded-lg">
-                            <SketchPicker
-                            // color={selectedColor}
-                            // onChange={(color) => setSelectedColor(color.hex)}
-                            />
+                          <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                          <HexColorPicker  color={selectedColor} onChange={(newcolor)=>setSelectedColor(newcolor)} />
+
+                          <HexColorInput 
+    color={selectedColor} 
+    onChange={(newColor) => setSelectedColor(newColor)} 
+    className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+  />
+
                           </PopoverContent>
                         </Popover>
 
