@@ -38,6 +38,7 @@ import { Button } from '@/components/ui/button';
 import { toast, Toaster } from 'sonner';
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import Colors from '../utils/Colors';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -76,8 +77,8 @@ function Editor() {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color:string }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color:'#000000' },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000' },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -118,30 +119,36 @@ function Editor() {
     }
   };
 
-  const updateText = (id: number, newContent: string) => {
-    setTexts((prev) =>
-      prev.map((text) => (text.id === id ? { ...text, content: newContent } : text))
-    );
-  };
+  // const updateText = (id: number, newContent: string) => {
+  //   setTexts((prev) =>
+  //     prev.map((text) => (text.id === id ? { ...text, content: newContent } : text))
+  //   );
+  // };
 
   const setActive = (id: number) => {
     setActiveTextId(id);
     console.log('active text...', activeTextId)
   };
 
-
   const deleteText = (id: number) => {
-    console.log('llll090..', texts.length)
     if (texts.length === 1) {
-      toast('minimum one layer should be there')
+      toast('Minimum one layer should be there');
       return;
     }
-    setTexts((prev) => prev.filter((text) => text.id !== id));
 
-    if (activeTextId === id) {
-      setActiveTextId(texts.length > 1 ? texts[0].id : 0);
-    }
+    setTexts((prev) => {
+      const newTexts = prev.filter((text) => text.id !== id);
+
+      if (activeTextId === id) {
+        // First element delete ho raha ho toh naya active element pehla element hi hoga
+        const newActiveText = newTexts[0];
+        setActiveTextId(newActiveText?.id || 0);
+      }
+
+      return newTexts;
+    });
   };
+
 
 
 
@@ -654,6 +661,7 @@ function Editor() {
                             fontFamily: text.fontFamily,
                             fontStyle: (text.italic) ? 'italic' : '',
                             fontWeight: (text.bold) ? 'bold' : '',
+                            color:text.color,
                           }}
                         >
                           {text.content}
@@ -890,29 +898,53 @@ function Editor() {
                             type="number"
                             placeholder="Size(px)"
                             className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
-                            // onChange={(e)=>setTexts(texts[activeTextId].size(e.target.value))}
-                            value={
-                              texts.find((text) => text.id === activeTextId)?.size.replace('px', '') || ''
-                            }
+                            value={texts.find((text) => text.id === activeTextId)?.size.replace('px', '') || ''}
+
+                            // Input ke waqt value control
                             onChange={(e) => {
-                              let newSize = parseInt(e.target.value, 10);
-                              if (isNaN(newSize)) return; // Agar invalid number ho toh kuch na kare
+                              let value = e.target.value;
 
-                              // Limiting logic
-                              newSize = Math.max(10, Math.min(newSize, 120));
+                              // Agar blank ho toh khaali rakhne de
+                              if (value === '') {
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, size: '' } : text
+                                  )
+                                );
+                                return;
+                              }
 
-                              // Add 'px' suffix
-                              const newSizeWithPx = `${newSize}px`;
+                              // Valid number check
+                              if (!/^\d*$/.test(value)) return;
 
-                              console.log('new size is', newSizeWithPx);
+                              // Max limit lagao (live typing par)
+                              if (Number(value) > 400) {
+                                value = '400';
+                              }
 
                               setTexts((prevTexts) =>
                                 prevTexts.map((text) =>
-                                  text.id === activeTextId ? { ...text, size: newSizeWithPx } : text
+                                  text.id === activeTextId ? { ...text, size: `${value}px` } : text
+                                )
+                              );
+                            }}
+
+                            // Blur pe minimum value fix karo
+                            onBlur={(e) => {
+                              let value = Number(e.target.value);
+
+                              if (isNaN(value) || value < 10) {
+                                value = 10;
+                              }
+
+                              setTexts((prevTexts) =>
+                                prevTexts.map((text) =>
+                                  text.id === activeTextId ? { ...text, size: `${value}px` } : text
                                 )
                               );
                             }}
                           />
+
                           {/* <button className="flex-1 bg-gray-700/50 hover:bg-gray-600 rounded-lg px-3 py-2 transition-colors">
                             Bold
                           </button> */}
@@ -963,28 +995,26 @@ function Editor() {
                           Color
                         </div>
                         <div className="grid grid-cols-6 gap-2">
-                          {[
-                            '#E63946', // Red
-                            '#F4A261', // Orange
-                            '#2A9D8F', // Teal
-                            '#264653', // Deep Navy
-                            '#A8DADC', // Aqua
-                            '#457B9D', // Blue
-                            '#1D3557', // Dark Blue
-                            '#F4D35E', // Yellow
-                            '#EE6C4D', // Coral
-                            '#3D405B', // Greyish Blue
-                            '#C56C86', // Rose Pink
-                            '#6A0572'  // Purple
-                          ]
-                            .map((color, index) => (
-                              <button
-                                key={index}
-                                className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
-                                style={{ backgroundColor: color }}
+                          {Colors(selectedColor).map((color, index) => (
+                            <button
+                              key={index}
+                              className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
+                              style={{ backgroundColor: color }}
+                              onClick={()=>{
+                                setSelectedColor(color)
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId
+                                      ? { ...text, color: color }
+                                      : text
+                                  )
+                                )
 
-                              />
-                            ))}
+                              }
+                               
+                              }
+                            />
+                          ))}
                         </div>
                         {/* <input
                           type="color"
@@ -995,17 +1025,28 @@ function Editor() {
                           <PopoverTrigger asChild>
                             <Button
                               className="h-9 w-full border-2"
-                            // style={{ backgroundColor: selectedColor }}
+                            style={{ backgroundColor: selectedColor }}
                             />
                           </PopoverTrigger>
                           <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
-                          <HexColorPicker  color={selectedColor} onChange={(newcolor)=>setSelectedColor(newcolor)} />
+                            <HexColorPicker color={selectedColor} onChange={(newcolor) =>{
+                              setSelectedColor(newcolor)
+                              setTexts((prevTexts) =>
+                                prevTexts.map((text) =>
+                                  text.id === activeTextId
+                                    ? { ...text, color: newcolor }
+                                    : text
+                                )
+                              )
+                            }   
+                            }
+                            />
 
-                          <HexColorInput 
-    color={selectedColor} 
-    onChange={(newColor) => setSelectedColor(newColor)} 
-    className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
-  />
+                            <HexColorInput
+                              color={selectedColor}
+                              onChange={(newColor) => setSelectedColor(newColor)}
+                              className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                            />
 
                           </PopoverContent>
                         </Popover>

@@ -1,52 +1,37 @@
-"use client"
-import React from 'react'
+"use client";
+import React, { useEffect, useState } from 'react';
 
-interface ColorsProps {
-    newcolor: string;
-}
+type ColorsProps = string;
 
-const Colors: React.FC<ColorsProps> = ({ newcolor }) => {
-    const ColorArray = [
-        '#E63946', // Red
-        '#F4A261', // Orange
-        '#2A9D8F', // Teal
-        '#264653', // Deep Navy
-        '#A8DADC', // Aqua
-        '#457B9D', // Blue
-        '#1D3557', // Dark Blue
-        '#F4D35E', // Yellow
-        '#EE6C4D', // Coral
-        '#3D405B', // Greyish Blue
-        '#C56C86', // Rose Pink
-        '#6A0572'  // Purple
-    ];
+const Colors = (newcolor: ColorsProps) => {
+    const [colors, setColors] = useState<string[]>([]);
 
+    useEffect(() => {
+        const ColorArray = [
+            '#E63946', '#F4A261', '#2A9D8F', '#264653',
+            '#A8DADC', '#457B9D', '#1D3557', '#F4D35E',
+            '#EE6C4D', '#3D405B', '#C56C86', '#6A0572'
+        ];
 
-    const sessColor = JSON.parse(sessionStorage.getItem('couu-olorsx-wertqo-234jhiexo') || '');
+        if (typeof window !== 'undefined') {
+            const storedColors = sessionStorage.getItem('couu-olorsx-wertqo-234jhiexo');
+            const sessColor = storedColors ? JSON.parse(storedColors) : null;
 
-
-    if (!sessColor) {
-        sessionStorage.setItem('couu-olorsx-wertqo-234jhiexo', JSON.stringify(ColorArray));
-        return ColorArray;
-    }
-
-    else if (sessColor.includes(newcolor)) {
-        return sessColor;
-    }
-
-    else {
-        const newArray = [...sessColor];
-        newArray.unshift(newcolor);
-        if (newArray.length > 12) {
-            newArray.pop();
+            if (!Array.isArray(sessColor) || sessColor.length === 0) {
+                sessionStorage.setItem('couu-olorsx-wertqo-234jhiexo', JSON.stringify(ColorArray));
+                setColors(ColorArray);
+            } else if (sessColor.includes(newcolor)) {
+                setColors(sessColor);
+            } else {
+                const newArray = [newcolor, ...sessColor];
+                if (newArray.length > 12) newArray.pop();
+                sessionStorage.setItem('couu-olorsx-wertqo-234jhiexo', JSON.stringify(newArray));
+                setColors(newArray);
+            }
         }
-        sessionStorage.setItem('couu-olorsx-wertqo-234jhiexo', JSON.stringify(newArray));
-        return newArray;
+    }, [newcolor]);
 
-    }
+    return colors;
+};
 
-
-
-}
-
-export default Colors
+export default Colors;
