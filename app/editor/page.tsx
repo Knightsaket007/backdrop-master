@@ -2,6 +2,37 @@
 import React, { useEffect } from 'react';
 import Editor from './Editor';
 
+
+
+function DisableNumberScroll() {
+  useEffect(() => {
+      const handleWheel = (event: WheelEvent) => {
+          const activeElement = document.activeElement as HTMLInputElement;
+          if (activeElement?.type === 'number') {
+              event.preventDefault();
+          }
+      };
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+          const activeElement = document.activeElement as HTMLInputElement;
+          if ((event.key === 'ArrowUp' || event.key === 'ArrowDown') && activeElement?.type === 'number') {
+              event.preventDefault();
+          }
+      };
+
+      window.addEventListener('wheel', handleWheel, { passive: false });
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+          window.removeEventListener('wheel', handleWheel);
+          window.removeEventListener('keydown', handleKeyDown);
+      };
+  }, []);
+
+  return null; // Yeh component bas event listeners add karne ke liye hai, toh render kuch nahi karega.
+}
+
+
 export default function Editorage() {
   // useEffect(() => {
   //   // Disable right-click
@@ -30,6 +61,15 @@ export default function Editorage() {
   //     window.removeEventListener('keydown', handleKeyDown);
   //   };
   // }, []);
+
+
+
+  
+  //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
+  DisableNumberScroll()
+  //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
+
+
 
   return <Editor />;
 }

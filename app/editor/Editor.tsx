@@ -39,6 +39,7 @@ import { toast, Toaster } from 'sonner';
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import Colors from '../utils/Colors';
+import { text } from 'stream/consumers';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -77,8 +78,8 @@ function Editor() {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000' },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '' },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -493,7 +494,6 @@ function Editor() {
   // }
 
 
-
   return (
 
 
@@ -614,7 +614,7 @@ function Editor() {
               {backgroundImage && !isCropping && (
                 <>
                   <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden">
-                    <div className="relative w-full h-full flex items-center justify-center">
+                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
                         src={backgroundImage}
@@ -646,22 +646,24 @@ function Editor() {
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
                       {/* {backgroundImage && bgremovedImage && ( */}
 
+
                       {texts.map((text) => (
                         <p
                           key={text.id}
-                          className="absolute flex items-center justify-center text-black text-center break-words z-20"
+                          className="absolute flex items-center justify-center text-black text-center break-words z-20 cust-animix-p-ref"
                           style={{
                             maxWidth: imgWidth,
                             maxHeight: imgHeight,
                             wordWrap: "break-word",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            padding: '4px',
                             fontSize: text.size,
                             fontFamily: text.fontFamily,
                             fontStyle: (text.italic) ? 'italic' : '',
                             fontWeight: (text.bold) ? 'bold' : '',
-                            color:text.color,
+                            color: text.color,
+                            left: text.left,
+                            top: text.top
                           }}
                         >
                           {text.content}
@@ -706,7 +708,7 @@ function Editor() {
                 <canvas
                   ref={canvasRef}
                   className="absolute w-full h-full rounded-xl"
-                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight }}
+                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden' }}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
@@ -918,8 +920,8 @@ function Editor() {
                               if (!/^\d*$/.test(value)) return;
 
                               // Max limit lagao (live typing par)
-                              if (Number(value) > 400) {
-                                value = '400';
+                              if (Number(value) > 500) {
+                                value = '500';
                               }
 
                               setTexts((prevTexts) =>
@@ -1000,7 +1002,7 @@ function Editor() {
                               key={index}
                               className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
                               style={{ backgroundColor: color }}
-                              onClick={()=>{
+                              onClick={() => {
                                 setSelectedColor(color)
                                 setTexts((prevTexts) =>
                                   prevTexts.map((text) =>
@@ -1011,7 +1013,7 @@ function Editor() {
                                 )
 
                               }
-                               
+
                               }
                             />
                           ))}
@@ -1025,11 +1027,11 @@ function Editor() {
                           <PopoverTrigger asChild>
                             <Button
                               className="h-9 w-full border-2"
-                            style={{ backgroundColor: selectedColor }}
+                              style={{ backgroundColor: selectedColor }}
                             />
                           </PopoverTrigger>
                           <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
-                            <HexColorPicker color={selectedColor} onChange={(newcolor) =>{
+                            <HexColorPicker color={selectedColor} onChange={(newcolor) => {
                               setSelectedColor(newcolor)
                               setTexts((prevTexts) =>
                                 prevTexts.map((text) =>
@@ -1038,7 +1040,7 @@ function Editor() {
                                     : text
                                 )
                               )
-                            }   
+                            }
                             }
                             />
 
@@ -1063,34 +1065,65 @@ function Editor() {
                         <div className="space-y-3">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span>Brightness</span>
-                              <span className="text-indigo-400">50%</span>
+                              <span>Position X</span>
+                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.left?.replace('px', '') || ''}</span>
                             </div>
                             <input
                               type="range"
+                              min={(imgWidth) ? -(imgWidth) : '-100'}
+                              max={(imgWidth) ? (imgWidth) : '100'}
                               className="w-full accent-indigo-500"
+                              onChange={(e) => {
+                                const newLeft = `${e.target.value}px`;
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, left: newLeft } : text
+                                  )
+                                );
+                              }}
+
                             />
-                          </div>
-                          <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span>Contrast</span>
-                              <span className="text-indigo-400">50%</span>
+                              <span>Position Y</span>
+                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.top?.replace('px', '') || ''}</span>
                             </div>
                             <input
                               type="range"
+                              min={(imgHeight) ? -(imgHeight) : '-100'}
+                              max={(imgHeight) ? (imgHeight) : '100'}
                               className="w-full accent-indigo-500"
+                              value={
+                                texts.find((row) => row.id === activeTextId)?.top?.replace('px', '') || ''
+                              }
+                              onChange={(e) => {
+                                const newTop = `${e.target.value}px`;
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, top: newTop } : text
+                                  )
+                                );
+                              }}
+
                             />
+
+
                           </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span>Saturation</span>
-                              <span className="text-indigo-400">50%</span>
-                            </div>
-                            <input
-                              type="range"
-                              className="w-full accent-indigo-500"
-                            />
+
+
+                          <div className="flex justify-between align-middle">
+                          <p>Width <span style={{fontSize:'12px'}} className='text-indigo-400'>(in px)</span></p>
+                            <input type="number" min='10' max={(imgWidth) && imgWidth} className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"/>
+                            
                           </div>
+                          <div className="flex justify-between align-middle">
+                          <p>Height <span style={{fontSize:'12px'}} className='text-indigo-400'>(in px)</span></p>
+                            <input type="number" className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"/>
+                            
+                          </div>
+
+
+
+
                         </div>
                       </div>
 

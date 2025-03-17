@@ -334,3 +334,12 @@ input[type="number"] {
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(144, 141, 204); /* Hover effect */
 }
+
+
+
+.cust-animix-p-ref{
+  background-color: rgba(0, 0, 0, 0.144);
+  border: dashed 1px black;
+  border-radius: 8px;
+  height: fit-content;
+}
