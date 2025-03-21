@@ -28,6 +28,7 @@ import {
   Check,
   Plus,
   Trash2,
+  SquareDashed,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
@@ -40,6 +41,8 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import Colors from '../utils/Colors';
 import { text } from 'stream/consumers';
+import { Toggle } from "@/components/ui/toggle"
+import { transform } from 'next/dist/build/swc/generated-native';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -73,13 +76,14 @@ function Editor() {
   const [brushColor, setBrushColor] = useState("rgb(79 70 229)");
   const [brushSize, setBrushSize] = useState(1);
   const [showText, setshowText] = useState(false)
+  const [outline, setOutline] = useState(false)
 
   const [selectedColor, setSelectedColor] = useState('#000000');
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "'Zeyada', serif", size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '' },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, gradient: Array<number> }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', gradient: [] },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -650,7 +654,7 @@ function Editor() {
                       {texts.map((text) => (
                         <p
                           key={text.id}
-                          className="absolute flex items-center justify-center text-black text-center break-words z-20 cust-animix-p-ref"
+                          className={`absolute flex items-center justify-center text-black text-center break-words z-20 ${outline ? 'cust-animix-p-ref' : ''}`}
                           style={{
                             maxWidth: imgWidth,
                             maxHeight: imgHeight,
@@ -663,7 +667,10 @@ function Editor() {
                             fontWeight: (text.bold) ? 'bold' : '',
                             color: text.color,
                             left: text.left,
-                            top: text.top
+                            top: text.top,
+                            transform: `rotate(${text.rotate}deg)`,
+                            width: text.width,
+                            height: text.height,
                           }}
                         >
                           {text.content}
@@ -1058,15 +1065,27 @@ function Editor() {
 
                       {/* Effects */}
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-lg font-semibold">
-                          <Wand2 size={20} className="text-indigo-400" />
-                          Effects
+                        <div className="flex justify-between">
+                          <div className="flex items-center gap-2 text-lg font-semibold">
+                            <Wand2 size={20} className="text-indigo-400" />
+                            Effects
+                          </div>
+
+                          <Toggle
+                            onClick={() => { setOutline(!outline) }}
+                          >
+                            <SquareDashed />
+                          </Toggle>
                         </div>
+
                         <div className="space-y-3">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span>Position X</span>
-                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.left?.replace('px', '') || ''}</span>
+                              <span className="text-indigo-400">
+                                {Math.round(parseFloat(texts.find((row) => row.id === activeTextId)?.left?.replace('px', '') || '0'))}
+                              </span>
+
                             </div>
                             <input
                               type="range"
@@ -1085,7 +1104,10 @@ function Editor() {
                             />
                             <div className="flex items-center justify-between">
                               <span>Position Y</span>
-                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.top?.replace('px', '') || ''}</span>
+                              <span className="text-indigo-400">
+                                {Math.round(parseFloat(texts.find((row) => row.id === activeTextId)?.top?.replace('px', '') || '0'))}
+                              </span>
+
                             </div>
                             <input
                               type="range"
@@ -1106,19 +1128,138 @@ function Editor() {
 
                             />
 
+                            <div className="flex items-center justify-between">
+                              <span>Rotation</span>
+                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min='-180'
+                              max='180'
+                              className="w-full accent-indigo-500"
+                              value={
+                                texts.find((row) => row.id === activeTextId)?.rotate
+                              }
+                              onChange={(e) => {
+                                const newRotate = Number(e.target.value);
+                                setTexts((prevNum) =>
+                                  prevNum.map((num) =>
+                                    num.id === activeTextId ? { ...num, rotate: newRotate } : num
+                                  )
+                                );
+                              }}
+
+                            />
+
 
                           </div>
 
 
                           <div className="flex justify-between align-middle">
-                          <p>Width <span style={{fontSize:'12px'}} className='text-indigo-400'>(in px)</span></p>
-                            <input type="number" min='10' max={(imgWidth) && imgWidth} className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"/>
-                            
+                            <p>Width <span style={{ fontSize: '12px' }} className='text-indigo-400'>(in px)</span></p>
+
+                            <input
+                              type="number"
+                              min="10"
+                              max={imgWidth || undefined} // Agar imgWidth nahi ho toh undefined rahe
+                              className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"
+                              value={texts.find((text) => text.id === activeTextId)?.width.replace('px', '') || ''}
+                              onChange={(e) => {
+                                const value = e.target.value.trim(); // Extra spaces remove karo
+
+                                if (value === '') {
+                                  // Agar input empty ho, toh blank rakho
+                                  setTexts((prevTexts) =>
+                                    prevTexts.map((text) =>
+                                      text.id === activeTextId ? { ...text, width: '' } : text
+                                    )
+                                  );
+                                  return;
+                                }
+
+                                // Valid number check
+                                if (!/^\d+$/.test(value)) return;
+
+                                let numValue = parseInt(value, 10);
+
+                                // Max limit apply
+                                if (imgWidth && numValue > imgWidth) {
+                                  numValue = imgWidth;
+                                }
+
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, width: `${numValue}px` } : text
+                                  )
+                                );
+                              }}
+                              onBlur={(e) => {
+                                let numValue = parseInt(e.target.value, 10) || 10;
+
+                                // Ensure minimum 10px width
+                                if (numValue < 10) numValue = 0;
+
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                text.id === activeTextId ? { ...text, width:(numValue===0)?'': `${numValue}px` } : text
+                                  )
+                                );
+                              }}
+                            />
+
+
                           </div>
                           <div className="flex justify-between align-middle">
-                          <p>Height <span style={{fontSize:'12px'}} className='text-indigo-400'>(in px)</span></p>
-                            <input type="number" className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"/>
-                            
+                            <p>Height <span style={{ fontSize: '12px' }} className='text-indigo-400'>(in px)</span></p>
+                            <input
+                              type="number"
+                              min="10"
+                              max={imgHeight || undefined} // Agar imgWidth nahi ho toh undefined rahe
+                              className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"
+                              value={texts.find((text) => text.id === activeTextId)?.height.replace('px', '') || ''}
+                              onChange={(e) => {
+                                const value = e.target.value.trim(); // Extra spaces remove karo
+
+                                if (value === '') {
+                                  // Agar input empty ho, toh blank rakho
+                                  setTexts((prevTexts) =>
+                                    prevTexts.map((text) =>
+                                      text.id === activeTextId ? { ...text, height: '' } : text
+                                    )
+                                  );
+                                  return;
+                                }
+
+                                // Valid number check
+                                if (!/^\d+$/.test(value)) return;
+
+                                let numValue = parseInt(value, 10);
+
+                                // Max limit apply
+                                if (imgHeight && numValue > imgHeight) {
+                                  numValue = imgHeight;
+                                }
+
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, height: `${numValue}px` } : text
+                                  )
+                                );
+                              }}
+                              onBlur={(e) => {
+                                let numValue = parseInt(e.target.value, 10) || 10;
+
+                                // Ensure minimum 10px width
+                                if (numValue < 10) numValue = 0;
+
+                                setTexts((prevTexts) =>
+                                  prevTexts.map((text) =>
+                                    text.id === activeTextId ? { ...text, height:(numValue===0)?'': `${numValue}px` } : text
+                                  )
+                                );
+                              }}
+                            />
+
                           </div>
 
 

@@ -338,8 +338,25 @@ input[type="number"] {
 
 
 .cust-animix-p-ref{
-  background-color: rgba(0, 0, 0, 0.144);
+  background-color: rgba(0, 0, 0, 0.144) !important;
   border: dashed 1px black;
   border-radius: 8px;
   height: fit-content;
+}
+
+input[type=range]{
+  cursor: pointer;
+}
+
+p{
+  
+  background: linear-gradient(90deg, #FF6B6B, #4A90E2);
+  background: linear-gradient(90deg, #FF6B6B, #4A90E2); 
+  background: url('https://image.api.playstation.com/vulcan/ap/rnd/202011/0402/C784xeOFo2wViCf4m5bxgoeH.png') no-repeat center center;
+  -webkit-background-clip: text; 
+  background-clip: text;       
+  -webkit-text-fill-color: transparent; /* Text color ko transparent banata hai */
+  color: transparent;              
+  font-weight: bold;
+  text-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
 }
