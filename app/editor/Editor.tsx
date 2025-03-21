@@ -43,6 +43,12 @@ import Colors from '../utils/Colors';
 import { text } from 'stream/consumers';
 import { Toggle } from "@/components/ui/toggle"
 import { transform } from 'next/dist/build/swc/generated-native';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -1067,8 +1073,9 @@ function Editor() {
                       <div className="space-y-4">
                         <div className="flex justify-between">
                           <div className="flex items-center gap-2 text-lg font-semibold">
-                            <Wand2 size={20} className="text-indigo-400" />
-                            Effects
+                            {/* <Wand2 size={20} className="text-indigo-400" /> */}
+                            <SlidersHorizontal size={20} className="text-indigo-400" />
+                            Alignment
                           </div>
 
                           <Toggle
@@ -1195,13 +1202,13 @@ function Editor() {
                               }}
                               onBlur={(e) => {
                                 let numValue = parseInt(e.target.value, 10) || 10;
-
+                                console.log('num valllll', numValue)
                                 // Ensure minimum 10px width
-                                if (numValue < 10) numValue = 0;
+                                if (numValue <= 10) numValue = 0;
 
                                 setTexts((prevTexts) =>
                                   prevTexts.map((text) =>
-                                text.id === activeTextId ? { ...text, width:(numValue===0)?'': `${numValue}px` } : text
+                                    text.id === activeTextId ? { ...text, width: numValue ? `${numValue}px` : '' } : text
                                   )
                                 );
                               }}
@@ -1250,11 +1257,11 @@ function Editor() {
                                 let numValue = parseInt(e.target.value, 10) || 10;
 
                                 // Ensure minimum 10px width
-                                if (numValue < 10) numValue = 0;
+                                if (numValue <= 10) numValue = 0;
 
                                 setTexts((prevTexts) =>
                                   prevTexts.map((text) =>
-                                    text.id === activeTextId ? { ...text, height:(numValue===0)?'': `${numValue}px` } : text
+                                    text.id === activeTextId ? { ...text, height: (numValue === 0) ? '' : `${numValue}px` } : text
                                   )
                                 );
                               }}
@@ -1269,7 +1276,7 @@ function Editor() {
                       </div>
 
                       {/* Advanced Settings */}
-                      <div className="space-y-4">
+                      {/* <div className="space-y-4">
                         <div className="flex items-center gap-2 text-lg font-semibold">
                           <SlidersHorizontal size={20} className="text-indigo-400" />
                           Advanced
@@ -1285,7 +1292,44 @@ function Editor() {
                             Transform
                           </button>
                         </div>
-                      </div>
+                      </div> */}
+
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="item-1" className="border-none">
+                          <AccordionTrigger >
+                          <div className="flex items-center gap-2 text-lg font-semibold">
+                          <SlidersHorizontal size={20} className="text-indigo-400" />
+                          Advanced
+                        </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                          <div className="flex items-center justify-between">
+                              <span>Rotation</span>
+                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min='-180'
+                              max='180'
+                              className="w-full accent-indigo-500"
+                              value={
+                                texts.find((row) => row.id === activeTextId)?.rotate
+                              }
+                              onChange={(e) => {
+                                const newRotate = Number(e.target.value);
+                                setTexts((prevNum) =>
+                                  prevNum.map((num) =>
+                                    num.id === activeTextId ? { ...num, rotate: newRotate } : num
+                                  )
+                                );
+                              }}
+
+                            />
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+
+
                     </div>
 
                     :
