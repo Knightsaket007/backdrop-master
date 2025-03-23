@@ -29,6 +29,7 @@ import {
   Plus,
   Trash2,
   SquareDashed,
+  Crown,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
@@ -88,8 +89,8 @@ function Editor() {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, gradient: Array<number> }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', gradient: [] },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], gradient: Array<number> }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 2, 3, 'black'], gradient: [] },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -1297,34 +1298,103 @@ function Editor() {
                       <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
                           <AccordionTrigger >
-                          <div className="flex items-center gap-2 text-lg font-semibold">
-                          <SlidersHorizontal size={20} className="text-indigo-400" />
-                          Advanced
-                        </div>
+                            <div className="flex items-center gap-2 text-lg font-semibold">
+                              {/* <SlidersHorizontal size={20} className="text-indigo-400" /> */}
+                              <Crown size={20} className="text-indigo-400" />
+                              Advanced
+                            </div>
                           </AccordionTrigger>
                           <AccordionContent>
-                          <div className="flex items-center justify-between">
-                              <span>Rotation</span>
-                              <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
-                            </div>
-                            <input
-                              type="range"
-                              min='-180'
-                              max='180'
-                              className="w-full accent-indigo-500"
-                              value={
-                                texts.find((row) => row.id === activeTextId)?.rotate
-                              }
-                              onChange={(e) => {
-                                const newRotate = Number(e.target.value);
-                                setTexts((prevNum) =>
-                                  prevNum.map((num) =>
-                                    num.id === activeTextId ? { ...num, rotate: newRotate } : num
-                                  )
-                                );
-                              }}
+                            <div className="bg-slate-700 p-3 rounded-lg ">
+                              <h4 className='text-lg mb-2'>shadow</h4>
 
-                            />
+                              <div className="flex items-center justify-between">
+                                <span className='text-sm'>Position X</span>
+                                <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="-30"
+                                max="30"
+                                className="w-full accent-indigo-500"
+                                value={texts.find((row) => row.id === activeTextId)?.shadow[0] || 0}
+                                onChange={(e) => {
+                                  const newNum = Number(e.target.value);
+
+                                  setTexts((prevTexts) =>
+                                    prevTexts.map((text) =>
+                                      text.id === activeTextId
+                                        ? { ...text, shadow: [newNum, text.shadow[1], text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
+                                        : text
+                                    )
+                                  );
+                                }}
+                              />
+
+
+
+                              <div className="flex items-center justify-between">
+                                <span className='text-sm'>Position Y</span>
+                                <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
+                              </div>
+
+
+                              <input
+                                type="range"
+                                min='-180'
+                                max='180'
+                                className="w-full accent-indigo-500"
+                                value={
+                                  texts.find((row) => row.id === activeTextId)?.rotate
+                                }
+                                onChange={(e) => {
+                                  const newRotate = Number(e.target.value);
+                                  setTexts((prevNum) =>
+                                    prevNum.map((num) =>
+                                      num.id === activeTextId ? { ...num, rotate: newRotate } : num
+                                    )
+                                  );
+                                }}
+
+                              />
+
+
+                              <div className="flex justify-between items-center">
+                                <span className='text-sm'>color</span>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      className="h-9 w-3/4 border-2"
+                                      style={{ backgroundColor: selectedColor }}
+                                    />
+                                  </PopoverTrigger>
+                                  <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                                    <HexColorPicker color={selectedColor} onChange={(newcolor) => {
+                                      setSelectedColor(newcolor)
+                                      setTexts((prevTexts) =>
+                                        prevTexts.map((text) =>
+                                          text.id === activeTextId
+                                            ? { ...text, color: newcolor }
+                                            : text
+                                        )
+                                      )
+                                    }
+                                    }
+                                    />
+
+                                    <HexColorInput
+                                      color={selectedColor}
+                                      onChange={(newColor) => setSelectedColor(newColor)}
+                                      className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                    />
+
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+
+
+                            </div>
+
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
