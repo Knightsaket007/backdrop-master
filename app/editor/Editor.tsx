@@ -30,6 +30,10 @@ import {
   Trash2,
   SquareDashed,
   Crown,
+  Circle,
+  SquarePower,
+  ToggleLeft,
+  ToggleRight,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
@@ -89,8 +93,8 @@ function Editor() {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], gradient: Array<number> }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 2, 3, 'black'], gradient: [] },
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], hasShadow: boolean, textImage: string, gradient: [number, string, string], isgradient:boolean }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90,'#FF6B6B', "#4A90E2"] , isgradient: true},
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -120,9 +124,10 @@ function Editor() {
   // -=-=-=-=For text-=-=-=-//
   const addText = () => {
     if (texts.length < 4) {
-      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)",', bold: false, italic: false };
+      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90,'#FF6B6B', "#4A90E2"], isgradient: true };
       setTexts([...texts, newText]);
       setActiveTextId(newText.id);
+
     } else {
       // alert("Max 10 text layers allowed!");
       toast("Maximum 4 text layers allowed!", {
@@ -142,25 +147,48 @@ function Editor() {
     console.log('active text...', activeTextId)
   };
 
+  // const deleteText = (id: number) => {
+  //   console.log('id is...', id)
+  //   if (texts.length === 1) {
+  //     toast('Minimum one layer should be there');
+  //     return;
+  //   }
+
+  //   setTexts((prev) => {
+  //     const newTexts = prev.filter((text) => text.id !== id);
+
+  //     if (activeTextId === id) {
+  //       // First element delete ho raha ho toh naya active element pehla element hi hoga
+  //       const newActiveText = newTexts[0];
+  //       setActiveTextId(newActiveText?.id || 0);
+  //     }
+
+  //     return newTexts;
+  //   });
+  // };
+
+
   const deleteText = (id: number) => {
+    console.log("id is...", id);
     if (texts.length === 1) {
-      toast('Minimum one layer should be there');
+      toast("Minimum one layer should be there");
       return;
     }
 
     setTexts((prev) => {
       const newTexts = prev.filter((text) => text.id !== id);
 
-      if (activeTextId === id) {
-        // First element delete ho raha ho toh naya active element pehla element hi hoga
-        const newActiveText = newTexts[0];
-        setActiveTextId(newActiveText?.id || 0);
-      }
+      setActiveTextId((prevActiveId) => {
+        // 🔥 Agar delete hone wala active hai, tabhi naya active set kar
+        if (prevActiveId === id) {
+          return newTexts.length > 0 ? newTexts[0].id : null;
+        }
+        return prevActiveId; // 🔥 Nahi toh wahi active rehne de
+      });
 
       return newTexts;
     });
   };
-
 
 
 
@@ -183,7 +211,7 @@ function Editor() {
     }
   }, []);
 
-  console.log("Selected Font:", selectedFont); // Debugging
+  console.log("Selected Font:", selectedFont);
 
   const resetCanvas = () => {
     const canvas = canvasRef.current;
@@ -499,11 +527,29 @@ function Editor() {
     }
   };
 
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setTexts((prev) =>
+        prev.map((text) =>
+          text.id === activeTextId ? { ...text, textImage: imageUrl } : text
+        )
+      );
+    }
+    else {
+      toast("oops... image upload failed")
+    }
+  };
+
+
   // const cancelCrop = () => {
   //   setIsCropping(false)
   //   setCroppingModeOn(false)
   // }
 
+  console.log('text....', texts)
 
   return (
 
@@ -673,11 +719,34 @@ function Editor() {
                             fontStyle: (text.italic) ? 'italic' : '',
                             fontWeight: (text.bold) ? 'bold' : '',
                             color: text.color,
+
                             left: text.left,
                             top: text.top,
                             transform: `rotate(${text.rotate}deg)`,
                             width: text.width,
                             height: text.height,
+                            ...(text.textImage && {
+                              backgroundImage: `url(${text.textImage})`,
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "center center",
+                              backgroundSize: "cover",
+                              WebkitBackgroundClip: "text",
+                              backgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }),
+                          
+                            ...(!text.isgradient && {
+                              backgroundImage: `linear-gradient(${text.gradient?.[0] || "0"}deg, ${text.gradient?.[1] || "#000"}, ${text.gradient?.[2] || "#fff"})`,
+                              backgroundRepeat: "no-repeat",
+                              backgroundSize: "100%",
+                              backgroundPosition: "center",
+                              WebkitBackgroundClip: "text",
+                              backgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }),
+
+                            filter: !text.hasShadow ? `drop-shadow(${text?.shadow?.[0]}px ${text.shadow[1]}px ${text.shadow[2]}px ${text.shadow[3]})` : '',
+
                           }}
                         >
                           {text.content}
@@ -1171,7 +1240,8 @@ function Editor() {
                               min="10"
                               max={imgWidth || undefined} // Agar imgWidth nahi ho toh undefined rahe
                               className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"
-                              value={texts.find((text) => text.id === activeTextId)?.width.replace('px', '') || ''}
+                              value={(texts.find((text) => text.id === activeTextId)?.width || '').replace('px', '')}
+
                               onChange={(e) => {
                                 const value = e.target.value.trim(); // Extra spaces remove karo
 
@@ -1224,7 +1294,9 @@ function Editor() {
                               min="10"
                               max={imgHeight || undefined} // Agar imgWidth nahi ho toh undefined rahe
                               className="w-20 bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-1 focus:outline-none focus:border-indigo-500 transition-colors"
-                              value={texts.find((text) => text.id === activeTextId)?.height.replace('px', '') || ''}
+                              // value={texts.find((text) => text.id === activeTextId)?.height.replace('px', '') || ''}
+                              value={(texts.find((text) => text.id === activeTextId)?.height || '').replace('px', '')}
+
                               onChange={(e) => {
                                 const value = e.target.value.trim(); // Extra spaces remove karo
 
@@ -1304,92 +1376,328 @@ function Editor() {
                               Advanced
                             </div>
                           </AccordionTrigger>
-                          <AccordionContent>
+                          <AccordionContent >
                             <div className="bg-slate-700 p-3 rounded-lg ">
-                              <h4 className='text-lg mb-2'>shadow</h4>
 
-                              <div className="flex items-center justify-between">
-                                <span className='text-sm'>Position X</span>
-                                <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="-30"
-                                max="30"
-                                className="w-full accent-indigo-500"
-                                value={texts.find((row) => row.id === activeTextId)?.shadow[0] || 0}
-                                onChange={(e) => {
-                                  const newNum = Number(e.target.value);
-
-                                  setTexts((prevTexts) =>
-                                    prevTexts.map((text) =>
-                                      text.id === activeTextId
-                                        ? { ...text, shadow: [newNum, text.shadow[1], text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
-                                        : text
-                                    )
-                                  );
-                                }}
-                              />
-
-
-
-                              <div className="flex items-center justify-between">
-                                <span className='text-sm'>Position Y</span>
-                                <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.rotate}</span>
-                              </div>
-
-
-                              <input
-                                type="range"
-                                min='-180'
-                                max='180'
-                                className="w-full accent-indigo-500"
-                                value={
-                                  texts.find((row) => row.id === activeTextId)?.rotate
-                                }
-                                onChange={(e) => {
-                                  const newRotate = Number(e.target.value);
-                                  setTexts((prevNum) =>
-                                    prevNum.map((num) =>
-                                      num.id === activeTextId ? { ...num, rotate: newRotate } : num
-                                    )
-                                  );
-                                }}
-
-                              />
-
-
-                              <div className="flex justify-between items-center">
-                                <span className='text-sm'>color</span>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      className="h-9 w-3/4 border-2"
-                                      style={{ backgroundColor: selectedColor }}
-                                    />
-                                  </PopoverTrigger>
-                                  <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
-                                    <HexColorPicker color={selectedColor} onChange={(newcolor) => {
-                                      setSelectedColor(newcolor)
-                                      setTexts((prevTexts) =>
-                                        prevTexts.map((text) =>
-                                          text.id === activeTextId
-                                            ? { ...text, color: newcolor }
-                                            : text
-                                        )
+                              <div className="flex justify-between">
+                                <h4 className='text-lg mb-2'>shadow</h4>
+                                <div
+                                  className="toggle-wrapper cursor-pointer"
+                                  onClick={() => {
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, hasShadow: !text.hasShadow }
+                                          : text
                                       )
-                                    }
-                                    }
-                                    />
+                                    );
+                                  }}
+                                >
+                                  {
+                                    texts.find((row) => row.id === activeTextId)?.hasShadow
+                                      ? <ToggleLeft />
+                                      : <ToggleRight style={{ color: 'rgb(34 197 94)' }} />
+                                  }
+                                </div>
 
-                                    <HexColorInput
-                                      color={selectedColor}
-                                      onChange={(newColor) => setSelectedColor(newColor)}
-                                      className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
-                                    />
+                              </div>
 
-                                  </PopoverContent>
-                                </Popover>
+
+                              <div className='relative' style={texts.find((row) => row.id === activeTextId)?.hasShadow ? { opacity: .3 } : {}}>
+                                <div className='absolute w-full h-full' style={texts.find((row) => row.id === activeTextId)?.hasShadow ? { display: 'flex' } : { display: 'none' }}></div>
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Horizontal offset</span>
+                                  <span className="text-indigo-400">
+                                    {texts.find((row) => row.id === activeTextId)?.shadow?.[0] ?? 0}
+                                  </span>
+
+                                </div>
+                                <input
+                                  type="range"
+                                  min="-30"
+                                  max="30"
+                                  className="w-full accent-indigo-500"
+                                  value={texts.find((row) => row.id === activeTextId)?.shadow?.[0] ?? 0}
+                                  onChange={(e) => {
+                                    const newNum = Number(e.target.value);
+
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, shadow: [newNum, text.shadow[1], text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
+                                          : text
+                                      )
+                                    );
+                                  }}
+                                />
+
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Vertical offset</span>
+                                  <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.shadow?.[1] ?? 0}</span>
+                                </div>
+
+                                <input
+                                  type="range"
+                                  min="-30"
+                                  max="30"
+                                  className="w-full accent-indigo-500"
+                                  value={texts.find((row) => row.id === activeTextId)?.shadow?.[1] ?? 0}
+
+                                  onChange={(e) => {
+                                    const newNum = Number(e.target.value);
+
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, shadow: [text.shadow[0], newNum, text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
+                                          : text
+                                      )
+                                    );
+                                  }}
+                                />
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Blur radius</span>
+                                  <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.shadow?.[2] ?? 0}</span>
+                                </div>
+
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="40"
+                                  className="w-full accent-indigo-500"
+                                  value={texts.find((row) => row.id === activeTextId)?.shadow?.[2] ?? 0}
+
+                                  onChange={(e) => {
+                                    const newNum = Number(e.target.value);
+
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, shadow: [text.shadow[0], text.shadow[1], newNum, text.shadow[3]] } // ✅ Correct way to update
+                                          : text
+                                      )
+                                    );
+                                  }}
+                                />
+
+
+                                <div className="flex justify-between items-center">
+                                  <span className='text-sm'>Shadow color</span>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        className="h-9 w-2/4 border-2"
+                                        style={{ backgroundColor: texts.find((row) => row.id === activeTextId)?.shadow?.[3] ?? 'black' }}
+                                      />
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                                      <HexColorPicker color={selectedColor} onChange={(newcolor) => {
+                                        setTexts((prevTexts) =>
+                                          prevTexts.map((text) =>
+                                            text.id === activeTextId
+                                              ? { ...text, shadow: [text.shadow[0], text.shadow[1], text.shadow[2], newcolor] }
+                                              : text
+                                          )
+                                        )
+                                      }
+                                      }
+                                      />
+
+                                      <HexColorInput
+                                        color={selectedColor}
+                                        onChange={(newColor) => setSelectedColor(newColor)}
+                                        className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                      />
+
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+
+                              </div>
+
+
+                            </div>
+
+                            <div className="bg-slate-700 p-3 rounded-lg mt-3">
+                              <div className="flex justify-between">
+                                <h4 className='text-lg mb-2'>Image in text</h4>
+                              </div>
+
+                              <label className="w-full h-32 bg-gray-700/50 border border-gray-600 rounded-lg flex items-center justify-center cursor-pointer border-dashed">
+                                <input
+                                  type="file"
+                                  accept="image/png, image/jpeg"
+                                  style={{ display: "none" }}
+                                  onChange={handleImageChange}
+
+                                />
+                                {texts.find((row) => row.id === activeTextId)?.textImage ? <img src={texts.find((row) => row.id === activeTextId)?.textImage} alt="image" className="h-32 w-full object-cover" /> : <span>Click to upload image</span>
+
+                                }
+
+                              </label>
+
+                              <div className='text-center'>
+                                <Button className='mt-2'
+                                  onClick={() => {
+                                    setTexts((text) =>
+                                      text.map((row) =>
+                                        row.id === activeTextId ? { ...row, textImage: '' } : row
+                                      )
+                                    )
+                                  }
+                                  }
+                                >Remove</Button>
+                              </div>
+
+                            </div>
+
+
+
+                            <div className="bg-slate-700 p-3 rounded-lg mt-3">
+
+                              <div className="flex justify-between">
+                                <h4 className='text-lg mb-2'>Gradient</h4>
+                                <div
+                                  className="toggle-wrapper cursor-pointer"
+                                  onClick={() => {
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, isgradient: !text.isgradient }
+                                          : text
+                                      )
+                                    );
+                                  }}
+                                >
+                                  {
+                                    texts.find((row) => row.id === activeTextId)?.isgradient
+                                      ? <ToggleLeft />
+                                      : <ToggleRight style={{ color: 'rgb(34 197 94)' }} />
+                                  }
+                                </div>
+
+                              </div>
+
+
+                              <div className='relative' style={texts.find((row) => row.id === activeTextId)?.isgradient ? { opacity: .3 } : {}}>
+                                <div className='absolute w-full h-full' style={texts.find((row) => row.id === activeTextId)?.isgradient ? { display: 'flex' } : { display: 'none' }}></div>
+
+
+                                <div className="flex"></div>
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Deg</span>
+                                  <span className="text-indigo-400">{texts.find((row) => row.id === activeTextId)?.gradient?.[0] ?? 0}</span>
+                                </div>
+
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="180"
+                                  className="w-full accent-indigo-500"
+                                  value={texts.find((row) => row.id === activeTextId)?.gradient?.[0] ?? 0}
+
+                                  onChange={(e) => {
+                                    const newNum = Number(e.target.value);
+
+                                    setTexts((prevTexts) =>
+                                      prevTexts.map((text) =>
+                                        text.id === activeTextId
+                                          ? { ...text, gradient: [newNum, text.gradient[1], text.gradient[2]] } // ✅ Correct way to update
+                                          : text
+                                      )
+                                    );
+                                  }}
+                                />
+
+
+                                <div className="flex justify-between items-center gap-3">
+
+                                  {/*=--=-=============- color 1 =============================*/}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        className="h-9 w-2/4 border-2"
+                                        style={{ backgroundColor: texts.find((row) => row.id === activeTextId)?.gradient?.[1] ?? 'black' }}
+                                      />
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                                      <HexColorPicker color={selectedColor} onChange={(newcolor) => {
+                                        setTexts((prevTexts) =>
+                                          prevTexts.map((text) =>
+                                            text.id === activeTextId
+                                              ? { ...text, gradient: [text.gradient[0],newcolor, text.gradient[2]] }
+                                              : text
+                                          )
+                                        )
+                                      }
+                                      }
+                                      />
+
+                                      <HexColorInput
+                                        color={selectedColor}
+                                        onChange={(newcolor) => {
+                                          setTexts((prevTexts) =>
+                                            prevTexts.map((text) =>
+                                              text.id === activeTextId
+                                                ? { ...text, gradient: [text.gradient[0],newcolor, text.gradient[2]] }
+                                                : text
+                                            )
+                                          )
+                                        }}
+                                        className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                      />
+
+                                    </PopoverContent>
+                                  </Popover>
+
+                                  {/*=--=-=============- color 2 =============================*/}
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        className="h-9 w-2/4 border-2"
+                                        style={{ backgroundColor: texts.find((row) => row.id === activeTextId)?.gradient?.[2] ?? 'black' }}
+                                      />
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                                      <HexColorPicker color={selectedColor} onChange={(newcolor) => {
+                                        setTexts((prevTexts) =>
+                                          prevTexts.map((text) =>
+                                            text.id === activeTextId
+                                              ? { ...text, gradient: [text.gradient[0], text.gradient[1], newcolor] }
+                                              : text
+                                          )
+                                        )
+                                      }
+                                      }
+                                      />
+
+                                      <HexColorInput
+                                        color={selectedColor}
+                                        onChange={(newcolor) => {
+                                          setTexts((prevTexts) =>
+                                            prevTexts.map((text) =>
+                                              text.id === activeTextId
+                                                ? { ...text, gradient: [text.gradient[0],text.gradient[1], newcolor] }
+                                                : text
+                                            )
+                                          )
+                                        }}
+                                        className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                      />
+
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+
                               </div>
 
 
