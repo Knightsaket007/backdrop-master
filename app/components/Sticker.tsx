@@ -1,47 +1,29 @@
 import { useEffect, useState } from "react";
 
-const PIXABAY_API_KEY = "49616266-4ed9268cf8716ab706261c0e1";
+const PIXABAY_API_KEY = process.env.NEXT_PUBLIC_PIXABAY_API_KEY;
 const PIXABAY_API_URL = "https://pixabay.com/api/";
 
-const fetchStickers = async () => {
-  const cacheKey = "pixabay_stickers";
-  const cachedData = localStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    const { data, timestamp } = JSON.parse(cachedData);
-    if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
-      console.log("Serving from cache");
-      return data;
-    } else {
-      localStorage.removeItem(cacheKey);
-    }
-  }
-
-  try {
-    const response = await fetch(
-      `${PIXABAY_API_URL}?key=${PIXABAY_API_KEY}&q=sticker&image_type=illustration&category=art&per_page=50`
-    );
-    const data = await response.json();
-
-    localStorage.setItem(cacheKey, JSON.stringify({ data: data.hits, timestamp: Date.now() }));
-    return data.hits;
-  } catch (error) {
-    console.error("Failed to fetch stickers", error);
-    return [];
-  }
-};
-
-const StickerComp = ({ onSelect }) => {
-  const [stickers, setStickers] = useState([]);
+const StickerComp = ({ onSelect }: { onSelect: (url: string) => void }) => {
+  const [stickers, setStickers] = useState<{ id: number; previewURL: string; largeImageURL: string; tags: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetchStickers()
-      .then((data) => setStickers(data))
-      .catch(() => setError("Failed to load stickers"))
-      .finally(() => setLoading(false));
+    const fetchStickers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${PIXABAY_API_URL}?key=${PIXABAY_API_KEY}&q=sticker&image_type=illustration&category=art&per_page=50`
+        );
+        const data = await response.json();
+        setStickers(data.hits || []);
+      } catch (err) {
+        setError("Failed to load stickers");
+      }
+      setLoading(false);
+    };
+
+    fetchStickers();
   }, []);
 
   if (loading) return <p>Loading...</p>;

@@ -302,15 +302,19 @@ function Editor() {
   };
 
   // Handle sticker selection from GIPHY
-  const handleGiphySelect = (gif: any) => {
-    setStickers(prev => [...prev, {
-      id: Date.now(),
-      src: gif.images.fixed_height.url,
-      x: Math.random() * 300,
-      y: Math.random() * 300
-    }]);
+  const handleStickerSelect = (stickerUrl: string) => {
+    setStickers((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        src: stickerUrl,
+        x: Math.random() * 300,
+        y: Math.random() * 300,
+      },
+    ]);
     setShowStickers(false);
   };
+  
 
   // Handle drawing
   const startDrawing = (e: React.MouseEvent) => {
@@ -831,7 +835,7 @@ function Editor() {
                   key={sticker.id}
                   src={sticker.src}
                   alt="Sticker"
-                  className="absolute w-16 h-16 object-contain cursor-move"
+                  className="absolute w-16 h-16 object-contain cursor-move z-50"
                   style={{
                     left: sticker.x,
                     top: sticker.y,
@@ -839,6 +843,8 @@ function Editor() {
                     transform: draggedSticker === sticker.id ? 'scale(1.1)' : 'scale(1)',
                     transition: 'transform 0.2s'
                   }}
+                  width={100}
+                  height={100}
                   onMouseDown={(e) => handleStickerMouseDown(e, sticker.id)}
                 />
               ))}
@@ -876,7 +882,7 @@ function Editor() {
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <div className="h-64 overflow-y-auto">
-                   <StickerComp onSelect={(sticker) => (sticker)} />
+                   <StickerComp onSelect={handleStickerSelect} />
 
                   </div>
                 </div>

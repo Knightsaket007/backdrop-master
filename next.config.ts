@@ -3,7 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   experimental: {
-    appDir: true,  // ✅ Ensure app router is enabled
+    appDir: true, // ✅ Ensure app router is enabled
+  },
+  images: {
+    domains: ["pixabay.com"], // ✅ Allow Pixabay images in Next.js
   },
 };
 
