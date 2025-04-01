@@ -54,6 +54,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import StickerComp from '../components/Sticker';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; };
@@ -93,8 +94,8 @@ function Editor() {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], hasShadow: boolean, textImage: string, gradient: [number, string, string], isgradient:boolean }[]>([
-    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90,'#FF6B6B', "#4A90E2"] , isgradient: true},
+  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], hasShadow: boolean, textImage: string, gradient: [number, string, string], isgradient: boolean }[]>([
+    { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90, '#FF6B6B', "#4A90E2"], isgradient: true },
   ]);
   const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
 
@@ -119,12 +120,26 @@ function Editor() {
   }, [activeTextId, texts]);
 
 
+  // =====To close sidebar feature open container when click outside that container=====//
+  const textContainerRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (textContainerRef.current && !textContainerRef.current.contains(event.target)) {
+        setshowText(false); // Close the container if clicked outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  // =====To close sidebar feature open container when click outside that container=====//
+
 
   // -=-=-=-=For text-=-=-=-//
   // -=-=-=-=For text-=-=-=-//
   const addText = () => {
     if (texts.length < 4) {
-      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90,'#FF6B6B', "#4A90E2"], isgradient: true };
+      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90, '#FF6B6B', "#4A90E2"], isgradient: true };
       setTexts([...texts, newText]);
       setActiveTextId(newText.id);
 
@@ -549,7 +564,12 @@ function Editor() {
   //   setCroppingModeOn(false)
   // }
 
+
+  const colorArray = Colors(selectedColor);
+
+
   console.log('text....', texts)
+  console.log('outline....', outline)
 
   return (
 
@@ -700,58 +720,64 @@ function Editor() {
                         style={{ width: imgWidth, height: imgHeight }}
                       />
 
+
+
                       {/* 📌 Fixed: Text Inside Image Boundaries */}
                       {/* {backgroundImage && bgremovedImage && ( */}
 
+                      {backgroundImage && bgremovedImage && (
+                        texts.map((text) => (
+                          <p
+                            key={text.id}
+                            className={`absolute flex items-center justify-center text-black text-center break-words z-20 ${outline ? "cust-animix-p-ref" : ""
+                              }`}
+                            style={{
+                              maxWidth: imgWidth,
+                              maxHeight: imgHeight,
+                              wordWrap: "break-word",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              fontSize: text.size,
+                              fontFamily: text.fontFamily,
+                              fontStyle: text.italic ? "italic" : "",
+                              fontWeight: text.bold ? "bold" : "",
+                              color: text.color,
 
-                      {texts.map((text) => (
-                        <p
-                          key={text.id}
-                          className={`absolute flex items-center justify-center text-black text-center break-words z-20 ${outline ? 'cust-animix-p-ref' : ''}`}
-                          style={{
-                            maxWidth: imgWidth,
-                            maxHeight: imgHeight,
-                            wordWrap: "break-word",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            fontSize: text.size,
-                            fontFamily: text.fontFamily,
-                            fontStyle: (text.italic) ? 'italic' : '',
-                            fontWeight: (text.bold) ? 'bold' : '',
-                            color: text.color,
+                              left: text.left,
+                              top: text.top,
+                              transform: `rotate(${text.rotate}deg)`,
+                              width: text.width,
+                              height: text.height,
+                              ...(text.textImage && {
+                                backgroundImage: `url(${text.textImage})`,
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "center center",
+                                backgroundSize: "cover",
+                                WebkitBackgroundClip: "text",
+                                backgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                              }),
 
-                            left: text.left,
-                            top: text.top,
-                            transform: `rotate(${text.rotate}deg)`,
-                            width: text.width,
-                            height: text.height,
-                            ...(text.textImage && {
-                              backgroundImage: `url(${text.textImage})`,
-                              backgroundRepeat: "no-repeat",
-                              backgroundPosition: "center center",
-                              backgroundSize: "cover",
-                              WebkitBackgroundClip: "text",
-                              backgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }),
-                          
-                            ...(!text.isgradient && {
-                              backgroundImage: `linear-gradient(${text.gradient?.[0] || "0"}deg, ${text.gradient?.[1] || "#000"}, ${text.gradient?.[2] || "#fff"})`,
-                              backgroundRepeat: "no-repeat",
-                              backgroundSize: "100%",
-                              backgroundPosition: "center",
-                              WebkitBackgroundClip: "text",
-                              backgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }),
+                              ...(!text.isgradient && {
+                                backgroundImage: `linear-gradient(${text.gradient?.[0] || "0"}deg, ${text.gradient?.[1] || "#000"}, ${text.gradient?.[2] || "#fff"})`,
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: "100%",
+                                backgroundPosition: "center",
+                                WebkitBackgroundClip: "text",
+                                backgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                              }),
 
-                            filter: !text.hasShadow ? `drop-shadow(${text?.shadow?.[0]}px ${text.shadow[1]}px ${text.shadow[2]}px ${text.shadow[3]})` : '',
+                              filter: !text.hasShadow
+                                ? `drop-shadow(${text?.shadow?.[0]}px ${text.shadow[1]}px ${text.shadow[2]}px ${text.shadow[3]})`
+                                : "",
+                            }}
+                          >
+                            {text.content}
+                          </p>
+                        ))
+                      )}
 
-                          }}
-                        >
-                          {text.content}
-                        </p>
-                      ))}
                       {/* )} */}
 
 
@@ -850,17 +876,7 @@ function Editor() {
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <div className="h-64 overflow-y-auto">
-                    <Grid
-                      width={250}
-                      columns={2}
-                      fetchGifs={async (offset: number) => gf.search(searchQuery || "trending", { limit: 50, type: "stickers", offset })}
-                      onGifClick={(gif, e) => {
-                        e.preventDefault(); // ⛔️ Prevent Giphy site from opening
-                        e.stopPropagation(); // ⛔️ Stop click event from bubbling to `<a>` tag
-                        handleGiphySelect(gif); // ✅ Select the GIF properly
-                      }}
-                      noLink={true} // ✅ Disable default link behavior
-                    />
+                   <StickerComp onSelect={(sticker) => (sticker)} />
 
                   </div>
                 </div>
@@ -869,7 +885,9 @@ function Editor() {
 
               {/* show Text */}
               {showText && (
-                <div className="absolute left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
+                <div
+                  ref={textContainerRef}
+                  className="absolute left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
                   <h2 className="text-white mb-2">Text Layers</h2>
 
                   <div className='max-h-96 overflow-y-auto'>
@@ -1080,24 +1098,19 @@ function Editor() {
                           Color
                         </div>
                         <div className="grid grid-cols-6 gap-2">
-                          {Colors(selectedColor).map((color, index) => (
+                          {colorArray.map((color, index) => (
                             <button
                               key={index}
                               className="w-8 h-8 rounded-lg border border-gray-600 hover:scale-110 transition-transform"
                               style={{ backgroundColor: color }}
                               onClick={() => {
-                                setSelectedColor(color)
+                                setSelectedColor(color);
                                 setTexts((prevTexts) =>
                                   prevTexts.map((text) =>
-                                    text.id === activeTextId
-                                      ? { ...text, color: color }
-                                      : text
+                                    text.id === activeTextId ? { ...text, color: color } : text
                                   )
-                                )
-
-                              }
-
-                              }
+                                );
+                              }}
                             />
                           ))}
                         </div>
@@ -1149,7 +1162,7 @@ function Editor() {
                           </div>
 
                           <Toggle
-                            onClick={() => { setOutline(!outline) }}
+                            onClick={() => { setOutline((prev) => !prev) }}
                           >
                             <SquareDashed />
                           </Toggle>
@@ -1511,7 +1524,15 @@ function Editor() {
 
                                       <HexColorInput
                                         color={selectedColor}
-                                        onChange={(newColor) => setSelectedColor(newColor)}
+                                        onChange={(newColor) => {
+                                          setTexts((prevTexts) =>
+                                            prevTexts.map((text) =>
+                                              text.id === activeTextId
+                                                ? { ...text, shadow: [text.shadow[0], text.shadow[1], text.shadow[2], newColor] }
+                                                : text
+                                            )
+                                          )
+                                        }}
                                         className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
                                       />
 
@@ -1634,7 +1655,7 @@ function Editor() {
                                         setTexts((prevTexts) =>
                                           prevTexts.map((text) =>
                                             text.id === activeTextId
-                                              ? { ...text, gradient: [text.gradient[0],newcolor, text.gradient[2]] }
+                                              ? { ...text, gradient: [text.gradient[0], newcolor, text.gradient[2]] }
                                               : text
                                           )
                                         )
@@ -1648,7 +1669,7 @@ function Editor() {
                                           setTexts((prevTexts) =>
                                             prevTexts.map((text) =>
                                               text.id === activeTextId
-                                                ? { ...text, gradient: [text.gradient[0],newcolor, text.gradient[2]] }
+                                                ? { ...text, gradient: [text.gradient[0], newcolor, text.gradient[2]] }
                                                 : text
                                             )
                                           )
@@ -1686,7 +1707,7 @@ function Editor() {
                                           setTexts((prevTexts) =>
                                             prevTexts.map((text) =>
                                               text.id === activeTextId
-                                                ? { ...text, gradient: [text.gradient[0],text.gradient[1], newcolor] }
+                                                ? { ...text, gradient: [text.gradient[0], text.gradient[1], newcolor] }
                                                 : text
                                             )
                                           )
