@@ -12,7 +12,6 @@ import {
   Redo,
   Download,
   Crop,
-  Wand2,
   SlidersHorizontal,
   Brush,
   Eraser,
@@ -30,10 +29,10 @@ import {
   Trash2,
   SquareDashed,
   Crown,
-  Circle,
-  SquarePower,
   ToggleLeft,
   ToggleRight,
+  BrushIcon,
+  EraserIcon,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp.';
@@ -45,9 +44,7 @@ import { toast, Toaster } from 'sonner';
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import Colors from '../utils/Colors';
-import { text } from 'stream/consumers';
 import { Toggle } from "@/components/ui/toggle"
-import { transform } from 'next/dist/build/swc/generated-native';
 import {
   Accordion,
   AccordionContent,
@@ -55,13 +52,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import StickerComp from '../components/Sticker';
+import filtersData from '@/app/filters/filtersData.json'
 
-type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'none';
-type Sticker = { id: number; src: string; x: number; y: number; };
+type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
+type Sticker = { id: number; src: string; x: number; y: number; size: number };
 
 // Initialize GIPHY API
-const giphykey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
-const gf = new GiphyFetch(giphykey as string);
 
 function Editor() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
@@ -69,6 +65,7 @@ function Editor() {
   const [selectedTool, setSelectedTool] = useState<Tool>('none');
   const [showStickers, setShowStickers] = useState(false);
   const [stickers, setStickers] = useState<Sticker[]>([]);
+  const [currSticker, setcurrSticker] = useState(0)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [bgremovedImage, setBgremovedImage] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -85,12 +82,15 @@ function Editor() {
   // const [imgHeight, setImgHeight] = useState(true);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [brushColor, setBrushColor] = useState("rgb(79 70 229)");
-  const [brushSize, setBrushSize] = useState(1);
+  const [brushColor, setBrushColor] = useState("black");
+  const [brushSize, setBrushSize] = useState(3);
+  const [eraserSize, setErazorsize] = useState(1.5);
   const [showText, setshowText] = useState(false)
-  const [outline, setOutline] = useState(false)
+  const [outline, setOutline] = useState(false);
+  const [showFilters, setFilters] = useState('none');
 
   const [selectedColor, setSelectedColor] = useState('#000000');
+  const [activesticker, setActivesticker] = useState(false);
 
 
   // const [text, setText] = useState("Your Text Here");
@@ -122,11 +122,18 @@ function Editor() {
 
   // =====To close sidebar feature open container when click outside that container=====//
   const textContainerRef = useRef(null);
+  const stickerContainerRef = useRef(null);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (textContainerRef.current && !textContainerRef.current.contains(event.target)) {
         setshowText(false); // Close the container if clicked outside
       }
+
+      if (stickerContainerRef.current && !stickerContainerRef.current.contains(event.target)) {
+        setShowStickers(false); // ✅ Sticker container hide kar do
+      }
+
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -161,26 +168,6 @@ function Editor() {
     setActiveTextId(id);
     console.log('active text...', activeTextId)
   };
-
-  // const deleteText = (id: number) => {
-  //   console.log('id is...', id)
-  //   if (texts.length === 1) {
-  //     toast('Minimum one layer should be there');
-  //     return;
-  //   }
-
-  //   setTexts((prev) => {
-  //     const newTexts = prev.filter((text) => text.id !== id);
-
-  //     if (activeTextId === id) {
-  //       // First element delete ho raha ho toh naya active element pehla element hi hoga
-  //       const newActiveText = newTexts[0];
-  //       setActiveTextId(newActiveText?.id || 0);
-  //     }
-
-  //     return newTexts;
-  //   });
-  // };
 
 
   const deleteText = (id: number) => {
@@ -254,34 +241,99 @@ function Editor() {
     if (!isCropping) {
       resetCanvas(); // Crop apply/cancel hone pe canvas refresh
     }
-  }, [isCropping, imgWidth, imgHeight, brushColor, brushSize]);
+  }, [isCropping, imgWidth, imgHeight]);
 
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
+    console.log('selected toollll..', selectedTool)
     setSelectedTool(tool);
     if (tool === 'sticker') {
-      setShowStickers(!showStickers);
+      setShowStickers((state) => {
+        return !state
+      });
       setshowText(false);
+      setActivesticker(true);
+      setIsCropping(false);
 
     } else if (tool === 'crop' && backgroundImage && !bgremovedImage) {
       setIsCropping(true);
       // setRightSidebarOpen(false);
       setCroppingModeOn(true)
+      setActivesticker(false)
     }
     else if (tool === 'text') {
       setshowText(!showText);
       setShowStickers(false);
+      setActivesticker(false)
+      setIsCropping(false);
+    }
+    else if (tool === 'filters') {
+      // setshowText(false);
+      setShowStickers(false);
+      setActivesticker(false)
+      setIsCropping(false);
     }
     else {
       setShowStickers(false);
+      setActivesticker(false)
     }
   };
 
   // Handle sticker movement
-  const handleStickerMouseDown = (e: React.MouseEvent, id: number) => {
-    if (selectedTool !== 'none') return;
-    setDraggedSticker(id);
+  // const handleStickerMouseDown = (e: React.MouseEvent, id: number) => {
+  //   if (selectedTool !== 'none') return;
+  //   setDraggedSticker(id);
+  // };
+
+
+  const handleStickerMouseDown = (e: React.MouseEvent, stickerId: number) => {
+    setcurrSticker(stickerId);
+    console.log("🖱️ Sticker Mouse Down:", stickerId);
+
+    const stickerIndex = stickers.findIndex(sticker => sticker.id === stickerId);
+    if (stickerIndex === -1) return;
+
+    const sticker = stickers[stickerIndex];
+    const offsetX = e.clientX - sticker.x;
+    const offsetY = e.clientY - sticker.y;
+
+    let wid = sticker.size;
+    let hig = sticker.size;
+    wid = wid * imgWidth;
+    hig = hig * imgHeight;
+    console.log('width...', wid)
+
+    const handleStickerMouseMove = (e: MouseEvent) => {
+      const newX = Math.max(0, Math.min(e.clientX - offsetX, imgWidth - wid)); // ✅ Sticker container ke andar rahega
+      // const newY = Math.max(0, Math.min(e.clientY - offsetY, imgHeight - 100));
+      const newY = Math.max(0, Math.min(e.clientY - offsetY, imgHeight - hig));
+
+      setStickers(prevStickers =>
+        prevStickers.map(s =>
+          s.id === stickerId ? { ...s, x: newX, y: newY } : s
+        )
+      );
+    };
+
+    const handleStickerMouseUp = () => {
+      console.log('actice sticker...', activesticker, stickerId)
+      console.log(' stickerzz...', sticker)
+      console.log('sticker...', stickers)
+      if (!activesticker) return;
+      console.log("🛑 Mouse Up - Dragging Stopped!");
+
+      document.removeEventListener("mousemove", handleStickerMouseMove);
+      document.removeEventListener("mouseup", handleStickerMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleStickerMouseMove);
+    document.addEventListener("mouseup", handleStickerMouseUp);
+    document.addEventListener("mouseleave", handleStickerMouseUp);
   };
+
+
+
+
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (draggedSticker === null) return;
@@ -303,18 +355,23 @@ function Editor() {
 
   // Handle sticker selection from GIPHY
   const handleStickerSelect = (stickerUrl: string) => {
-    setStickers((prev) => [
-      ...prev,
-      {
+    setStickers(prev => {
+      const stickerWidth = 100; // ✅ Sticker ka width
+      const stickerHeight = 100; // ✅ Sticker ka height
+
+      const newSticker = {
         id: Date.now(),
         src: stickerUrl,
-        x: Math.random() * 300,
-        y: Math.random() * 300,
-      },
-    ]);
-    setShowStickers(false);
+        x: Math.min(Math.random() * (imgWidth - stickerWidth), imgWidth - stickerWidth),
+        y: Math.min(Math.random() * (imgHeight - stickerHeight), imgHeight - stickerHeight),
+        size: .1
+      };
+      setcurrSticker(newSticker.id);
+      setShowStickers(false);
+      return [...prev, newSticker];
+    });
   };
-  
+
 
   // Handle drawing
   const startDrawing = (e: React.MouseEvent) => {
@@ -347,7 +404,8 @@ function Editor() {
 
     if (selectedTool === "eraser") {
       contextRef.current.globalCompositeOperation = "destination-out";
-      contextRef.current.lineWidth = brushSize * 1.5;  // Eraser a little bigger
+      // contextRef.current.lineWidth = brushSize * 1.5;  
+      contextRef.current.lineWidth = brushSize * eraserSize;
     } else {
       contextRef.current.globalCompositeOperation = "source-over";
     }
@@ -422,6 +480,7 @@ function Editor() {
       if (backgroundImage && !bgremovedImage) {
         setactiveLoader(true);
         const removed = await removeBg(backgroundImage);
+        setSelectedTool('text');
         setactiveLoader(false)
         setBgremovedImage(removed)
         setIsDraggable(false);
@@ -573,7 +632,7 @@ function Editor() {
 
 
   console.log('text....', texts)
-  console.log('outline....', outline)
+  console.log('tool....', selectedTool)
 
   return (
 
@@ -595,12 +654,12 @@ function Editor() {
               { icon: <ImagePlus size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
               { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
-              { icon: <Shapes size={24} />, tooltip: "Shapes", tool: 'none' as Tool },
+              // { icon: <Shapes size={24} />, tooltip: "Shapes", tool: 'none' as Tool },
               { icon: <Type size={24} />, tooltip: "Text", tool: 'text' as Tool },
               { icon: <Sticker size={24} />, tooltip: "Stickers", tool: 'sticker' as Tool },
               { icon: <Crop size={24} />, tooltip: "Crop", tool: 'crop' as Tool },
-              { icon: <Filter size={24} />, tooltip: "Filters", tool: 'none' as Tool },
-              { icon: <Layers size={24} />, tooltip: "Layers", tool: 'none' as Tool },
+              { icon: <Filter size={24} />, tooltip: "Filters", tool: 'filters' as Tool },
+              // { icon: <Layers size={24} />, tooltip: "Layers", tool: 'none' as Tool },
             ].map((item, index) => (
               <button
                 key={index}
@@ -694,7 +753,7 @@ function Editor() {
               {/* Background Image */}
               {backgroundImage && !isCropping && (
                 <>
-                  <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden">
+                  <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden" style={{filter:showFilters}}>
                     <div className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
@@ -821,7 +880,7 @@ function Editor() {
                 <canvas
                   ref={canvasRef}
                   className="absolute w-full h-full rounded-xl"
-                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden' }}
+                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden', cursor: (selectedTool === 'brush' || selectedTool === 'eraser') ? 'url("https://img.icons8.com/?size=20&id=rKqQiYPTkVLU&format=png&color=000000") 6 4, auto' : "default", filter:showFilters }}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
@@ -830,24 +889,37 @@ function Editor() {
               )}
 
               {/* Stickers Layer */}
-              {!isCropping && stickers.map(sticker => (
-                <Image
-                  key={sticker.id}
-                  src={sticker.src}
-                  alt="Sticker"
-                  className="absolute w-16 h-16 object-contain cursor-move z-50"
-                  style={{
-                    left: sticker.x,
-                    top: sticker.y,
-                    zIndex: 15,
-                    transform: draggedSticker === sticker.id ? 'scale(1.1)' : 'scale(1)',
-                    transition: 'transform 0.2s'
-                  }}
-                  width={100}
-                  height={100}
-                  onMouseDown={(e) => handleStickerMouseDown(e, sticker.id)}
-                />
-              ))}
+              {backgroundImage && !isCropping && (
+                <div className='absolute flex items-center justify-center overflow-hidden' style={{ zIndex: activesticker ? 50 : 30, width: imgWidth, height: imgHeight }} >
+                  {!isCropping && stickers.map(sticker => (
+                    <img
+                      key={sticker.id}
+                      src={sticker.src}
+                      alt="Sticker"
+                      className="absolute cursor-move"
+                      style={{
+                        filter:showFilters,
+                        left: `${sticker.x}px`,
+                        top: `${sticker.y}px`,
+                        zIndex: 15,
+                        transform: "scale(1)",
+                        transition: "transform 0.1s",
+                        width: Math.max(Math.round((sticker.size || 0.1) * imgWidth), Math.round((sticker.size || 0.1) * imgHeight)),
+                        // height: Math.max(Math.round(0.1 * imgHeight), Math.round(0.1 * imgHeight)),
+                        border: (activesticker && sticker.id === currSticker) ? "1px solid red" : "none",
+                        animation: (activesticker && sticker.id === currSticker) ? "blinkBorder 2s infinite" : "none",
+
+                      }}
+                      onMouseDown={(e) => handleStickerMouseDown(e, sticker.id)}
+
+                    />
+                  ))}
+                </div>
+              )}
+
+
+
+
 
               {/* Upload Prompt */}
               {!backgroundImage && (
@@ -864,9 +936,9 @@ function Editor() {
 
               {/* GIPHY Sticker Selector */}
               {showStickers && (
-                <div className="absolute top-4 left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
+                <div className="absolute top-4 left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72" ref={stickerContainerRef}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-semibold">GIPHY Stickers</span>
+                    <span className="font-semibold">Stickers</span>
                     <button
                       onClick={() => setShowStickers(false)}
                       className="p-1 hover:bg-gray-700 rounded-full"
@@ -882,7 +954,7 @@ function Editor() {
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <div className="h-64 overflow-y-auto">
-                   <StickerComp onSelect={handleStickerSelect} />
+                    <StickerComp onSelect={handleStickerSelect} />
 
                   </div>
                 </div>
@@ -890,7 +962,7 @@ function Editor() {
 
 
               {/* show Text */}
-              {showText && (
+              {bgremovedImage && showText && (
                 <div
                   ref={textContainerRef}
                   className="absolute left-4 bg-gray-800/95 backdrop-blur-sm p-4 rounded-lg border border-gray-700 z-50 w-72">
@@ -925,7 +997,6 @@ function Editor() {
 
 
 
-
           {/* Right Sidebar - Properties */}
           {/* Right Sidebar - Properties */}
           <div
@@ -943,8 +1014,8 @@ function Editor() {
               <div className="h-full p-6 overflow-y-auto">
 
                 {
-                  !croppingModeOn ?
-
+                  // ---------------------------------Text====----------------------------//
+                  (bgremovedImage && !croppingModeOn && selectedTool === 'text') ?
                     <div className="space-y-6">
                       {/* Text Properties */}
                       <div className="space-y-4">
@@ -1368,23 +1439,6 @@ function Editor() {
                       </div>
 
                       {/* Advanced Settings */}
-                      {/* <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-lg font-semibold">
-                          <SlidersHorizontal size={20} className="text-indigo-400" />
-                          Advanced
-                        </div>
-                        <div className="space-y-2">
-                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
-                            Filters
-                          </button>
-                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
-                            Adjustments
-                          </button>
-                          <button className="w-full bg-gray-700/50 hover:bg-gray-600 rounded-lg px-4 py-2 text-left transition-colors hover:pl-6 duration-200">
-                            Transform
-                          </button>
-                        </div>
-                      </div> */}
 
                       <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
@@ -1738,33 +1792,32 @@ function Editor() {
                     </div>
 
                     :
+                    // ---------------------------------Cropping====----------------------------//
+                    (croppingModeOn && selectedTool === 'crop') ? (
+                      <div className="space-y-6">
+                        {/* Text Properties */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-lg font-semibold">
+                            <Type size={20} className="text-indigo-400" />
+                            Select Ratio
+                          </div>
 
+                          <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors" onChange={(e) => setAspect(eval(e.target.value))}>
+                            <option value="1/1">1:1 (Square)</option>
+                            <option value="4/3">4:3 (Standard Photo)</option>
+                            <option value="16/9">16:9 (YouTube, Widescreen)</option>
+                            <option value="3/2">3:2 (DSLR Photo)</option>
+                            <option value="5/4">5:4 (Frame Prints)</option>
+                            <option value="9/16">9:16 (Stories, TikTok)</option>
+                            <option value="2/3">2:3 (Portrait Photo)</option>
+                            <option value="21/9">21:9 (Cinematic)</option>
+                          </select>
 
-
-                    <div className="space-y-6">
-                      {/* Text Properties */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-lg font-semibold">
-                          <Type size={20} className="text-indigo-400" />
-                          Select Ratio
-                        </div>
-
-                        <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors" onChange={(e) => setAspect(eval(e.target.value))}>
-                          <option value="1/1">1:1 (Square)</option>
-                          <option value="4/3">4:3 (Standard Photo)</option>
-                          <option value="16/9">16:9 (YouTube, Widescreen)</option>
-                          <option value="3/2">3:2 (DSLR Photo)</option>
-                          <option value="5/4">5:4 (Frame Prints)</option>
-                          <option value="9/16">9:16 (Stories, TikTok)</option>
-                          <option value="2/3">2:3 (Portrait Photo)</option>
-                          <option value="21/9">21:9 (Cinematic)</option>
-                        </select>
-
-                        {/* <div style={{textAlign:'center'}}>
+                          {/* <div style={{textAlign:'center'}}>
                           or
                         </div> */}
 
-                        {/* <div className="flex gap-4 justify-center">
+                          {/* <div className="flex gap-4 justify-center">
                           <input
                             type="number"
                             placeholder="width"
@@ -1778,12 +1831,215 @@ function Editor() {
                           />
                          
                         </div> */}
+                        </div>
+
+
+
                       </div>
+                    )
+                      :
+                      // ---------------------------------Sticker====----------------------------//
+                      (selectedTool === 'sticker') ? (
+                        <div className="space-y-6">
+                          {/* Text Properties */}
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-lg font-semibold">
+                              <Type size={20} className="text-indigo-400" />
+                              Select dimension
+                            </div>
+
+
+                            <div className="flex items-center justify-between">
+                              <span className='text-sm'>size</span>
+                              <span className="text-indigo-400">{Math.round((stickers.find((row) => row.id === currSticker)?.size ?? 0.01) * 100)}</span>
+                            </div>
+
+                            <input
+                              type="range"
+                              min="1"
+                              max="30"
+                              className="w-full accent-indigo-500"
+                              value={(stickers.find((row) => row.id === currSticker)?.size ?? 0.01) * 100}
+
+                              onChange={(e) => {
+                                const newNum = Number(e.target.value) / 100;
+
+                                setStickers((prevStick) =>
+                                  prevStick.map((stick) =>
+                                    stick.id === currSticker
+                                      ? { ...stick, size: newNum }
+                                      : stick
+                                  )
+                                );
+                              }}
+                            />
+
+
+                            <Button
+                              onClick={() => {
+                                setStickers((prevStick) =>
+                                  prevStick.filter((stick) => stick.id !== currSticker)
+                                );
+                              }}
+                            >
+                              Remove
+                            </Button>
 
 
 
-                    </div>
+                            <p className='text-gray-300 text-sm'>Left click on sticker + drag to move sticker(once draged then you can move without left click). </p>
+                            <p className='text-gray-300 text-sm'>Right click again to stop movement</p>
 
+                          </div>
+                        </div>
+                      )
+                        :
+                        (selectedTool === 'brush') ?
+                          (
+                            <div className="space-y-6">
+                              {/* Text Properties */}
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-lg font-semibold">
+                                  <BrushIcon size={20} className="text-indigo-400" />
+                                  Brush Property
+                                </div>
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Thinkness</span>
+                                  <span className="text-indigo-400">{brushSize}</span>
+                                </div>
+
+                                <input
+                                  type="range"
+                                  min="1"
+                                  max="30"
+                                  className="w-full accent-indigo-500"
+                                  value={brushSize}
+
+                                  onChange={(e) => {
+                                    const newNum = Number(e.target.value);
+
+                                    setBrushSize(newNum);
+                                  }}
+                                />
+
+
+
+                                <div className="flex items-center justify-between">
+                                  <span className='text-sm'>Color</span>
+                                  <span className="text-indigo-400">{brushColor}</span>
+                                </div>
+
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      className="h-9 w-full border-2"
+                                      style={{ backgroundColor: brushColor }}
+                                    />
+                                  </PopoverTrigger>
+                                  <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
+                                    <HexColorPicker color={selectedColor} onChange={(newcolor) => {
+                                      setBrushColor(newcolor);
+                                    }
+                                    }
+                                    />
+
+                                    <HexColorInput
+                                      color={selectedColor}
+                                      onChange={(newcolor) => {
+                                        setBrushColor(newcolor);
+                                      }}
+                                      className="w-full bg-gray-800 text-white border border-gray-600  px-3 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                    />
+
+                                  </PopoverContent>
+                                </Popover>
+
+
+                                <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
+
+                              </div>
+                            </div>
+                          )
+
+                          :
+
+                          (selectedTool === 'eraser') ?
+                            (
+                              <div className="space-y-6">
+                                {/* Text Properties */}
+                                <div className="space-y-4">
+                                  <div className="flex items-center gap-2 text-lg font-semibold">
+                                    <EraserIcon size={20} className="text-indigo-400" />
+                                    Eraser Property
+                                  </div>
+
+
+                                  <div className="flex items-center justify-between">
+                                    <span className='text-sm'>Thinkness</span>
+                                    <span className="text-indigo-400">{eraserSize}</span>
+                                  </div>
+
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="10"
+                                    className="w-full accent-indigo-500"
+                                    value={eraserSize}
+                                    onChange={(e) => {
+                                      const newNum = Number(e.target.value);
+                                      setErazorsize(newNum);
+                                    }}
+                                  />
+
+
+                                  <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
+
+                                </div>
+                              </div>
+                            )
+                            :
+                            (selectedTool === 'filters') ?
+                              (
+                                <div className='flex flex-col gap-3'>
+                                  {
+                                    filtersData?.[0]?.filters?.map((row, index) => (
+                                      <div key={index} className="p-2 text-center cursor-pointer" 
+                                      onClick={()=>{
+                                        // console.log('row.value', row.value)
+                                        setFilters(row.value)
+                                      }}
+                                      >
+                                        <img
+                                          className="rounded-sm w-48 h-48 object-cover mx-auto"
+                                          src="https://images.unsplash.com/photo-1737712334383-debc45ffa906?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                          alt={row.name}
+                                          style={{ filter: row.value }} 
+                                          
+                                        />
+                                        <p className="mt-2 text-sm font-medium">{row.name}</p>
+                                      </div>
+                                    ))
+                                  }
+
+                                </div>
+                              )
+                              :
+                              (
+                                <div>
+                                  <p className='text-gray-300 text-sm mt-4'>The left sidebar contains a variety of creative tools.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>Tool-specific settings and options will appear here once you select a tool.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>The Crop tool should be used before adding any text behind the image.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>Some features and tools are available exclusively to premium users.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>You can draw, erase, add stickers, text, or apply effects — all from the left panel.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>Make sure to save your work regularly to avoid losing changes.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>For best results, use high-resolution images while editing.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>Tip: You can combine multiple tools for more creative control.</p>
+                                  <p className='text-gray-300 text-sm mt-4'>✨ Start creating — your canvas is ready!</p>
+                                </div>
+
+                              )
 
 
                 }

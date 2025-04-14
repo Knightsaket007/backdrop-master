@@ -29,7 +29,7 @@ function DisableNumberScroll() {
       };
   }, []);
 
-  return null; // Yeh component bas event listeners add karne ke liye hai, toh render kuch nahi karega.
+  return null; 
 }
 
 

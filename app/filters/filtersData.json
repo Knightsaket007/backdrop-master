@@ -1,0 +1,63 @@
+[
+  {
+    "image": "https://images.unsplash.com/photo-1737712334383-debc45ffa906?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "filters": [
+      {
+        "name": "Default",
+        "value": "none"
+      },
+      {
+        "name": "Classic Grayscale",
+        "value": "grayscale(100%)"
+      },
+      {
+        "name": "High Brightness",
+        "value": "brightness(1.5)"
+      },
+      {
+        "name": "Sharp Contrast",
+        "value": "contrast(120%)"
+      },
+      {
+        "name": "Color Twist",
+        "value": "hue-rotate(180deg)"
+      },
+      {
+        "name": "Dark Invert",
+        "value": "invert(100%)"
+      },
+      {
+        "name": "Half Transparent",
+        "value": "opacity(50%)"
+      },
+      {
+        "name": "Color Pop",
+        "value": "saturate(200%)"
+      },
+      {
+        "name": "Vintage Vibes",
+        "value": "sepia(90%)"
+      },
+      {
+        "name": "Shadow Glow",
+        "value": "drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.5))"
+      },
+      {
+        "name": "Vibrant Boost",
+        "value": "contrast(110%) saturate(150%) brightness(1.2)"
+      },
+      {
+        "name": "Cinematic Tone",
+        "value": "sepia(40%) hue-rotate(20deg) contrast(120%)"
+      },
+      {
+        "name": "Night Shift",
+        "value": "invert(100%) brightness(0.9)"
+      },
+      {
+        "name": "Drama Blur",
+        "value": "blur(3px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6))"
+      }
+    ]
+  }
+]

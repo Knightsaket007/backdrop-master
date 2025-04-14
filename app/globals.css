@@ -359,3 +359,24 @@ input[type=range]{
   color: transparent;              
   font-weight: bold;
 } */
+
+@keyframes blinkBorder {
+  0% {
+    border-color: transparent;
+  }
+  50% {
+    border-color: rgb(184, 102, 102);
+  }
+  100% {
+    border-color: transparent;
+  }
+}
+
+
+div {
+  /* filter: sepia(40%) drop-shadow(2px 4px 6px black) hue-rotate(20deg); */
+  backdrop-filter: "";
+}
+
+
+
