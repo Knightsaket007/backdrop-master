@@ -54,6 +54,9 @@ const Page = () => {
         />
       </SignedIn>
 
+   
+
+
       <input
         type="file"
         accept="image/*"
