@@ -954,7 +954,9 @@ function Editor() {
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <div className="h-64 overflow-y-auto">
-                    <StickerComp onSelect={handleStickerSelect} />
+                    {/* <StickerComp onSelect={handleStickerSelect} /> */}
+                    <StickerComp onSelect={handleStickerSelect} searchQuery={searchQuery} />
+
 
                   </div>
                 </div>
