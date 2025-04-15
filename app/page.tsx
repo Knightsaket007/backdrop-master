@@ -3,6 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "@/components/ui/button"
+import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+
 
 const Page = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -38,14 +40,28 @@ const Page = () => {
 
     <div className="flex flex-col items-center justify-center p-6">
       <h1>hjfhbhj</h1>
-      <input 
-        type="file" 
-        accept="image/*" 
-        ref={fileInputRef} 
-        onChange={handleFileChange} 
+
+      <SignedIn>
+        <UserButton
+          appearance={{
+            elements: {
+              userButtonPopoverCard: "bg-gray-800 text-white border-gray-700",
+            },
+          }}
+          userProfileMode="navigation"
+          userProfileUrl="/profile"
+          redirectUrl="/"
+        />
+      </SignedIn>
+
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={handleFileChange}
         className="hidden"
       />
-      <Button 
+      <Button
         className="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4"
         onClick={() => fileInputRef.current?.click()}
       >
@@ -59,7 +75,7 @@ const Page = () => {
             <img src={selectedImage} alt="Selected" className="w-64 h-auto rounded-md" />
           </div>
 
-          <button 
+          <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
             onClick={handleRemoveBackground}
           >

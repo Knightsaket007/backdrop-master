@@ -753,7 +753,7 @@ function Editor() {
               {/* Background Image */}
               {backgroundImage && !isCropping && (
                 <>
-                  <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden" style={{filter:showFilters}}>
+                  <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden" style={{ filter: showFilters }}>
                     <div className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
@@ -880,7 +880,7 @@ function Editor() {
                 <canvas
                   ref={canvasRef}
                   className="absolute w-full h-full rounded-xl"
-                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden', cursor: (selectedTool === 'brush' || selectedTool === 'eraser') ? 'url("https://img.icons8.com/?size=20&id=rKqQiYPTkVLU&format=png&color=000000") 6 4, auto' : "default", filter:showFilters }}
+                  style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden', cursor: (selectedTool === 'brush' || selectedTool === 'eraser') ? 'url("https://img.icons8.com/?size=20&id=rKqQiYPTkVLU&format=png&color=000000") 6 4, auto' : "default", filter: showFilters }}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
@@ -898,7 +898,7 @@ function Editor() {
                       alt="Sticker"
                       className="absolute cursor-move"
                       style={{
-                        filter:showFilters,
+                        filter: showFilters,
                         left: `${sticker.x}px`,
                         top: `${sticker.y}px`,
                         zIndex: 15,
@@ -1959,6 +1959,8 @@ function Editor() {
                                 </Popover>
 
 
+                                <Button onClick={()=>{resetCanvas()}}>Clear</Button>
+
                                 <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
 
                               </div>
@@ -2007,18 +2009,18 @@ function Editor() {
                                 <div className='flex flex-col gap-3'>
                                   {
                                     filtersData?.[0]?.filters?.map((row, index) => (
-                                      <div key={index} className="p-2 text-center cursor-pointer" 
-                                      onClick={()=>{
-                                        // console.log('row.value', row.value)
-                                        setFilters(row.value)
-                                      }}
+                                      <div key={index} className="p-2 text-center cursor-pointer"
+                                        onClick={() => {
+                                          // console.log('row.value', row.value)
+                                          setFilters(row.value)
+                                        }}
                                       >
                                         <img
                                           className="rounded-sm w-48 h-48 object-cover mx-auto"
                                           src="https://images.unsplash.com/photo-1737712334383-debc45ffa906?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                           alt={row.name}
-                                          style={{ filter: row.value }} 
-                                          
+                                          style={{ filter: row.value }}
+
                                         />
                                         <p className="mt-2 text-sm font-medium">{row.name}</p>
                                       </div>
