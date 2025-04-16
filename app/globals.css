@@ -373,12 +373,26 @@ input[type=range]{
 }
 
 
-div {
-  /* filter: sepia(40%) drop-shadow(2px 4px 6px black) hue-rotate(20deg); */
-  backdrop-filter: "";
-}
-
+.cl-internal-1hp5nqm,
 .cl-internal-1dauvpw{
   display: none !important;
 }
+
+.nextjs-toast{
+  display: none !important;
+  background-color: pink !important;
+  opacity: 0;
+}
+
+div[aria-label="Next.js"] {
+  display: none !important;
+}
+
+/* globals.css ya kisi CSS file me */
+#__next-build-watcher,
+#__next-route-announcer {
+  display: none !important;
+}
+
+
 

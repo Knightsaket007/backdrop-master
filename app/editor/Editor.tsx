@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Cropper, { Area } from 'react-easy-crop';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Grid } from '@giphy/react-components';
+import { UserButton, SignedIn } from "@clerk/nextjs";
 import {
   Type,
   Palette,
@@ -477,6 +478,18 @@ function Editor() {
 
   const applyBgRemover = async () => {
     try {
+
+      console.log('image bggg...', backgroundImage)
+
+      if (
+        backgroundImage &&
+        !backgroundImage.match(/\.(png|jpe?g)$/i)
+      ) {
+
+        toast('Please upload a valid image file (PNG, JPEG, WEBP)');
+        // return;
+      }  
+
       if (backgroundImage && !bgremovedImage) {
         setactiveLoader(true);
         const removed = await removeBg(backgroundImage);
@@ -673,7 +686,33 @@ function Editor() {
                   {item.tooltip}
                 </span>
               </button>
+
+
+
+
             ))}
+
+            <div className='absolute bottom-2 flex flex-col gap-2 items-center'>
+              
+              <div>
+              <button
+                // onClick={() => handleToolClick(item.tool)}
+                className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110 
+                 `}
+                  > 
+                  <Crown size={24} className='text-yellow-400' />
+                  </button>
+              </div>
+
+              <SignedIn>
+                <UserButton
+                  // userProfileMode="navigation"
+                  // userProfileUrl="/profile"
+                  redirectUrl="/"
+                />
+              </SignedIn>
+            </div>
+
           </>
         )}
       </div>
@@ -1959,7 +1998,7 @@ function Editor() {
                                 </Popover>
 
 
-                                <Button onClick={()=>{resetCanvas()}}>Clear</Button>
+                                <Button onClick={() => { resetCanvas() }}>Clear</Button>
 
                                 <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
 

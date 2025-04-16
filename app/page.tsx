@@ -43,13 +43,9 @@ const Page = () => {
 
       <SignedIn>
         <UserButton
-          appearance={{
-            elements: {
-              userButtonPopoverCard: "bg-gray-800 text-white border-gray-700",
-            },
-          }}
-          userProfileMode="navigation"
-          userProfileUrl="/profile"
+          
+          // userProfileMode="navigation"
+          // userProfileUrl="/profile"
           redirectUrl="/"
         />
       </SignedIn>
