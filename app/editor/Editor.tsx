@@ -653,20 +653,9 @@ function Editor() {
 
 
   // =-=-===============---Download btn-----------------------//
-  const editorRef = useRef<HTMLDivElement>(null); // 👈 Unique ref name
 
   const downloadImage = async () => {
-    if (!editorRef.current) return;
-
-    const canvas = await html2canvas(editorRef.current, {
-      useCORS: true,
-      backgroundColor: null, // Keeps background transparent
-    });
-
-    const link = document.createElement("a");
-    link.download = "backdrop-master.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    
   };
   // =-=-===============---Download btn-----------------------//
 
@@ -1033,7 +1022,7 @@ function Editor() {
 
               {/* Stickers Layer */}
               {backgroundImage && !isCropping && (
-                <div className='absolute flex items-center justify-center overflow-hidden' style={{ zIndex: activesticker ? 50 : 30, width: imgWidth, height: imgHeight }} crossOrigin="anonymous">
+                <div className='absolute flex items-center justify-center overflow-hidden' style={{ zIndex: activesticker ? 50 : 30, width: imgWidth, height: imgHeight }} >
                   {!isCropping && stickers.map(sticker => (
                     <img
                       key={sticker.id}
