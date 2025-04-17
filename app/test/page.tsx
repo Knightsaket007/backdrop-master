@@ -1,52 +1,66 @@
-'use client'
+"use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import Upscaler from "upscaler";
+import model from "@upscalerjs/esrgan-slim";
 
-const ImageEditor = () => {
-  const [textPosition, setTextPosition] = useState({ top: 100, left: 100 });
+const upscaler = new Upscaler({
+  model,
+  backend: "cpu", // optional, CPU preferred for lighter use
+});
 
-  const handleDrag = (e) => {
-    setTextPosition({
-      top: e.clientY - 30,  // Adjust the offset for the text
-      left: e.clientX - 50,  // Adjust the offset for the text
-    });
+export default function UpscalePage() {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [upscaledUrl, setUpscaledUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = async () => {
+      setLoading(true);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0);
+
+      const imageData = ctx?.getImageData(0, 0, img.width, img.height);
+      if (!imageData) return;
+
+      const upscaled = await upscaler.upscale(imageData);
+      const upscaledCanvas = document.createElement("canvas");
+      upscaledCanvas.width = img.width * 2;
+      upscaledCanvas.height = img.height * 2;
+      upscaledCanvas.getContext("2d")?.putImageData(upscaled, 0, 0);
+
+      const upscaledBlob = await new Promise<Blob | null>((resolve) =>
+        upscaledCanvas.toBlob(resolve)
+      );
+      if (!upscaledBlob) return;
+
+      const upscaledObjectURL = URL.createObjectURL(upscaledBlob);
+      setImageUrl(img.src);
+      setUpscaledUrl(upscaledObjectURL);
+      setLoading(false);
+    };
   };
 
   return (
-    <div style={{ position: "relative", width: "500px", height: "500px" }}>
-      <img
-        src="your-image-url.jpg"
-        alt="background"
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          zIndex: 1,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: textPosition.top,
-          left: textPosition.left,
-          zIndex: 2,
-          background: "rgba(0, 0, 0, 0.5)",
-          color: "white",
-          padding: "5px",
-          cursor: "move",
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          document.addEventListener("mousemove", handleDrag);
-          document.addEventListener("mouseup", () => {
-            document.removeEventListener("mousemove", handleDrag);
-          });
-        }}
-      >
-        Your Text Here
-      </div>
+    <div className="p-4 space-y-4">
+      <input type="file" accept="image/*" onChange={handleImageUpload} />
+      {loading && <p>Upscaling...</p>}
+      {imageUrl && <img src={imageUrl} alt="Original" width={200} />}
+      {upscaledUrl && (
+        <div>
+          <p>Upscaled Image:</p>
+          <img src={upscaledUrl} alt="Upscaled" width={400} />
+        </div>
+      )}
     </div>
   );
-};
-
-export default ImageEditor;
+}

@@ -7,8 +7,8 @@ import "./globals.css";
 const IBMPlex = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ['400', '500', '600', '700'],
-  variable:'--font-ibm-plex'
- });
+  variable: '--font-ibm-plex'
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,14 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    
+
     <ClerkProvider>
-    <html lang="en">
-      <body className={cn("font-IBMPlex antialiased", IBMPlex.variable)}>
-        {children}
+      <html lang="en">
+        <body className={cn("font-IBMPlex antialiased", IBMPlex.variable)}>
+          {children}
         </body>
-    </html>
+      </html>
     </ClerkProvider>
-  
+
   );
 }

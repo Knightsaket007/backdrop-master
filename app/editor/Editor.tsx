@@ -54,6 +54,7 @@ import {
 } from "@/components/ui/accordion"
 import StickerComp from '../components/Sticker';
 import filtersData from '@/app/filters/filtersData.json'
+import { upscaleImage } from '../components/Upscaler';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -444,6 +445,8 @@ function Editor() {
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (event) => {
+        setImgWidth(0);
+        setImgHeight(0);
         setBackgroundImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
@@ -464,11 +467,16 @@ function Editor() {
     input.accept = "image/*";
 
     input.onchange = (event) => {
-      // const file = event.target.files[0];
       const file = (event.target as HTMLInputElement)?.files?.[0];
-      if (file) {
-        console.log("Selected Image:", file);
-        setBackgroundImage(URL.createObjectURL(file)); // ⬅️ Image preview ke liye
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setImgWidth(0);
+          setImgHeight(0)
+
+          setBackgroundImage(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
       }
     };
 
@@ -476,19 +484,25 @@ function Editor() {
   }
 
 
+  const isValidImage = (src: string) => {
+    const allowedExtensions = /\.(png|jpe?g|webp)$/i;
+    const isBase64 = src.startsWith("data:image/");
+    const isBase64Allowed = /data:image\/(png|jpe?g|webp)/i.test(src);
+
+    return (allowedExtensions.test(src) || (isBase64 && isBase64Allowed));
+  };
+
+
   const applyBgRemover = async () => {
     try {
 
       console.log('image bggg...', backgroundImage)
 
-      if (
-        backgroundImage &&
-        !backgroundImage.match(/\.(png|jpe?g)$/i)
-      ) {
+      if (backgroundImage && !isValidImage(backgroundImage)) {
+        toast("Please upload a valid image file (only PNG, JPEG, or WEBP allowed)");
+        return;
+      }
 
-        toast('Please upload a valid image file (PNG, JPEG, WEBP)');
-        // return;
-      }  
 
       if (backgroundImage && !bgremovedImage) {
         setactiveLoader(true);
@@ -635,10 +649,38 @@ function Editor() {
   };
 
 
-  // const cancelCrop = () => {
-  //   setIsCropping(false)
-  //   setCroppingModeOn(false)
-  // }
+
+  // -=-=-=-=-=-=UPscale Image-=-=-=-=-=-//
+  const upscaleImgfun = async () => {
+    if (!backgroundImage) return;
+
+    // Check if image is already upscaled (looks for our custom data attribute)
+    if (backgroundImage.includes('data-upscaled="true"')) {
+      toast("Image is already upscaled");
+      return;
+    }
+
+    setactiveLoader(true);
+    try {
+      const upscaledUrl = await upscaleImage(backgroundImage);
+      if (upscaledUrl) {
+        // Mark the image as upscaled by adding a custom attribute
+        const markedUrl = upscaledUrl.replace(
+          /^data:image\/(png|jpeg|jpg);base64,/,
+          (match, ext) => `data:image/${ext};data-upscaled="true";base64,`
+        );
+        setBackgroundImage(markedUrl);
+      }
+    } catch (error) {
+      toast("Upscaling failed. Try again.");
+      console.error("Upscaling error:", error);
+    } finally {
+      setactiveLoader(false);
+    }
+  };
+
+  // -=-=-=-=-=-=UPscale Image-=-=-=-=-=-//
+
 
 
   const colorArray = Colors(selectedColor);
@@ -693,22 +735,22 @@ function Editor() {
             ))}
 
             <div className='absolute bottom-2 flex flex-col gap-2 items-center'>
-              
+
               <div>
-              <button
-                // onClick={() => handleToolClick(item.tool)}
-                className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110 
+                <button
+                  // onClick={() => handleToolClick(item.tool)}
+                  className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110 
                  `}
-                  > 
+                >
                   <Crown size={24} className='text-yellow-400' />
-                  </button>
+                </button>
               </div>
 
               <SignedIn>
                 <UserButton
-                  // userProfileMode="navigation"
-                  // userProfileUrl="/profile"
-                  redirectUrl="/"
+                // userProfileMode="navigation"
+                // userProfileUrl="/profile"
+                // redirectUrl="/"
                 />
               </SignedIn>
             </div>
@@ -767,7 +809,10 @@ function Editor() {
 
             }
 
-            <button className="hidden md:flex px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg items-center gap-2 transition-colors">
+            <button className="hidden md:flex px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg items-center gap-2 transition-colors"
+              onClick={upscaleImgfun}
+            // onClick={()=>upscaleImage(backgroundImage || "")}
+            >
               <Sparkles size={18} className="text-yellow-400" />
               AI Enhance
             </button>
