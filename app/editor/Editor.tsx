@@ -36,7 +36,7 @@ import {
   EraserIcon,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
-import LoaderComp from '../components/LoaderComp.';
+import LoaderComp from '../components/LoaderComp';
 import Image from 'next/image';
 import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
@@ -55,6 +55,7 @@ import {
 import StickerComp from '../components/Sticker';
 import filtersData from '@/app/filters/filtersData.json'
 import { upscaleImage } from '../components/Upscaler';
+import html2canvas from "html2canvas";
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -112,6 +113,7 @@ function Editor() {
 
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
+  const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
 
 
   useEffect(() => {
@@ -650,13 +652,32 @@ function Editor() {
 
 
 
+  // =-=-===============---Download btn-----------------------//
+  const editorRef = useRef<HTMLDivElement>(null); // 👈 Unique ref name
+
+  const downloadImage = async () => {
+    if (!editorRef.current) return;
+
+    const canvas = await html2canvas(editorRef.current, {
+      useCORS: true,
+      backgroundColor: null, // Keeps background transparent
+    });
+
+    const link = document.createElement("a");
+    link.download = "backdrop-master.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+  // =-=-===============---Download btn-----------------------//
+
+
+
   // -=-=-=-=-=-=UPscale Image-=-=-=-=-=-//
   const upscaleImgfun = async () => {
     if (!backgroundImage) return;
 
-    // Check if image is already upscaled (looks for our custom data attribute)
     if (backgroundImage.includes('data-upscaled="true"')) {
-      toast("Image is already upscaled");
+      toast("Image is already Enhanced");
       return;
     }
 
@@ -669,6 +690,7 @@ function Editor() {
           /^data:image\/(png|jpeg|jpg);base64,/,
           (match, ext) => `data:image/${ext};data-upscaled="true";base64,`
         );
+        setBeforeenhancedImg(backgroundImage);
         setBackgroundImage(markedUrl);
       }
     } catch (error) {
@@ -680,6 +702,16 @@ function Editor() {
   };
 
   // -=-=-=-=-=-=UPscale Image-=-=-=-=-=-//
+
+
+  // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
+  const cancelupscaleImg=()=>{
+    if(beforeenhancedImg){
+      setBackgroundImage(beforeenhancedImg)
+      setBeforeenhancedImg('')
+    }
+  }
+  // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
 
 
 
@@ -809,14 +841,41 @@ function Editor() {
 
             }
 
-            <button className="hidden md:flex px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg items-center gap-2 transition-colors"
-              onClick={upscaleImgfun}
-            // onClick={()=>upscaleImage(backgroundImage || "")}
-            >
-              <Sparkles size={18} className="text-yellow-400" />
-              AI Enhance
-            </button>
-            <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center gap-2 transition-colors group">
+
+            {
+              backgroundImage && !bgremovedImage && (
+                <>
+                  {
+                    beforeenhancedImg ? (
+                      <button className="hidden md:flex px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg items-center gap-2 transition-colors"
+                        onClick={cancelupscaleImg}
+                      // onClick={()=>upscaleImage(backgroundImage || "")}
+                      >
+                        <Sparkles size={18} className="text-yellow-400" />
+                        Cancel Enhancement
+                      </button>
+                    )
+                      :
+                      (
+                        <button className="hidden md:flex px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg items-center gap-2 transition-colors"
+                          onClick={upscaleImgfun}
+                        // onClick={()=>upscaleImage(backgroundImage || "")}
+                        >
+                          <Sparkles size={18} className="text-yellow-400" />
+                          AI Enhance
+                        </button>
+                      )
+                  }
+
+
+
+                </>
+              )
+            }
+
+
+
+            <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center gap-2 transition-colors group" onClick={downloadImage}>
               <Download size={20} className="group-hover:translate-y-0.5 transition-transform" />
               <span className="hidden md:inline">Export</span>
             </button>
@@ -838,7 +897,7 @@ function Editor() {
               {backgroundImage && !isCropping && (
                 <>
                   <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden" style={{ filter: showFilters }}>
-                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
+                    <div ref={editorRef} className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
                         src={backgroundImage}
@@ -974,7 +1033,7 @@ function Editor() {
 
               {/* Stickers Layer */}
               {backgroundImage && !isCropping && (
-                <div className='absolute flex items-center justify-center overflow-hidden' style={{ zIndex: activesticker ? 50 : 30, width: imgWidth, height: imgHeight }} >
+                <div className='absolute flex items-center justify-center overflow-hidden' style={{ zIndex: activesticker ? 50 : 30, width: imgWidth, height: imgHeight }} crossOrigin="anonymous">
                   {!isCropping && stickers.map(sticker => (
                     <img
                       key={sticker.id}
