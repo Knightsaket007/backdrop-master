@@ -18,7 +18,6 @@ export default function ScreenMismatch() {
     }
   }, []);
 
-  //=--=-=-=- Resize listener =-=-=-=//
   useEffect(() => {
     const handleResize = () => {
       const currentWidth = window.innerWidth;
@@ -26,8 +25,6 @@ export default function ScreenMismatch() {
       const hasResized = initialWidth !== null && currentWidth !== initialWidth;
 
       if (hasResized) {
-        //=-=-=-=-=-=- Important: If resized, override "do anyway"=-=-=-=//
-        //=-=-=-=-=-=- Important: If resized, override "do anyway"=-=-=-=//>
         setAllowAnyway(false);
         setResized(true);
         setShowPopup(true);
@@ -55,12 +52,22 @@ export default function ScreenMismatch() {
         </p>
 
         {!resized && (
-          <button
-            onClick={() => setAllowAnyway(true)}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-          >
-            Do Anyway
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setAllowAnyway(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            >
+              Do Anyway
+            </button>
+            <button
+              onClick={() => {
+                window.open(window.location.href, '_blank', 'width=1200,height=800');
+              }}
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+            >
+              Open in Desktop Mode
+            </button>
+          </div>
         )}
       </div>
     </div>
