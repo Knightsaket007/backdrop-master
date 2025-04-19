@@ -46,7 +46,7 @@ export default function ScreenMismatch() {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center" style={{ zIndex: "100" }}>
       <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm text-center">
-        <h2 className="text-xl font-semibold mb-2 text-red-700">Screen Size Not Supported</h2>
+        <h2 className="text-xl font-semibold mb-2 text-red-700">Screen Resize Detect</h2>
         <p className="text-gray-700 mb-4">
           {resized
             ? "You resized your screen or switched device. Please use a desktop or full-screen mode to continue."
