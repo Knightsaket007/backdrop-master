@@ -5,9 +5,8 @@ export default function ScreenMismatch() {
   const [initialWidth, setInitialWidth] = useState<number | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [allowAnyway, setAllowAnyway] = useState(false);
-  const [resized, setResized] = useState(false); // 🔥 Track if resize happened after load
+  const [resized, setResized] = useState(false);
 
-  // On mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const width = window.innerWidth;
@@ -19,18 +18,21 @@ export default function ScreenMismatch() {
     }
   }, []);
 
-  // On resize
+  //=--=-=-=- Resize listener =-=-=-=//
   useEffect(() => {
     const handleResize = () => {
       const currentWidth = window.innerWidth;
-
-      // If resized OR screen is too small
       const isScreenTooSmall = currentWidth < 800;
       const hasResized = initialWidth !== null && currentWidth !== initialWidth;
 
-      if (hasResized || isScreenTooSmall) {
+      if (hasResized) {
+        //=-=-=-=-=-=- Important: If resized, override "do anyway"=-=-=-=//
+        //=-=-=-=-=-=- Important: If resized, override "do anyway"=-=-=-=//>
+        setAllowAnyway(false);
+        setResized(true);
         setShowPopup(true);
-        setResized(hasResized); // 🧠 Only set true if actually resized
+      } else if (isScreenTooSmall) {
+        setShowPopup(true);
       } else {
         setShowPopup(false);
       }
@@ -40,7 +42,6 @@ export default function ScreenMismatch() {
     return () => window.removeEventListener("resize", handleResize);
   }, [initialWidth]);
 
-  // If user clicked "Do Anyway", hide popup
   if (!showPopup || allowAnyway) return null;
 
   return (
