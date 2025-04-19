@@ -252,7 +252,7 @@ function Editor() {
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
     console.log('selected toollll..', selectedTool)
-    
+    if(!backgroundImage)return;
     setSelectedTool(tool);
     if (tool === 'sticker') {
       setShowStickers((state) => {
