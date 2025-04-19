@@ -55,7 +55,9 @@ import {
 import StickerComp from '../components/Sticker';
 import filtersData from '@/app/filters/filtersData.json'
 import { upscaleImage } from '../components/Upscaler';
-import html2canvas from "html2canvas";
+import * as htmlToImage from 'html-to-image';
+import { blobUrlToDataUrl } from '@/lib/blobToBase64';
+import ScreenMismatch from '../components/ScreenMismatch';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -250,6 +252,7 @@ function Editor() {
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
     console.log('selected toollll..', selectedTool)
+    
     setSelectedTool(tool);
     if (tool === 'sticker') {
       setShowStickers((state) => {
@@ -510,9 +513,24 @@ function Editor() {
         setactiveLoader(true);
         const removed = await removeBg(backgroundImage);
         setSelectedTool('text');
-        setactiveLoader(false)
-        setBgremovedImage(removed)
-        setIsDraggable(false);
+        try {
+          if (removed) {
+            const base64img = await blobUrlToDataUrl(removed)
+            setBgremovedImage(base64img)
+            setactiveLoader(false)
+            setIsDraggable(false);
+          }
+          else {
+            toast('Some thing went worng', {
+              description: 'Please upgrade or try later'
+            })
+          }
+
+        }
+        catch (error) {
+          console.error('error to convert to base64', error)
+        }
+
 
       }
     }
@@ -655,8 +673,64 @@ function Editor() {
   // =-=-===============---Download btn-----------------------//
 
   const downloadImage = async () => {
-    
+    const container = document.getElementById('final-preview');
+    if (!container || !imgWidth || !imgHeight) return;
+
+    setactiveLoader(true);
+
+    const originalMargin = container.style.marginTop;
+    container.style.marginTop = '0px';
+   
+
+    try {
+      const pixelRatio = 4; // Higher = Better Quality (try 2–4)
+
+      // Step 1: Get full canvas of the preview
+      const fullCanvas = await htmlToImage.toCanvas(container, {
+        cacheBust: true,
+        pixelRatio,
+      });
+
+      // Step 2: Calculate the exact center area based on fixed design size
+      const cropWidth = imgWidth * pixelRatio;
+      const cropHeight = imgHeight * pixelRatio;
+      const centerX = (fullCanvas.width - cropWidth) / 2;
+      const centerY = (fullCanvas.height - cropHeight) / 2;
+
+      // Step 3: Create a new canvas with those fixed dimensions
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = cropWidth;
+      croppedCanvas.height = cropHeight;
+
+      const ctx = croppedCanvas.getContext('2d');
+      if (!ctx) throw new Error("Canvas context not available");
+
+      ctx.drawImage(
+        fullCanvas,
+        centerX, centerY,
+        cropWidth, cropHeight,
+        0, 0,
+        cropWidth, cropHeight
+      );
+
+      // Step 4: Export final image
+      const dataUrl = croppedCanvas.toDataURL('image/png');
+
+      const link = document.createElement('a');
+      link.download = 'hi-res-image.png';
+      link.href = dataUrl;
+      link.click();
+
+    } catch (err) {
+      console.error('Image export failed:', err);
+      alert('Export failed. Try again.');
+    } finally {
+      container.style.marginTop = originalMargin;
+      setactiveLoader(false);
+    }
   };
+
+
   // =-=-===============---Download btn-----------------------//
 
 
@@ -694,8 +768,8 @@ function Editor() {
 
 
   // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
-  const cancelupscaleImg=()=>{
-    if(beforeenhancedImg){
+  const cancelupscaleImg = () => {
+    if (beforeenhancedImg) {
       setBackgroundImage(beforeenhancedImg)
       setBeforeenhancedImg('')
     }
@@ -710,10 +784,14 @@ function Editor() {
   console.log('text....', texts)
   console.log('tool....', selectedTool)
 
+
   return (
 
 
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+
+      <ScreenMismatch />
+
       {activeLoader && (<LoaderComp />)}
 
       {/* Left Sidebar - Main Tools */}
@@ -740,8 +818,11 @@ function Editor() {
               <button
                 key={index}
                 onClick={() => handleToolClick(item.tool)}
-                className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110 
-                  ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}`}
+                className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110
+                  ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
+                  ${!backgroundImage && 'opacity-50 bg-transparent'} 
+                  
+                  `}
                 title={item.tooltip}
               >
                 {item.icon}
@@ -875,6 +956,7 @@ function Editor() {
         <div className="flex-1 flex min-h-0">
           <div className="flex-1 bg-[#1a1a1a] p-4 md:p-8 flex items-center justify-center overflow-auto" >
             <div
+              id='final-preview'
               className="relative w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl flex items-center justify-center text-gray-400 group" style={{ marginTop: '150px' }}
               onDrop={isDraggable ? handleDrop : undefined}  // 🔥 Disable drag events
               onDragOver={isDraggable ? handleDragOver : undefined}
@@ -886,7 +968,7 @@ function Editor() {
               {backgroundImage && !isCropping && (
                 <>
                   <div className="relative flex items-center justify-center w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl overflow-hidden" style={{ filter: showFilters }}>
-                    <div ref={editorRef} className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
+                    <div id='final-preview' className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
                         src={backgroundImage}
@@ -1011,6 +1093,7 @@ function Editor() {
               {!isCropping && (
                 <canvas
                   ref={canvasRef}
+
                   className="absolute w-full h-full rounded-xl"
                   style={{ zIndex: selectedTool === 'brush' || selectedTool === 'eraser' ? 50 : 40, width: imgWidth, height: imgHeight, overflow: 'hidden', cursor: (selectedTool === 'brush' || selectedTool === 'eraser') ? 'url("https://img.icons8.com/?size=20&id=rKqQiYPTkVLU&format=png&color=000000") 6 4, auto' : "default", filter: showFilters }}
                   onMouseDown={startDrawing}
