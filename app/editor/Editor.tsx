@@ -680,7 +680,7 @@ function Editor() {
 
     const originalMargin = container.style.marginTop;
     container.style.marginTop = '0px';
-   
+    if(outline)setOutline(false)
 
     try {
       const pixelRatio = 4; // Higher = Better Quality (try 2–4)
