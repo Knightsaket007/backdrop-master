@@ -10,7 +10,13 @@ import {
 // import Head from 'next/head';
 
 
-const FontSelector = ({ selectedFont, setSelectedFont, isPremiumUser = false }) => (
+type FontSelectorProps = {
+  selectedFont: string;
+  setSelectedFont: (font: string) => void;
+  isPremiumUser?: boolean;
+};
+
+const FontSelector = ({ selectedFont, setSelectedFont, isPremiumUser = false }: FontSelectorProps) => (
   <>
 
     <Select value={selectedFont} onValueChange={setSelectedFont}>

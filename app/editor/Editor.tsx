@@ -102,7 +102,9 @@ function Editor() {
   const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], hasShadow: boolean, textImage: string, gradient: [number, string, string], isgradient: boolean }[]>([
     { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90, '#FF6B6B', "#4A90E2"], isgradient: true },
   ]);
-  const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
+  // const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
+  const [activeTextId, setActiveTextId] = useState<number | null>(texts[0]?.id || null);
+
 
 
   // const [selectedFont, setSelectedFont] = useState(fonts[0].value); 
@@ -127,17 +129,19 @@ function Editor() {
 
 
   // =====To close sidebar feature open container when click outside that container=====//
-  const textContainerRef = useRef(null);
-  const stickerContainerRef = useRef(null);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const stickerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (textContainerRef.current && !textContainerRef.current.contains(event.target)) {
-        setshowText(false); // Close the container if clicked outside
-      }
+      const target = event.target as Node;
 
-      if (stickerContainerRef.current && !stickerContainerRef.current.contains(event.target)) {
-        setShowStickers(false); // ✅ Sticker container hide kar do
+      if (textContainerRef.current && !textContainerRef.current.contains(target)) {
+        setshowText(false);
+      }
+  
+      if (stickerContainerRef.current && !stickerContainerRef.current.contains(target)) {
+        setShowStickers(false);
       }
 
     };
@@ -152,7 +156,25 @@ function Editor() {
   // -=-=-=-=For text-=-=-=-//
   const addText = () => {
     if (texts.length < 4) {
-      const newText = { id: Date.now(), content: "New Text", fontFamily: 'Inter, sans-serif', size: 'clamp(12px, 3vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90, '#FF6B6B', "#4A90E2"], isgradient: true };
+      const newText = {
+        id: Date.now(),
+        content: "New Text",
+        fontFamily: 'Inter, sans-serif',
+        size: 'clamp(12px, 3vw, 100px)',
+        bold: false,
+        italic: false,
+        color: '#000000',
+        top: '',
+        left: '',
+        rotate: 0,
+        width: '',
+        height: '',
+        shadow: [4, 4, 4, 'black'] as [number, number, number, string],
+        hasShadow: true,
+        textImage: "",
+        gradient: [90, '#FF6B6B', "#4A90E2"] as [number, string, string],
+        isgradient: true
+      };
       setTexts([...texts, newText]);
       setActiveTextId(newText.id);
 
