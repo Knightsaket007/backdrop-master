@@ -139,7 +139,7 @@ function Editor() {
       if (textContainerRef.current && !textContainerRef.current.contains(target)) {
         setshowText(false);
       }
-  
+
       if (stickerContainerRef.current && !stickerContainerRef.current.contains(target)) {
         setShowStickers(false);
       }
@@ -274,7 +274,7 @@ function Editor() {
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
     console.log('selected toollll..', selectedTool)
-    if(!backgroundImage)return;
+    if (!backgroundImage) return;
     setSelectedTool(tool);
     if (tool === 'sticker') {
       setShowStickers((state) => {
@@ -659,12 +659,14 @@ function Editor() {
         ctx.scale(dpr, dpr);
 
         // Redraw the original background image
-        const image = new Image();
-        image.src = backgroundImage;
+        if (backgroundImage) {
+          const image = new window.Image();
+          image.src = backgroundImage;
 
-        image.onload = () => {
-          ctx.drawImage(image, 0, 0, imgWidth, imgHeight);
-        };
+          image.onload = () => {
+            ctx.drawImage(image, 0, 0, imgWidth, imgHeight);
+          };
+        }
 
         // Update contextRef
         contextRef.current = ctx;
@@ -702,7 +704,7 @@ function Editor() {
 
     const originalMargin = container.style.marginTop;
     container.style.marginTop = '0px';
-    if(outline)setOutline(false)
+    if (outline) setOutline(false)
 
     try {
       const pixelRatio = 4; // Higher = Better Quality (try 2–4)
