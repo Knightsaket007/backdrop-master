@@ -741,7 +741,7 @@ function Editor() {
       const dataUrl = croppedCanvas.toDataURL('image/png');
 
       const link = document.createElement('a');
-      link.download = 'hi-res-image.png';
+      link.download = 'myImage(picfer.com).png';
       link.href = dataUrl;
       link.click();
 
@@ -2200,7 +2200,7 @@ function Editor() {
 
                                 <Button onClick={() => { resetCanvas() }}>Clear</Button>
 
-                                <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
+                                <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw untill you change size.</p>
 
                               </div>
                             </div>
@@ -2236,8 +2236,9 @@ function Editor() {
                                     }}
                                   />
 
+                                  <Button onClick={() => { resetCanvas() }}>Clear</Button>
 
-                                  <p className='text-gray-300 text-sm mt-4'>Brush size is same for all draw. Change thinkness reset all drawings</p>
+                                  <p className='text-gray-300 text-sm mt-4'>Change size of Eraser or reset entire drawing</p>
 
                                 </div>
                               </div>
