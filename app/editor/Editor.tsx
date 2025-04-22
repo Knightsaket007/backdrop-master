@@ -999,7 +999,7 @@ function Editor() {
                         alt="Background"
                         className="max-w-full max-h-full object-contain z-10"
                         onLoad={(e) => {
-                          const img = e.target;
+                          const img = e.target as HTMLImageElement; 
                           const parent = img.parentElement;
                           if (parent) {
                             const parentWidth = parent.clientWidth;
