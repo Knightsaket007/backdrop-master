@@ -47,7 +47,7 @@ export default function ScreenMismatch() {
         <h2 className="text-xl font-semibold mb-2 text-red-700">Screen Resize Detect</h2>
         <p className="text-gray-700 mb-4">
           {resized
-            ? "You resized your screen or switched device. Please use a desktop or full-screen mode to continue."
+            ? "You resized your screen or switched device. Please use same screen size for best experience or reload the page."
             : "You're using a small screen. For best results, use a larger screen (like a PC)."}
         </p>
 
