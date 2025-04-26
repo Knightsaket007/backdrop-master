@@ -46,7 +46,7 @@ const Page = () => {
           
           // userProfileMode="navigation"
           // userProfileUrl="/profile"
-          redirectUrl="/"
+          // redirectUrl="/"
         />
       </SignedIn>
 

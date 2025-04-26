@@ -2,8 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Cropper, { Area } from 'react-easy-crop';
-import { GiphyFetch } from '@giphy/js-fetch-api';
-import { Grid } from '@giphy/react-components';
 import { UserButton, SignedIn } from "@clerk/nextjs";
 import {
   Type,
@@ -16,8 +14,6 @@ import {
   SlidersHorizontal,
   Brush,
   Eraser,
-  Shapes,
-  Layers,
   PanelLeftClose,
   PanelRightClose,
   Sparkles,
@@ -37,7 +33,7 @@ import {
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp';
-import Image from 'next/image';
+// import Image from 'next/image';
 import FontSelector from '../components/Fonts';
 import fonts from '@/app/font/font.json';
 import { Button } from '@/components/ui/button';
