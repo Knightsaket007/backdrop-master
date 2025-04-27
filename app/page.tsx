@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "@/components/ui/button"
-import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { UserButton, SignedIn } from "@clerk/nextjs";
 
 
 const Page = () => {

@@ -995,7 +995,7 @@ function Editor() {
                         alt="Background"
                         className="max-w-full max-h-full object-contain z-10"
                         onLoad={(e) => {
-                          const img = e.target as HTMLImageElement; 
+                          const img = e.target as HTMLImageElement;
                           const parent = img.parentElement;
                           if (parent) {
                             const parentWidth = parent.clientWidth;
@@ -1029,8 +1029,8 @@ function Editor() {
                             className={`absolute flex items-center justify-center text-black text-center break-words z-20 ${outline ? "cust-animix-p-ref" : ""
                               }`}
                             style={{
-                              maxWidth: imgWidth,
-                              maxHeight: imgHeight,
+                              // maxWidth: imgWidth,
+                              // maxHeight: imgHeight,
                               wordWrap: "break-word",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
@@ -1839,10 +1839,11 @@ function Editor() {
 
                               </div>
 
-
                             </div>
 
-                            <div className="bg-slate-700 p-3 rounded-lg mt-3">
+
+                            {/*=-=-=- Text in Image =-=-=-*/}
+                            {/* <div className="bg-slate-700 p-3 rounded-lg mt-3">
                               <div className="flex justify-between">
                                 <h4 className='text-lg mb-2'>Image in text</h4>
                               </div>
@@ -1874,7 +1875,7 @@ function Editor() {
                                 >Remove</Button>
                               </div>
 
-                            </div>
+                            </div> */}
 
 
 
