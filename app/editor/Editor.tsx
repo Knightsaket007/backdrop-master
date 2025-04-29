@@ -54,6 +54,7 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
+import HandleState from './HandleState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -795,10 +796,34 @@ function Editor() {
     }
   }
   // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
-
-
-
+  
   const colorArray = Colors(selectedColor);
+
+
+
+  // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
+  useEffect(()=>{
+    const handleSaveBeforeExit=()=>{
+      // HandleState()
+    }
+    //=-=-=-=-Tab close=-=-=-=//
+    window.addEventListener("beforeunload", handleSaveBeforeExit);
+    
+    //=-=-=-=-Close Browser=-=-=-=//
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        handleSaveBeforeExit();
+      }
+    });
+
+    // return () => {
+    //   window.removeEventListener("beforeunload", handleSaveBeforeExit);
+    //   document.removeEventListener("visibilitychange", handleSaveBeforeExit);
+    // };
+    
+
+  },[])
+
 
 
   console.log('text....', texts)
