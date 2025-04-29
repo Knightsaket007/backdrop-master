@@ -674,20 +674,20 @@ function Editor() {
   };
 
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setTexts((prev) =>
-        prev.map((text) =>
-          text.id === activeTextId ? { ...text, textImage: imageUrl } : text
-        )
-      );
-    }
-    else {
-      toast("oops... image upload failed")
-    }
-  };
+  // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     const imageUrl = URL.createObjectURL(file);
+  //     setTexts((prev) =>
+  //       prev.map((text) =>
+  //         text.id === activeTextId ? { ...text, textImage: imageUrl } : text
+  //       )
+  //     );
+  //   }
+  //   else {
+  //     toast("oops... image upload failed")
+  //   }
+  // };
 
 
 
