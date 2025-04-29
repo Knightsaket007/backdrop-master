@@ -816,10 +816,10 @@ function Editor() {
       }
     });
 
-    // return () => {
-    //   window.removeEventListener("beforeunload", handleSaveBeforeExit);
-    //   document.removeEventListener("visibilitychange", handleSaveBeforeExit);
-    // };
+    return () => {
+      window.removeEventListener("beforeunload", handleSaveBeforeExit);
+      document.removeEventListener("visibilitychange", handleSaveBeforeExit);
+    };
     
 
   },[])
