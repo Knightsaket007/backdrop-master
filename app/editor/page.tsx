@@ -75,7 +75,7 @@ export default function Editorage() {
     return (
         <>
             <SignedIn>
-                <Editor />
+                <Editor id="007" plan="free"/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />

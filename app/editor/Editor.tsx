@@ -61,7 +61,11 @@ type Sticker = { id: number; src: string; x: number; y: number; size: number };
 
 // Initialize GIPHY API
 
-function Editor() {
+type EditorProps = {
+  id: string;
+  plan: string;
+};
+function Editor({id, plan}: EditorProps) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [selectedTool, setSelectedTool] = useState<Tool>('none');
@@ -804,7 +808,7 @@ function Editor() {
   // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
   useEffect(()=>{
     const handleSaveBeforeExit=()=>{
-      // HandleState()
+      HandleState(id,plan)
     }
     //=-=-=-=-Tab close=-=-=-=//
     window.addEventListener("beforeunload", handleSaveBeforeExit);
