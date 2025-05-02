@@ -806,27 +806,36 @@ function Editor({id, plan}: EditorProps) {
 
 
   // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
-  useEffect(()=>{
-    const handleSaveBeforeExit=()=>{
-      HandleState(id,plan)
-    }
-    //=-=-=-=-Tab close=-=-=-=//
-    window.addEventListener("beforeunload", handleSaveBeforeExit);
-    
-    //=-=-=-=-Close Browser=-=-=-=//
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        handleSaveBeforeExit();
-      }
-    });
-
-    return () => {
-      window.removeEventListener("beforeunload", handleSaveBeforeExit);
-      document.removeEventListener("visibilitychange", handleSaveBeforeExit);
+  useEffect(() => {
+    // let hasSaved=false
+    const saveData = () => {
+      // if(hasSaved) return;
+      // hasSaved = true;
+      console.log("💾 Saving before exit...");
+      navigator.sendBeacon(
+        "/api/save-editor",
+        JSON.stringify({ userId: id, texts: plan })
+      );
     };
-    
-
-  },[])
+  
+    //=---=-=-=- Save on tab/browser close =-=-=-=-//
+    window.addEventListener("beforeunload", saveData);
+  
+    //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        saveData();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+  
+    // Cleanup
+    return () => {
+      window.removeEventListener("beforeunload", saveData);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+  
 
 
 
