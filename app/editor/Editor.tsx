@@ -827,7 +827,7 @@ function Editor({id, plan}: EditorProps) {
     window.addEventListener("beforeunload", saveData);
   
     //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = () => { 
       if (document.visibilityState === "hidden") {
         saveData();
       }
