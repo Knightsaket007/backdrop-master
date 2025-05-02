@@ -806,10 +806,15 @@ function Editor({id, plan}: EditorProps) {
 
 
   // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
+  console.log('bg img isss', backgroundImage)
+  
+  const backgroundImageRef=useRef(backgroundImage);
+  backgroundImageRef.current = backgroundImage;
   useEffect(() => {
     // let hasSaved=false
     const saveData = () => {
-      // if(hasSaved) return;
+      console.log('inside save state...', backgroundImageRef.current)
+      if(!backgroundImageRef.current) return;
       // hasSaved = true;
       console.log("💾 Saving before exit...");
       navigator.sendBeacon(
