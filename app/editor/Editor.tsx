@@ -808,18 +808,53 @@ function Editor({id, plan}: EditorProps) {
   // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
   console.log('bg img isss', backgroundImage)
   
+  const stickersRef=useRef(stickers);
   const backgroundImageRef=useRef(backgroundImage);
+  const bgremovedImageRef=useRef(bgremovedImage);
+  const imgWidthRef=useRef(imgWidth);
+  const imgHeightRef=useRef(imgHeight);
+  const brushColorRef=useRef(brushColor);
+  const brushSizeRef=useRef(brushSize);
+  const showFiltersRef=useRef(showFilters);
+  const colorArrayRef=useRef(colorArray);
+  const textsRef=useRef(texts);
+
+  
+  stickersRef.current = stickers;
   backgroundImageRef.current = backgroundImage;
+  bgremovedImageRef.current = bgremovedImage;
+  imgWidthRef.current = imgWidth;
+  imgHeightRef.current = imgHeight;
+  brushColorRef.current = brushColor;
+  brushSizeRef.current = brushSize;
+  showFiltersRef.current = showFilters;
+  colorArrayRef.current = colorArray;
+  textsRef.current = texts;
+
   useEffect(() => {
-    // let hasSaved=false
     const saveData = () => {
       console.log('inside save state...', backgroundImageRef.current)
       if(!backgroundImageRef.current) return;
-      // hasSaved = true;
+
+      const payload = {
+        userId: id,
+        plan: plan,
+        backgroundImage: backgroundImageRef.current,
+        bgremovedImage: bgremovedImageRef.current,
+        imgWidth: imgWidthRef.current,
+        imgHeight: imgHeightRef.current,
+        brushColor: brushColorRef.current,
+        brushSize: brushSizeRef.current,
+        showFilters: showFiltersRef.current,
+        colorArray: colorArrayRef.current,
+        texts: textsRef.current,
+        stickers: stickersRef.current,
+      };
+
       console.log("💾 Saving before exit...");
       navigator.sendBeacon(
         "/api/save-editor",
-        JSON.stringify({ userId: id, texts: plan })
+        JSON.stringify(payload)
       );
     };
   

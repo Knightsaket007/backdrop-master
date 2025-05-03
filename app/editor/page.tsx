@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from 'react';
 import Editor from './Editor';
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
+import { SignedIn, SignedOut, RedirectToSignIn,useUser } from '@clerk/nextjs';
 
 
 function DisableNumberScroll() {
@@ -34,6 +34,9 @@ function DisableNumberScroll() {
 
 
 export default function Editorage() {
+
+    const { isLoaded, isSignedIn, user } = useUser();
+
     // useEffect(() => {
     //   // Disable right-click
     //   const handleContextMenu = (e: MouseEvent) => {
@@ -69,13 +72,13 @@ export default function Editorage() {
     DisableNumberScroll()
     //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
 
-
+    if (!isLoaded) return null;
 
     //   return <Editor />;
     return (
         <>
             <SignedIn>
-                <Editor id="007" plan="free"/>
+                <Editor id={user?.id || "guest"} plan="free"/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />

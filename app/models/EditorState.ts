@@ -2,16 +2,9 @@ import { Schema, models, model } from "mongoose";
 
 
 
-// const EditorStateSchema = new Schema({
-//   userId: { type: String, required: false },
-//   texts: { type: String, required: false },
-// }, {
-//   collection: "EditorStates"
-// });
-
-
 const EditorStateSchema = new Schema({
-
+  userId: { type: String, required: true },
+  plan: { type: String, required: false, default: "free" },
   stickers: {
     type: [
       {
@@ -33,7 +26,11 @@ const EditorStateSchema = new Schema({
   brushColor: { type: String, required: false },
   brushSize: { type: String, required: false },
   showFilters: { type: String, required: false },
-  colorArray: { type: String, required: false },
+  colorArray: {
+    type: [String], // allows array of strings like ['#000', '#fff']
+  required: false,
+  default: [],
+  },
 
 
   texts: {
@@ -46,21 +43,19 @@ const EditorStateSchema = new Schema({
         bold: { type: Boolean, required: true },
         italic: { type: Boolean, required: true },
         color: { type: String, required: true },
-        top: { type: String, required: true },
-        left: { type: String, required: true },
-        rotate: { type: Number, required: true },
-        width: { type: String, required: true },
-        height: { type: String, required: true },
+        top: { type: String, required: false },
+        left: { type: String, required: false },
+        rotate: { type: Number, required: false },
+        width: { type: String, required: false },
+        height: { type: String, required: false },
         shadow: {
           type: [Schema.Types.Mixed], // since array has 3 numbers & 1 string
-          validate: arr => arr.length === 4,
-          required: true,
+          required: false,
         },
-        hasShadow: { type: Boolean, required: true },
-        textImage: { type: String, required: true },
+        hasShadow: { type: Boolean, required: false },
+        textImage: { type: String, required: false },
         gradient: {
           type: [Schema.Types.Mixed], // [angle, color1, color2]
-          validate: arr => arr.length === 3,
           required: true,
         },
         isgradient: { type: Boolean, required: true },
