@@ -25,7 +25,7 @@ const EditorStateSchema = new Schema({
   imgWidth: { type: Number, required: true },
   imgHeight: { type: Number, required: true },
   brushColor: { type: String, required: false },
-  brushSize: { type: String, required: false },
+  brushSize: { type: Number, required: false },
   showFilters: { type: String, required: false },
   colorArray: {
     type: [String], // allows array of strings like ['#000', '#fff']

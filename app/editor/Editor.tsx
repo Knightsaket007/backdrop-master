@@ -54,7 +54,7 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
-import HandleState from './HandleState';
+import HandleState, { saveEditorState } from './HandleState';
 import { useEditorSave } from '../models/EditorState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
@@ -75,7 +75,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [currSticker, setcurrSticker] = useState(0)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
-  const [bgremovedImage, setBgremovedImage] = useState<string | null>(null);
+  const [bgremovedImage, setBgremovedImage] = useState<string | undefined>(undefined);
   const [isDrawing, setIsDrawing] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -856,13 +856,27 @@ function Editor({ id, plan, editorId }: EditorProps) {
       };
 
       //==-=-= Try sendBeacon first=-===//
-      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-        // sendBeacon logic
-        const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
-      }
-      else{
-        
-      }
+      // if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+      //   // sendBeacon logic
+      //   const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
+      // }
+
+      saveEditorState({
+        userId: id,
+        plan,
+        editorId,
+        backgroundImage: backgroundImageRef.current!,
+        bgremovedImage: bgremovedImageRef.current,
+        imgWidth: imgWidthRef.current!,
+        imgHeight: imgHeightRef.current!,
+        brushColor: brushColorRef.current,
+        brushSize: brushSizeRef.current,
+        showFilters: showFiltersRef.current,
+        colorArray: colorArrayRef.current,
+        texts: textsRef.current,
+        stickers: stickersRef.current,
+      });
+    
       
 
       //===-=-=If beacon fails or is not supported, fallback to fetch-===//
