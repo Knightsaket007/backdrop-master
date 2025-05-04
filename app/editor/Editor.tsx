@@ -55,6 +55,7 @@ import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
 import HandleState from './HandleState';
+import { useEditorSave } from '../models/EditorState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -820,7 +821,6 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const colorArrayRef = useRef(colorArray);
   const textsRef = useRef(texts);
 
-
   stickersRef.current = stickers;
   backgroundImageRef.current = backgroundImage;
   bgremovedImageRef.current = bgremovedImage;
@@ -831,6 +831,8 @@ function Editor({ id, plan, editorId }: EditorProps) {
   showFiltersRef.current = showFilters;
   colorArrayRef.current = colorArray;
   textsRef.current = texts;
+
+
 
   useEffect(() => {
     const saveData = () => {
@@ -853,24 +855,29 @@ function Editor({ id, plan, editorId }: EditorProps) {
         stickers: stickersRef.current,
       };
 
-      console.log("💾 Saving before exit...");
-      // Try sendBeacon first
-      const beaconSuccess = navigator.sendBeacon(
-        "/api/save-editor",
-        JSON.stringify(payload)
-      );
-
-      // ✅ If beacon fails or is not supported, fallback to fetch
-      if (!beaconSuccess) {
-        fetch("/api/save-editor", {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          keepalive: true,
-        });
+      //==-=-= Try sendBeacon first=-===//
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        // sendBeacon logic
+        const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
       }
+      else{
+        
+      }
+      
+
+      //===-=-=If beacon fails or is not supported, fallback to fetch-===//
+      // if (!success) {
+      //   // Fallback
+      //   fetch("/api/save-editor", {
+      //     method: "POST",
+      //     body: JSON.stringify(payload),
+      //     headers: { "Content-Type": "application/json" },
+      //     keepalive: true,
+      //   }).catch((err) => {
+      //     console.warn("Fallback fetch failed:", err);
+      //   });
+      // }
+
 
     };
 

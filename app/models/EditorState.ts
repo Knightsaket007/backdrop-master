@@ -4,7 +4,7 @@ import { Schema, models, model } from "mongoose";
 
 const EditorStateSchema = new Schema({
   userId: { type: String, required: true },
-  plan: { type: String, required: true, default: "free" },
+  plan: { type: String, required: false, default: "free" },
   editorId: { type: String, required: true },
   stickers: {
     type: [
