@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect } from 'react';
-import Editor from './Editor';
+import Editor from '../Editor';
 import { SignedIn, SignedOut, RedirectToSignIn,useUser } from '@clerk/nextjs';
-
+import { useParams } from 'next/navigation'
 
 function DisableNumberScroll() {
     useEffect(() => {
@@ -35,7 +35,11 @@ function DisableNumberScroll() {
 
 export default function Editorage() {
 
+    const params = useParams();
+    const editorId = params?.id as string;
     const { isLoaded, isSignedIn, user } = useUser();
+    
+    console.log('Editor ID:', editorId)
 
     // useEffect(() => {
     //   // Disable right-click

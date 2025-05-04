@@ -32,7 +32,6 @@ const EditorStateSchema = new Schema({
   default: [],
   },
 
-
   texts: {
     type: [
       {

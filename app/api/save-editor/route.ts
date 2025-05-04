@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
       await user.save();
     } else {
-      console.log("➕ No existing user, creating new state...");
+      console.log(" No existing user, creating new state...");
       await EditorState.create({
         userId,
         stickers,
