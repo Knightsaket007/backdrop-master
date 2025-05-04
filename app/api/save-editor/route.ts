@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     const {
       userId,
       plan,
+      editorId,
       stickers,
       backgroundImage,
       bgremovedImage,
@@ -21,15 +22,17 @@ export async function POST(req: Request) {
       texts,
     } = body;
 
-    console.log("inapi data..:", { userId, texts });
+    console.log("inapi data..:", { userId, editorId });
 
     const user=await EditorState.findOne({ userId });
     console.log("user found:", user);
+
     if (user) {
       console.log("📝 User found, updating state...");
 
       user.stickers = stickers;
       user.plan = plan;
+      user.editorId = editorId;
       user.backgroundImage = backgroundImage;
       user.bgremovedImage = bgremovedImage;
       user.imgWidth = imgWidth;
@@ -45,6 +48,8 @@ export async function POST(req: Request) {
       console.log(" No existing user, creating new state...");
       await EditorState.create({
         userId,
+        plan,
+        editorId,
         stickers,
         backgroundImage,
         bgremovedImage,

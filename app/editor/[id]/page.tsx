@@ -38,7 +38,7 @@ export default function Editorage() {
     const params = useParams();
     const editorId = params?.id as string;
     const { isLoaded, isSignedIn, user } = useUser();
-    
+
     console.log('Editor ID:', editorId)
 
     // useEffect(() => {
@@ -82,7 +82,7 @@ export default function Editorage() {
     return (
         <>
             <SignedIn>
-                <Editor id={user?.id || "guest"} plan="free"/>
+                <Editor id={user?.id || "guest"} plan="free" editorId={editorId}/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />

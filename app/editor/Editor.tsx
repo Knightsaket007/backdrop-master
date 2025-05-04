@@ -64,8 +64,9 @@ type Sticker = { id: number; src: string; x: number; y: number; size: number };
 type EditorProps = {
   id: string;
   plan: string;
+  editorId: string;
 };
-function Editor({id, plan}: EditorProps) {
+function Editor({ id, plan, editorId }: EditorProps) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [selectedTool, setSelectedTool] = useState<Tool>('none');
@@ -800,26 +801,26 @@ function Editor({id, plan}: EditorProps) {
     }
   }
   // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
-  
+
   const colorArray = Colors(selectedColor);
 
 
 
   // =-=-=-=-=-=- states send to DB =-=-=-=-=-=-//
   console.log('bg img isss', backgroundImage)
-  
-  const stickersRef=useRef(stickers);
-  const backgroundImageRef=useRef(backgroundImage);
-  const bgremovedImageRef=useRef(bgremovedImage);
-  const imgWidthRef=useRef(imgWidth);
-  const imgHeightRef=useRef(imgHeight);
-  const brushColorRef=useRef(brushColor);
-  const brushSizeRef=useRef(brushSize);
-  const showFiltersRef=useRef(showFilters);
-  const colorArrayRef=useRef(colorArray);
-  const textsRef=useRef(texts);
 
-  
+  const stickersRef = useRef(stickers);
+  const backgroundImageRef = useRef(backgroundImage);
+  const bgremovedImageRef = useRef(bgremovedImage);
+  const imgWidthRef = useRef(imgWidth);
+  const imgHeightRef = useRef(imgHeight);
+  const brushColorRef = useRef(brushColor);
+  const brushSizeRef = useRef(brushSize);
+  const showFiltersRef = useRef(showFilters);
+  const colorArrayRef = useRef(colorArray);
+  const textsRef = useRef(texts);
+
+
   stickersRef.current = stickers;
   backgroundImageRef.current = backgroundImage;
   bgremovedImageRef.current = bgremovedImage;
@@ -834,11 +835,12 @@ function Editor({id, plan}: EditorProps) {
   useEffect(() => {
     const saveData = () => {
       console.log('inside save state...', backgroundImageRef.current)
-      if(!backgroundImageRef.current) return;
+      if (!backgroundImageRef.current) return;
 
       const payload = {
         userId: id,
         plan: plan,
+        editorId: editorId,
         backgroundImage: backgroundImageRef.current,
         bgremovedImage: bgremovedImageRef.current,
         imgWidth: imgWidthRef.current,
@@ -852,30 +854,44 @@ function Editor({id, plan}: EditorProps) {
       };
 
       console.log("💾 Saving before exit...");
-      navigator.sendBeacon(
+      // Try sendBeacon first
+      const beaconSuccess = navigator.sendBeacon(
         "/api/save-editor",
         JSON.stringify(payload)
       );
+
+      // ✅ If beacon fails or is not supported, fallback to fetch
+      if (!beaconSuccess) {
+        fetch("/api/save-editor", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          keepalive: true,
+        });
+      }
+
     };
-  
+
     //=---=-=-=- Save on tab/browser close =-=-=-=-//
     window.addEventListener("beforeunload", saveData);
-  
+
     //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
-    const handleVisibilityChange = () => { 
+    const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
         saveData();
       }
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
-  
+
     // Cleanup
     return () => {
       window.removeEventListener("beforeunload", saveData);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
-  
+
 
 
 
