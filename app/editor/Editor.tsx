@@ -54,7 +54,7 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
-import HandleState, { flushColdBackup, initEditorAutoSave, saveEditorState } from './HandleState';
+import HandleState, { flushColdBackup, flushEditorBackupToDB, initEditorAutoSave, saveEditorState } from './HandleState';
 import { useEditorSave } from '../models/EditorState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
@@ -914,8 +914,8 @@ function Editor({ id, plan, editorId }: EditorProps) {
   // }, []);
 
 
- useEffect(() => {
-  const interval = setInterval(() => {
+useEffect(() => {
+  const saveToLocal = () => {
     if (!backgroundImageRef.current) return;
 
     const payload = {
@@ -934,12 +934,22 @@ function Editor({ id, plan, editorId }: EditorProps) {
       stickers: stickersRef.current,
     };
 
-    console.log("Auto-saving editor state...");
-    saveEditorState(payload);
-  }, 2000);
+    saveEditorState(payload); // localStorage only
+  };
 
-  return () => clearInterval(interval); 
+  const flushToDB = () => {
+    flushEditorBackupToDB(); // only if localStorage has data
+  };
+
+  const localInterval = setInterval(saveToLocal, 2000); // testing
+  const dbFlushInterval = setInterval(flushToDB, 10000); // save to DB every 10s only if needed
+
+  return () => {
+    clearInterval(localInterval);
+    clearInterval(dbFlushInterval);
+  };
 }, []);
+
 
 
 

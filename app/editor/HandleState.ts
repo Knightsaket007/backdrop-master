@@ -46,18 +46,28 @@ export async function saveEditorState(payload: EditorPayload) {
   try {
     const json = JSON.stringify(payload);
 
-    // Optional: store backup
+    // Always update local backup
     localStorage.setItem("unsavedEditorData", json);
 
-    await fetch("/api/save-editor", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: json,
-    });
-
-    console.log("Editor state saved to DB");
   } catch (err) {
-    console.error("Failed to save editor state:", err);
+    console.error("Failed to save editor state to localStorage:", err);
   }
 }
 
+export async function flushEditorBackupToDB() {
+  const raw = localStorage.getItem("unsavedEditorData");
+  if (!raw) return; // Skip if no data
+
+  try {
+    await fetch("/api/save-editor", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: raw,
+    });
+
+    console.log("Flushed editor state to DB");
+    localStorage.removeItem("unsavedEditorData");
+  } catch (err) {
+    console.warn("Failed to flush editor backup:", err);
+  }
+}
