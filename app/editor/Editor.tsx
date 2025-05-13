@@ -914,62 +914,33 @@ function Editor({ id, plan, editorId }: EditorProps) {
   // }, []);
 
 
-  useEffect(() => {
-    const saveData = () => {
-      console.log('inside save state...', backgroundImageRef.current)
-      if (!backgroundImageRef.current) return;
+ useEffect(() => {
+  const interval = setInterval(() => {
+    if (!backgroundImageRef.current) return;
 
-      const payload = {
-        userId: id,
-        plan: plan,
-        editorId: editorId,
-        backgroundImage: backgroundImageRef.current,
-        bgremovedImage: bgremovedImageRef.current,
-        imgWidth: imgWidthRef.current,
-        imgHeight: imgHeightRef.current,
-        brushColor: brushColorRef.current,
-        brushSize: brushSizeRef.current,
-        showFilters: showFiltersRef.current,
-        colorArray: colorArrayRef.current,
-        texts: textsRef.current,
-        stickers: stickersRef.current,
-      };
-
-      //==-=-= Try sendBeacon first=-===//
-      const fallback = async () => {
-        await saveEditorState(payload);
-      };
-
-      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-        const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
-        if (!success) {
-          console.warn("Beacon failed");
-          fallback();
-        }
-      } else {
-        fallback();
-      }
-
-
+    const payload = {
+      userId: id,
+      plan,
+      editorId,
+      backgroundImage: backgroundImageRef.current,
+      bgremovedImage: bgremovedImageRef.current,
+      imgWidth: imgWidthRef.current,
+      imgHeight: imgHeightRef.current,
+      brushColor: brushColorRef.current,
+      brushSize: brushSizeRef.current,
+      showFilters: showFiltersRef.current,
+      colorArray: colorArrayRef.current,
+      texts: textsRef.current,
+      stickers: stickersRef.current,
     };
 
-    //=---=-=-=- Save on tab/browser close =-=-=-=-//
-    window.addEventListener("beforeunload", saveData);
+    console.log("Auto-saving editor state...");
+    saveEditorState(payload);
+  }, 2000);
 
-    //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        saveData();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+  return () => clearInterval(interval); 
+}, []);
 
-    // Cleanup
-    return () => {
-      window.removeEventListener("beforeunload", saveData);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
 
 
 

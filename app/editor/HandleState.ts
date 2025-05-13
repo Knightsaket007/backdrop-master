@@ -30,7 +30,7 @@ export interface EditorPayload {
   userId: string;
   plan: string;
   editorId: string;
-  backgroundImage: string;
+  backgroundImage: string | null;
   bgremovedImage?: string;
   imgWidth: number;
   imgHeight: number;
@@ -42,43 +42,22 @@ export interface EditorPayload {
   stickers?: Sticker[];
 }
 
-export function saveEditorState(payload: EditorPayload) {
-  if (!payload.backgroundImage) return;
-
-  const json = JSON.stringify(payload);
-
-  //=-=-=-=- Save to localStorage as backup (cold start recovery)-0===-=-//
-  localStorage.setItem("unsavedEditorData", json);
-
-  const success = navigator.sendBeacon("/api/save-editor", json);
-
-  if (!success) {
-    console.warn("sendBeacon failed, using fallback");
-    fetch("/api/save-editor", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: json,
-      keepalive: true,
-    }).catch((err) => {
-      console.warn("Fallback fetch failed:", err);
-    });
-  }
-}
-
-export async function flushEditorBackup() {
-  const raw = localStorage.getItem("unsavedEditorData");
-  if (!raw) return;
-
+export async function saveEditorState(payload: EditorPayload) {
   try {
+    const json = JSON.stringify(payload);
+
+    // Optional: store backup
+    localStorage.setItem("unsavedEditorData", json);
+
     await fetch("/api/save-editor", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: raw,
-      keepalive: true,
+      body: json,
     });
-    localStorage.removeItem("unsavedEditorData");
-    console.log("Recovered and flushed unsaved editor state");
+
+    console.log("Editor state saved to DB");
   } catch (err) {
-    console.warn("Failed to flush editor backup:", err);
+    console.error("Failed to save editor state:", err);
   }
 }
+
