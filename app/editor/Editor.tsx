@@ -54,7 +54,7 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
-import HandleState, { saveEditorState } from './HandleState';
+import HandleState, { flushColdBackup, initEditorAutoSave, saveEditorState } from './HandleState';
 import { useEditorSave } from '../models/EditorState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
@@ -834,6 +834,86 @@ function Editor({ id, plan, editorId }: EditorProps) {
 
 
 
+  // useEffect(() => {
+  //   const saveData = () => {
+  //     console.log('inside save state...', backgroundImageRef.current)
+  //     if (!backgroundImageRef.current) return;
+
+  //     const payload = {
+  //       userId: id,
+  //       plan: plan,
+  //       editorId: editorId,
+  //       backgroundImage: backgroundImageRef.current,
+  //       bgremovedImage: bgremovedImageRef.current,
+  //       imgWidth: imgWidthRef.current,
+  //       imgHeight: imgHeightRef.current,
+  //       brushColor: brushColorRef.current,
+  //       brushSize: brushSizeRef.current,
+  //       showFilters: showFiltersRef.current,
+  //       colorArray: colorArrayRef.current,
+  //       texts: textsRef.current,
+  //       stickers: stickersRef.current,
+  //     };
+
+  //     //==-=-= Try sendBeacon first=-===//
+  //     // if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+  //     //   // sendBeacon logic
+  //     //   const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
+  //     // }
+
+  //     saveEditorState({
+  //       userId: id,
+  //       plan,
+  //       editorId,
+  //       backgroundImage: backgroundImageRef.current!,
+  //       bgremovedImage: bgremovedImageRef.current,
+  //       imgWidth: imgWidthRef.current!,
+  //       imgHeight: imgHeightRef.current!,
+  //       brushColor: brushColorRef.current,
+  //       brushSize: brushSizeRef.current,
+  //       showFilters: showFiltersRef.current,
+  //       colorArray: colorArrayRef.current,
+  //       texts: textsRef.current,
+  //       stickers: stickersRef.current,
+  //     });
+
+
+
+  //     //===-=-=If beacon fails or is not supported, fallback to fetch-===//
+  //     // if (!success) {
+  //     //   // Fallback
+  //     //   fetch("/api/save-editor", {
+  //     //     method: "POST",
+  //     //     body: JSON.stringify(payload),
+  //     //     headers: { "Content-Type": "application/json" },
+  //     //     keepalive: true,
+  //     //   }).catch((err) => {
+  //     //     console.warn("Fallback fetch failed:", err);
+  //     //   });
+  //     // }
+
+
+  //   };
+
+  //   //=---=-=-=- Save on tab/browser close =-=-=-=-//
+  //   window.addEventListener("beforeunload", saveData);
+
+  //   //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === "hidden") {
+  //       saveData();
+  //     }
+  //   };
+  //   document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  //   // Cleanup
+  //   return () => {
+  //     window.removeEventListener("beforeunload", saveData);
+  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
+  //   };
+  // }, []);
+
+
   useEffect(() => {
     const saveData = () => {
       console.log('inside save state...', backgroundImageRef.current)
@@ -856,41 +936,19 @@ function Editor({ id, plan, editorId }: EditorProps) {
       };
 
       //==-=-= Try sendBeacon first=-===//
-      // if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-      //   // sendBeacon logic
-      //   const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
-      // }
+      const fallback = async () => {
+        await saveEditorState(payload);
+      };
 
-      saveEditorState({
-        userId: id,
-        plan,
-        editorId,
-        backgroundImage: backgroundImageRef.current!,
-        bgremovedImage: bgremovedImageRef.current,
-        imgWidth: imgWidthRef.current!,
-        imgHeight: imgHeightRef.current!,
-        brushColor: brushColorRef.current,
-        brushSize: brushSizeRef.current,
-        showFilters: showFiltersRef.current,
-        colorArray: colorArrayRef.current,
-        texts: textsRef.current,
-        stickers: stickersRef.current,
-      });
-    
-      
-
-      //===-=-=If beacon fails or is not supported, fallback to fetch-===//
-      // if (!success) {
-      //   // Fallback
-      //   fetch("/api/save-editor", {
-      //     method: "POST",
-      //     body: JSON.stringify(payload),
-      //     headers: { "Content-Type": "application/json" },
-      //     keepalive: true,
-      //   }).catch((err) => {
-      //     console.warn("Fallback fetch failed:", err);
-      //   });
-      // }
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
+        if (!success) {
+          console.warn("Beacon failed");
+          fallback();
+        }
+      } else {
+        fallback();
+      }
 
 
     };
@@ -912,7 +970,6 @@ function Editor({ id, plan, editorId }: EditorProps) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
-
 
 
 

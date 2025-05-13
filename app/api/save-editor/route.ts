@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       texts,
     } = body;
 
-    console.log("inapi data..:", { userId, editorId });
+    console.log("inapi data..:", body);
 
     const user=await EditorState.findOne({ userId });
     console.log("user found:", user);
