@@ -42,21 +42,29 @@ export interface EditorPayload {
   stickers?: Sticker[];
 }
 
-export async function saveEditorState(payload: EditorPayload) {
+export function saveEditorState(payload: EditorPayload) {
   try {
-    const json = JSON.stringify(payload);
+    const newJson = JSON.stringify(payload);
+    const lastJson = localStorage.getItem("unsavedEditorData");
 
-    // Always update local backup
-    localStorage.setItem("unsavedEditorData", json);
+    // Skip if no change in data
+    if (lastJson === newJson) return;
 
+    // Store updated data
+    localStorage.setItem("unsavedEditorData", newJson);
+    localStorage.setItem("hasPendingSave", "true"); // flag for DB flush
   } catch (err) {
-    console.error("Failed to save editor state to localStorage:", err);
+    console.error("Failed to save editor state:", err);
   }
 }
 
+
 export async function flushEditorBackupToDB() {
+  const hasPending = localStorage.getItem("hasPendingSave");
   const raw = localStorage.getItem("unsavedEditorData");
-  if (!raw) return; // Skip if no data
+
+  // Only flush if there's something new
+  if (!hasPending || !raw) return;
 
   try {
     await fetch("/api/save-editor", {
@@ -66,7 +74,7 @@ export async function flushEditorBackupToDB() {
     });
 
     console.log("Flushed editor state to DB");
-    localStorage.removeItem("unsavedEditorData");
+    localStorage.removeItem("hasPendingSave"); // mark as saved
   } catch (err) {
     console.warn("Failed to flush editor backup:", err);
   }
