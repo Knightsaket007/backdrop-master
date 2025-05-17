@@ -124,7 +124,16 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
 
 
-
+  // =-=-= fetch states =-=-=-=//
+  useEffect(()=>{
+    const fth=async()=>{
+      const stateData=await fetchEditorState(editorId);
+      
+      console.log('herer is all states..', stateData)
+    }
+    fth()
+  })
+  // =-=-= fetch states =-=-=-=//
 
 
   useEffect(() => {
