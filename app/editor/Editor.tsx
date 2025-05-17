@@ -122,17 +122,29 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
   const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
+  const [stateData, setStateData]=useState<EditorPayload | null>(null);
 
+  const [colorArray, setcolorArray]=useState<string[]>([])
+
+  // const colorArray = Colors(selectedColor);
 
   // =-=-= fetch states =-=-=-=//
   useEffect(()=>{
     const fth=async()=>{
-      const stateData=await fetchEditorState(editorId);
-      
+      const sD=await fetchEditorState(editorId);
+      setStateData(sD)
       console.log('herer is all states..', stateData)
+      setBackgroundImage(stateData?.backgroundImage ?? null)
+      setBrushColor(stateData?.brushColor??"")
+      setBrushSize(stateData?.brushSize??3)
+      setcolorArray(
+        (stateData?.colorArray??[])? 
+        stateData?.colorArray??[]:
+        Colors(selectedColor)
+      )
     }
     fth()
-  })
+  },[])
   // =-=-= fetch states =-=-=-=//
 
 
@@ -816,7 +828,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
   }
   // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
 
-  const colorArray = Colors(selectedColor);
+  
 
 
 
