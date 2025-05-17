@@ -56,6 +56,7 @@ import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
 import HandleState, { flushColdBackup, flushEditorBackupToDB, initEditorAutoSave, saveEditorState } from './HandleState';
 import { useEditorSave } from '../models/EditorState';
+import { fetchEditorState } from './FetchState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -121,6 +122,9 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
   const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
+
+
+
 
 
   useEffect(() => {
