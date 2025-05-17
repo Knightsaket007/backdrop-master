@@ -142,10 +142,12 @@ function Editor({ id, plan, editorId }: EditorProps) {
         stateData?.colorArray??[]:
         Colors(selectedColor)
       )
+      setImgHeight(stateData?.imgHeight??0)
+      setImgWidth(stateData?.imgWidth??0)
     }
     fth()
   },[])
-  // =-=-= fetch states =-=-=-=//
+  // =-=-= fetch states Ended =-=-=-=//
 
 
   useEffect(() => {
