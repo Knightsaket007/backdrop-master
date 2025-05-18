@@ -122,7 +122,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [croppingModeOn, setCroppingModeOn] = useState(false)
 
   const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
-  const [stateData, setStateData]=useState<EditorPayload | null>(null);
+  // const [stateData, setStateData]=useState<EditorPayload | null>(null);
 
   const [colorArray, setcolorArray]=useState<string[]>([])
 
@@ -131,10 +131,10 @@ function Editor({ id, plan, editorId }: EditorProps) {
   // =-=-= fetch states =-=-=-=//
   useEffect(()=>{
     const fth=async()=>{
-      const sD=await fetchEditorState(editorId);
-      setStateData(sD)
-      console.log('herer is all states..', sD)
-      setBackgroundImage(sD?.backgroundImage ?? null)
+      const stateData=await fetchEditorState(editorId);
+      // setStateData(sD)
+      // console.log('herer is all states..', sD)
+      setBackgroundImage(stateData?.backgroundImage ?? null)
       console.log(' set image vall')
       setBrushColor(stateData?.brushColor??"")
       setBrushSize(stateData?.brushSize??3)
