@@ -133,8 +133,9 @@ function Editor({ id, plan, editorId }: EditorProps) {
     const fth=async()=>{
       const sD=await fetchEditorState(editorId);
       setStateData(sD)
-      console.log('herer is all states..', stateData)
-      setBackgroundImage(stateData?.backgroundImage ?? null)
+      console.log('herer is all states..', sD)
+      setBackgroundImage(sD?.backgroundImage ?? null)
+      console.log(' set image vall')
       setBrushColor(stateData?.brushColor??"")
       setBrushSize(stateData?.brushSize??3)
       setcolorArray(

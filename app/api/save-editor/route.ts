@@ -24,26 +24,28 @@ export async function POST(req: Request) {
 
     console.log("inapi data..:", body);
 
-    const user=await EditorState.findOne({ userId });
-    console.log("user found:", user);
+    const existing =await EditorState.findOne({ userId });
+    console.log("user found:", existing );
 
-    if (user) {
+    if (existing) {
       console.log("📝 User found, updating state...");
 
-      user.stickers = stickers;
-      user.plan = plan;
-      user.editorId = editorId;
-      user.backgroundImage = backgroundImage;
-      user.bgremovedImage = bgremovedImage;
-      user.imgWidth = imgWidth;
-      user.imgHeight = imgHeight;
-      user.brushColor = brushColor;
-      user.brushSize = brushSize;
-      user.showFilters = showFilters;
-      user.colorArray = colorArray;
-      user.texts = texts;
+        await EditorState.findByIdAndUpdate(existing._id, {
+        plan,
+        editorId,
+        stickers,
+        backgroundImage,
+        bgremovedImage,
+        imgWidth,
+        imgHeight,
+        brushColor,
+        brushSize,
+        showFilters,
+        colorArray,
+        texts,
+      });
 
-      await user.save();
+      // await user.save();
     } else {
       console.log(" No existing user, creating new state...");
       await EditorState.create({
