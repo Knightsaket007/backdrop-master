@@ -1,21 +1,6 @@
 
 export async function fetchEditorState(editorId: string): Promise<EditorPayload | null> {
-  // 1️⃣ Check localStorage first
-  const backupRaw = localStorage.getItem("unsavedEditorData");
-  if (backupRaw) {
-    try {
-      const parsed = JSON.parse(backupRaw);
-      if (parsed?.editorId === editorId && parsed?.backgroundImage) {
-        console.log("Restoring from localStorage backup");
-        console.log(parsed);
-        return parsed;
-      }
-    } catch (err) {
-      console.warn("Invalid local backup, skipping", err);
-    }
-  }
-
-  // 2️⃣ If no localStorage backup, fetch from DB
+ 
   try {
     const res = await fetch("/api/load-editor", {
       method: "POST",
