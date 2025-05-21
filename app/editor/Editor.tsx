@@ -135,6 +135,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
       // setStateData(sD)
       // console.log('herer is all states..', sD)
       setBackgroundImage(stateData?.backgroundImage ?? null)
+      setBgremovedImage(stateData?.bgremovedImage?? "")
       console.log(' set image vall')
       setBrushColor(stateData?.brushColor??"")
       setBrushSize(stateData?.brushSize??3)
