@@ -1,4 +1,4 @@
-declare type Sticker={
+declare type Sticker = {
   id: number;
   src: string;
   x: number;
@@ -6,7 +6,7 @@ declare type Sticker={
   size: number;
 }
 
-declare type TextItem ={
+declare type TextItem = {
   id: number;
   content: string;
   fontFamily: string;
@@ -22,12 +22,13 @@ declare type TextItem ={
   shadow?: (string | number)[];
   hasShadow?: boolean;
   textImage?: string;
-  gradient: (string | number)[];
+  // gradient: (string | number)[];
+  gradient: [number, string, string];
   isgradient: boolean;
 }
 
 
-declare type EditorPayload={
+declare type EditorPayload = {
   userId: string;
   plan: string;
   editorId: string;

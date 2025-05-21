@@ -103,7 +103,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
 
 
   // const [text, setText] = useState("Your Text Here");
-  const [texts, setTexts] = useState<{ id: number; content: string; fontFamily: string; size: string; bold: boolean; italic: boolean, color: string, top: string, left: string, rotate: number, width: string, height: string, shadow: [number, number, number, string], hasShadow: boolean, textImage: string, gradient: [number, string, string], isgradient: boolean }[]>([
+  const [texts, setTexts] = useState<TextItem[]>([
     { id: Date.now(), content: "Design Your Words, Define Your World.", fontFamily: "Inter, sans-serif", size: 'clamp(12px, 4vw, 100px)', bold: false, italic: false, color: '#000000', top: '', left: '', rotate: 0, width: '', height: '', shadow: [4, 4, 4, 'black'], hasShadow: true, textImage: "", gradient: [90, '#FF6B6B', "#4A90E2"], isgradient: true },
   ]);
   // const [activeTextId, setActiveTextId] = useState<number>(texts[0].id);
@@ -147,7 +147,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
       setImgWidth(stateData?.imgWidth??0)
       setFilters(stateData?.showFilters??'')
       setStickers(stateData?.stickers??[])
-      // setTexts(stateData?.texts?? [])
+      setTexts(stateData?.texts ?? []);
     }
     fth()
   },[])
