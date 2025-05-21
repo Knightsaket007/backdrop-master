@@ -145,6 +145,9 @@ function Editor({ id, plan, editorId }: EditorProps) {
       )
       setImgHeight(stateData?.imgHeight??0)
       setImgWidth(stateData?.imgWidth??0)
+      setFilters(stateData?.showFilters??'')
+      setStickers(stateData?.stickers??[])
+      // setTexts(stateData?.texts?? [])
     }
     fth()
   },[])

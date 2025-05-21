@@ -1,6 +1,6 @@
 
 export async function fetchEditorState(editorId: string): Promise<EditorPayload | null> {
- 
+//  console.log("Editor id..", editorId);
   try {
     const res = await fetch("/api/load-editor", {
       method: "POST",
@@ -13,7 +13,7 @@ export async function fetchEditorState(editorId: string): Promise<EditorPayload 
     console.log('res is..', res)
 
     const data = await res.json();
-    console.log("Restored from DB");
+    console.log("Restored from DB", data);
     return data;
   } catch (err) {
     console.error("Error fetching editor state:", err);
