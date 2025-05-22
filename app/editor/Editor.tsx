@@ -54,8 +54,8 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
-import HandleState, { flushColdBackup, flushEditorBackupToDB, initEditorAutoSave, saveEditorState } from './HandleState';
-import { useEditorSave } from '../models/EditorState';
+import {flushEditorBackupToDB, saveEditorState } from './HandleState';
+// import { useEditorSave } from '../models/EditorState';
 import { fetchEditorState } from './FetchState';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
@@ -1251,7 +1251,7 @@ useEffect(() => {
                               }),
 
                               filter: !text.hasShadow
-                                ? `drop-shadow(${text?.shadow?.[0]}px ${text.shadow[1]}px ${text.shadow[2]}px ${text.shadow[3]})`
+                                ? `drop-shadow(${text?.shadow?.[0]}px ${text?.shadow?.[1]}px ${text?.shadow?.[2]}px ${text?.shadow?.[3]})`
                                 : "",
                             }}
                           >
@@ -1921,7 +1921,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [newNum, text.shadow[1], text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
+                                          ? { ...text, shadow: [newNum, text.shadow?.[1]??0, text?.shadow?.[2]??0, text?.shadow?.[3]??0] } 
                                           : text
                                       )
                                     );
@@ -1948,7 +1948,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [text.shadow[0], newNum, text.shadow[2], text.shadow[3]] } // ✅ Correct way to update
+                                          ? { ...text, shadow: [text?.shadow?.[0]??0, newNum, text?.shadow?.[2]??0, text?.shadow?.[3]??0] } // ✅ Correct way to update
                                           : text
                                       )
                                     );
@@ -1974,7 +1974,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [text.shadow[0], text.shadow[1], newNum, text.shadow[3]] } // ✅ Correct way to update
+                                          ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, newNum, text?.shadow?.[3]??0] } // ✅ Correct way to update
                                           : text
                                       )
                                     );
@@ -1988,7 +1988,7 @@ useEffect(() => {
                                     <PopoverTrigger asChild>
                                       <Button
                                         className="h-9 w-2/4 border-2"
-                                        style={{ backgroundColor: texts.find((row) => row.id === activeTextId)?.shadow?.[3] ?? 'black' }}
+                                        style={{ backgroundColor: String(texts.find((row) => row.id === activeTextId)?.shadow?.[3] ?? 'black') }}
                                       />
                                     </PopoverTrigger>
                                     <PopoverContent className="p-2 w-fit bg-gray-800 border border-gray-700 rounded-lg">
@@ -1996,7 +1996,7 @@ useEffect(() => {
                                         setTexts((prevTexts) =>
                                           prevTexts.map((text) =>
                                             text.id === activeTextId
-                                              ? { ...text, shadow: [text.shadow[0], text.shadow[1], text.shadow[2], newcolor] }
+                                              ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, text?.shadow?.[2]??0, newcolor] }
                                               : text
                                           )
                                         )
@@ -2010,7 +2010,7 @@ useEffect(() => {
                                           setTexts((prevTexts) =>
                                             prevTexts.map((text) =>
                                               text.id === activeTextId
-                                                ? { ...text, shadow: [text.shadow[0], text.shadow[1], text.shadow[2], newColor] }
+                                                ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, text?.shadow?.[2]??0, newColor] }
                                                 : text
                                             )
                                           )
