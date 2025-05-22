@@ -149,6 +149,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
       setFilters(stateData?.showFilters??'')
       setStickers(stateData?.stickers??[])
       setTexts(stateData?.texts ?? []);
+      setActiveTextId(stateData?.texts?.[0]?.id ?? null);
     }
     fth()
   },[])
