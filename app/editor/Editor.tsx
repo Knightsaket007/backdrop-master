@@ -54,7 +54,7 @@ import { upscaleImage } from '../components/Upscaler';
 import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
-import {flushEditorBackupToDB, saveEditorState } from './HandleState';
+import { flushEditorBackupToDB, saveEditorState } from './HandleState';
 // import { useEditorSave } from '../models/EditorState';
 import { fetchEditorState } from './FetchState';
 
@@ -124,35 +124,46 @@ function Editor({ id, plan, editorId }: EditorProps) {
   const [beforeenhancedImg, setBeforeenhancedImg] = useState('')
   // const [stateData, setStateData]=useState<EditorPayload | null>(null);
 
-  const [colorArray, setcolorArray]=useState<string[]>([])
+  const [colorArray, setcolorArray] = useState<string[]>([])
 
   // const colorArray = Colors(selectedColor);
 
   // =-=-= fetch states =-=-=-=//
-  useEffect(()=>{
-    const fth=async()=>{
-      const stateData=await fetchEditorState(editorId);
-      // setStateData(sD)
-      // console.log('herer is all states..', sD)
-      setBackgroundImage(stateData?.backgroundImage ?? null)
-      setBgremovedImage(stateData?.bgremovedImage?? "")
-      console.log(' set image vall')
-      setBrushColor(stateData?.brushColor??"")
-      setBrushSize(stateData?.brushSize??3)
-      setcolorArray(
-        (stateData?.colorArray??[])? 
-        stateData?.colorArray??[]:
-        Colors(selectedColor)
-      )
-      setImgHeight(stateData?.imgHeight??0)
-      setImgWidth(stateData?.imgWidth??0)
-      setFilters(stateData?.showFilters??'')
-      setStickers(stateData?.stickers??[])
-      setTexts(stateData?.texts ?? []);
-      setActiveTextId(stateData?.texts?.[0]?.id ?? null);
+  useEffect(() => {
+    setactiveLoader(true);
+    const fth = async () => {
+      try {
+        const stateData = await fetchEditorState(editorId);
+        // setStateData(sD)
+        // console.log('herer is all states..', sD)
+        setBackgroundImage(stateData?.backgroundImage ?? null)
+        setBgremovedImage(stateData?.bgremovedImage ?? "")
+        setBrushColor(stateData?.brushColor ?? "")
+        setBrushSize(stateData?.brushSize ?? 3)
+        setcolorArray(
+          (stateData?.colorArray ?? []) ?
+            stateData?.colorArray ?? [] :
+            Colors(selectedColor)
+        )
+        setImgHeight(stateData?.imgHeight ?? 0)
+        setImgWidth(stateData?.imgWidth ?? 0)
+        setFilters(stateData?.showFilters ?? '')
+        setStickers(stateData?.stickers ?? [])
+        setTexts(stateData?.texts ?? []);
+        setActiveTextId(stateData?.texts?.[0]?.id ?? null);
+
+        setactiveLoader(false);
+      }
+      catch (error) {
+        console.error('error in fetching editor state', error)
+        toast("Error fetching editor state. Please try again later.");
+      }
+
     }
     fth()
-  },[])
+
+    
+  }, [])
   // =-=-= fetch states Ended =-=-=-=//
 
 
@@ -836,7 +847,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
   }
   // -=-=-=-=-=-=Cancel UPscale Image-=-=-=-=-=-//
 
-  
+
 
 
 
@@ -947,41 +958,41 @@ function Editor({ id, plan, editorId }: EditorProps) {
   // }, []);
 
 
-useEffect(() => {
-  const saveToLocal = () => {
-    if (!backgroundImageRef.current) return;
+  useEffect(() => {
+    const saveToLocal = () => {
+      if (!backgroundImageRef.current) return;
 
-    const payload = {
-      userId: id,
-      plan,
-      editorId,
-      backgroundImage: backgroundImageRef.current,
-      bgremovedImage: bgremovedImageRef.current,
-      imgWidth: imgWidthRef.current,
-      imgHeight: imgHeightRef.current,
-      brushColor: brushColorRef.current,
-      brushSize: brushSizeRef.current,
-      showFilters: showFiltersRef.current,
-      colorArray: colorArrayRef.current,
-      texts: textsRef.current,
-      stickers: stickersRef.current,
+      const payload = {
+        userId: id,
+        plan,
+        editorId,
+        backgroundImage: backgroundImageRef.current,
+        bgremovedImage: bgremovedImageRef.current,
+        imgWidth: imgWidthRef.current,
+        imgHeight: imgHeightRef.current,
+        brushColor: brushColorRef.current,
+        brushSize: brushSizeRef.current,
+        showFilters: showFiltersRef.current,
+        colorArray: colorArrayRef.current,
+        texts: textsRef.current,
+        stickers: stickersRef.current,
+      };
+
+      saveEditorState(payload); // localStorage only
     };
 
-    saveEditorState(payload); // localStorage only
-  };
+    const flushToDB = () => {
+      flushEditorBackupToDB(); // only if localStorage has data
+    };
 
-  const flushToDB = () => {
-    flushEditorBackupToDB(); // only if localStorage has data
-  };
+    const localInterval = setInterval(saveToLocal, 2000); // testing
+    const dbFlushInterval = setInterval(flushToDB, 10000); // save to DB every 10s only if needed
 
-  const localInterval = setInterval(saveToLocal, 2000); // testing
-  const dbFlushInterval = setInterval(flushToDB, 10000); // save to DB every 10s only if needed
-
-  return () => {
-    clearInterval(localInterval);
-    clearInterval(dbFlushInterval);
-  };
-}, []);
+    return () => {
+      clearInterval(localInterval);
+      clearInterval(dbFlushInterval);
+    };
+  }, []);
 
 
 
@@ -1922,7 +1933,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [newNum, text.shadow?.[1]??0, text?.shadow?.[2]??0, text?.shadow?.[3]??0] } 
+                                          ? { ...text, shadow: [newNum, text.shadow?.[1] ?? 0, text?.shadow?.[2] ?? 0, text?.shadow?.[3] ?? 0] }
                                           : text
                                       )
                                     );
@@ -1949,7 +1960,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [text?.shadow?.[0]??0, newNum, text?.shadow?.[2]??0, text?.shadow?.[3]??0] } // ✅ Correct way to update
+                                          ? { ...text, shadow: [text?.shadow?.[0] ?? 0, newNum, text?.shadow?.[2] ?? 0, text?.shadow?.[3] ?? 0] } // ✅ Correct way to update
                                           : text
                                       )
                                     );
@@ -1975,7 +1986,7 @@ useEffect(() => {
                                     setTexts((prevTexts) =>
                                       prevTexts.map((text) =>
                                         text.id === activeTextId
-                                          ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, newNum, text?.shadow?.[3]??0] } // ✅ Correct way to update
+                                          ? { ...text, shadow: [text?.shadow?.[0] ?? 0, text?.shadow?.[1] ?? 0, newNum, text?.shadow?.[3] ?? 0] } // ✅ Correct way to update
                                           : text
                                       )
                                     );
@@ -1997,7 +2008,7 @@ useEffect(() => {
                                         setTexts((prevTexts) =>
                                           prevTexts.map((text) =>
                                             text.id === activeTextId
-                                              ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, text?.shadow?.[2]??0, newcolor] }
+                                              ? { ...text, shadow: [text?.shadow?.[0] ?? 0, text?.shadow?.[1] ?? 0, text?.shadow?.[2] ?? 0, newcolor] }
                                               : text
                                           )
                                         )
@@ -2011,7 +2022,7 @@ useEffect(() => {
                                           setTexts((prevTexts) =>
                                             prevTexts.map((text) =>
                                               text.id === activeTextId
-                                                ? { ...text, shadow: [text?.shadow?.[0]??0, text?.shadow?.[1]??0, text?.shadow?.[2]??0, newColor] }
+                                                ? { ...text, shadow: [text?.shadow?.[0] ?? 0, text?.shadow?.[1] ?? 0, text?.shadow?.[2] ?? 0, newColor] }
                                                 : text
                                             )
                                           )
