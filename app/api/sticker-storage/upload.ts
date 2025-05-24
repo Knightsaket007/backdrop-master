@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { uploadToCloudinary } from '@/utils/uploadToCloudinary';
+import { uploadToCloudinary } from '@/app/utils/UploadToCloudinary';
 
 export const config = {
   api: {
