@@ -43,7 +43,8 @@ const StickerComp = ({
         sessionStorage.setItem(CACHE_KEY, JSON.stringify(data.hits || []));
         sessionStorage.setItem(CACHE_EXPIRY_KEY, (new Date().getTime() + 24 * 60 * 60 * 1000).toString());
       }
-    } catch (err) {
+    } catch (err:unknown) {
+      console.log('error occoured ', err)
       setError("Failed to load stickers");
     }
     setLoading(false);
