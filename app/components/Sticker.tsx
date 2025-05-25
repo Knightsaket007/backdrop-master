@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { uploadImage } from "@/app/utils/upload"; // 📌 util function yeh call karega API ko
 
-const PIXABAY_API_KEY = process.env.NEXT_PUBLIC_PIXABAY_API_KEY;
+const PIXABAY_API_KEY = process.env.NEXT_PUBLIC_PIXABAY_API_KEY!;
 const PIXABAY_API_URL = "https://pixabay.com/api/";
 
 const CACHE_KEY = "pixabay_stickers";
@@ -20,7 +21,6 @@ const StickerComp = ({
   const fetchStickers = async (query = "sticker", useCache = true) => {
     setLoading(true);
     try {
-      // Cache logic for default load only (not for search)
       if (useCache && query === "sticker") {
         const cached = sessionStorage.getItem(CACHE_KEY);
         const expiry = sessionStorage.getItem(CACHE_EXPIRY_KEY);
@@ -37,13 +37,11 @@ const StickerComp = ({
         `${PIXABAY_API_URL}?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(query)}&image_type=illustration&category=art&per_page=50`
       );
       const data = await response.json();
-
       setStickers(data.hits || []);
 
-      // Only cache default sticker data
       if (useCache && query === "sticker") {
         sessionStorage.setItem(CACHE_KEY, JSON.stringify(data.hits || []));
-        sessionStorage.setItem(CACHE_EXPIRY_KEY, (new Date().getTime() + 24 * 60 * 60 * 1000).toString()); // 1 day
+        sessionStorage.setItem(CACHE_EXPIRY_KEY, (new Date().getTime() + 24 * 60 * 60 * 1000).toString());
       }
     } catch (err) {
       setError("Failed to load stickers");
@@ -51,23 +49,39 @@ const StickerComp = ({
     setLoading(false);
   };
 
-  // 🔹 Initial load
   useEffect(() => {
     fetchStickers();
   }, []);
 
-  // 🔍 Search stickers live from Pixabay
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (searchQuery.trim()) {
-        fetchStickers(searchQuery.trim(), false); // No cache when searching
+        fetchStickers(searchQuery.trim(), false);
       } else {
-        fetchStickers("sticker", true); // Default with cache
+        fetchStickers("sticker", true);
       }
-    }, 500); // 500ms debounce
-  
-    return () => clearTimeout(timeout); // Cleanup on next keystroke
+    }, 500);
+    return () => clearTimeout(timeout);
   }, [searchQuery]);
+
+  const handleStickerClick = async (pixabayUrl: string) => {
+    try {
+      const res = await fetch(pixabayUrl);
+      const blob = await res.blob();
+
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const cloudUrl = await uploadImage(base64, 'sticker');
+      onSelect(cloudUrl); // 🎯 Send final Cloudinary URL to Editor
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -80,7 +94,7 @@ const StickerComp = ({
           src={sticker.previewURL}
           alt={sticker.tags}
           className="cursor-pointer rounded-lg hover:scale-110 transition-transform"
-          onClick={() => onSelect(sticker.largeImageURL)}
+          onClick={() => handleStickerClick(sticker.largeImageURL)}
         />
       ))}
     </div>

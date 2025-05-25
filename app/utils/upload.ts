@@ -3,7 +3,7 @@ export const uploadImage = async (
   type: 'sticker' | 'other',
   name?: string
 ): Promise<string> => {
-  const res = await fetch('/api/upload', {
+  const res = await fetch('/api/upload-media', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ base64, type, name }),
