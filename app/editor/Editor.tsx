@@ -65,10 +65,10 @@ type Sticker = { id: number; src: string; x: number; y: number; size: number };
 
 type EditorProps = {
   id: string;
-  plan: string;
+  // plan: string;
   editorId: string;
 };
-function Editor({ id, plan, editorId }: EditorProps) {
+function Editor({ id, editorId }: EditorProps) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [selectedTool, setSelectedTool] = useState<Tool>('none');
@@ -964,7 +964,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
 
       const payload = {
         userId: id,
-        plan,
+        // plan,
         editorId,
         backgroundImage: backgroundImageRef.current,
         bgremovedImage: bgremovedImageRef.current,

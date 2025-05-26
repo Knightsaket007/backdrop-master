@@ -14,6 +14,7 @@ const StickerComp = ({
 }: {
   onSelect: (url: string) => void;
   searchQuery?: string;
+  setactiveLoader: (isLoading: boolean) => void;
 }) => {
   const [stickers, setStickers] = useState<{ id: number; previewURL: string; largeImageURL: string; tags: string }[]>([]);
   const [loading, setLoading] = useState(false);
