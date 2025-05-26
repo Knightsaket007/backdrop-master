@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
       userId,
-      plan,
+      // plan,
       editorId,
       stickers,
       backgroundImage,
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       console.log("📝 User found, updating state...");
 
         await EditorState.findByIdAndUpdate(existing._id, {
-        plan,
+        // plan,
         editorId,
         stickers,
         backgroundImage,
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       console.log(" No existing user, creating new state...");
       await EditorState.create({
         userId,
-        plan,
+        // plan,
         editorId,
         stickers,
         backgroundImage,

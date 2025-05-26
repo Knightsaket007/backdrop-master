@@ -28,7 +28,7 @@ export interface TextItem {
 
 export interface EditorPayload {
   userId: string;
-  plan: string;
+  // plan: string;
   editorId: string;
   backgroundImage: string | null;
   bgremovedImage?: string;
