@@ -1387,7 +1387,7 @@ function Editor({ id, plan, editorId }: EditorProps) {
                   />
                   <div className="h-64 overflow-y-auto">
                     {/* <StickerComp onSelect={handleStickerSelect} /> */}
-                    <StickerComp onSelect={handleStickerSelect} searchQuery={searchQuery} />
+                    <StickerComp onSelect={handleStickerSelect} searchQuery={searchQuery} setactiveLoader={setactiveLoader} />
 
 
                   </div>

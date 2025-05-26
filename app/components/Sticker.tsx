@@ -10,6 +10,7 @@ const CACHE_EXPIRY_KEY = "pixabay_stickers_expiry";
 const StickerComp = ({
   onSelect,
   searchQuery = "",
+  setactiveLoader
 }: {
   onSelect: (url: string) => void;
   searchQuery?: string;
@@ -67,6 +68,7 @@ const StickerComp = ({
 
   const handleStickerClick = async (pixabayUrl: string) => {
     try {
+      setactiveLoader(true);
       const res = await fetch(pixabayUrl);
       const blob = await res.blob();
 
@@ -78,9 +80,11 @@ const StickerComp = ({
       });
 
       const cloudUrl = await uploadImage(base64, 'sticker');
-      onSelect(cloudUrl); // 🎯 Send final Cloudinary URL to Editor
+      onSelect(cloudUrl); 
+      setactiveLoader(false);
     } catch (err) {
       console.error("Upload failed:", err);
+      setactiveLoader(false);
     }
   };
 
