@@ -6,7 +6,8 @@ const nextConfig = {
     appDir: true, // ✅ Ensure app router is enabled
   },
   images: {
-    domains: ["pixabay.com"], // ✅ Allow Pixabay images in Next.js
+    domains: ["pixabay.com", "images.pexels.com"], // ✅ Allow Pixabay images in Next.js
+    
   },
 };
 

@@ -82,7 +82,7 @@ export default function Editorage() {
     return (
         <>
             <SignedIn>
-                <Editor id={user?.id || "guest"} plan="free" editorId={editorId}/>
+                <Editor id={user?.id || "guest"}  editorId={editorId}/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />
