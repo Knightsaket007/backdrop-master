@@ -36,7 +36,7 @@ export function Gallery() {
             <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Masterpiece</span> Gallery
           </h2>
           <p className="text-xl text-gray-400">
-            See what's possible with Backdrop Master
+           { `See what's possible with Backdrop Master`}
           </p>
         </div>
 
