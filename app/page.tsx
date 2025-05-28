@@ -12,7 +12,6 @@ const Page = () => {
 
   return (
     <>
-      {/* <h1>hello worl</h1> */}
       <Navbar />
       <Hero />
       <Features />
