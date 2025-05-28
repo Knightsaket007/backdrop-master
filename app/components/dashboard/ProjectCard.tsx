@@ -60,11 +60,10 @@ export default function ProjectCard({ project, onEdit, onDelete }: ProjectCardPr
           </button>
           <button
             onClick={handleDelete}
-            className={`p-1.5 rounded-lg transition-colors ${
-              showDeleteConfirm
+            className={`p-1.5 rounded-lg transition-colors ${showDeleteConfirm
                 ? 'bg-red-100 text-red-600 hover:bg-red-200'
                 : 'hover:bg-gray-100 text-gray-600'
-            }`}
+              }`}
           >
             <Trash2 size={18} />
           </button>

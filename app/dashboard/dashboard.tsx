@@ -26,7 +26,9 @@ const sampleProjects = [
   }
 ];
 
-export default function Dashboard() {
+export default function Dashboard({userid}: { id?: string }) {
+
+  
   const [projects, setProjects] = useState(sampleProjects);
 
   const handleCreateNew = () => {

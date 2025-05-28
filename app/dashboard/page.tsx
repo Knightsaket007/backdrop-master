@@ -4,7 +4,8 @@ import React from 'react'
 import { SignedIn, SignedOut, RedirectToSignIn, useUser } from '@clerk/nextjs';
 import Dashboard from './dashboard';
 
-const page = () => {
+const DashboardPage = () => {
+
 const { isLoaded, isSignedIn, user } = useUser();
 if (!isLoaded) return null;
 
@@ -13,7 +14,7 @@ if (!isLoaded) return null;
 
             <SignedIn>
                 {/* <Editor id={user?.id || "guest"} editorId={editorId} /> */}
-                <Dashboard/>
+                <Dashboard userid={user?.id}/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />
@@ -22,4 +23,4 @@ if (!isLoaded) return null;
     )
 }
 
-export default page
+export default DashboardPage;
