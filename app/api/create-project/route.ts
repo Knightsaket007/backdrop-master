@@ -12,11 +12,15 @@ export async function POST(req: Request) {
 
         await connectToDB();
 
-        
-
 
     }
     catch (err) {
+
+        console.error("Error creating project:", err);
+        return NextResponse.json(
+            { error: "Failed to create project" },
+            { status: 500 }
+        );
 
     }
 }
