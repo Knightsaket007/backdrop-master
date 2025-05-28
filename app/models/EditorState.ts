@@ -29,8 +29,8 @@ const EditorStateSchema = new Schema({
   showFilters: { type: String, required: false },
   colorArray: {
     type: [String], // allows array of strings like ['#000', '#fff']
-  required: false,
-  default: [],
+    required: false,
+    default: [],
   },
 
   texts: {
