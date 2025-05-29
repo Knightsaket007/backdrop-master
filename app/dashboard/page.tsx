@@ -7,7 +7,13 @@ import Dashboard from './dashboard';
 const DashboardPage = () => {
 
 const { isLoaded, isSignedIn, user } = useUser();
-if (!isLoaded) return null;
+ if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
+        <div className="animate-pulse text-xl">Loading Dashboard...</div>
+      </div>
+    );
+  }
 
     return (
         <>
