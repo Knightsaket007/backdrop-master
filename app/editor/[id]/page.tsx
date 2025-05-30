@@ -76,7 +76,14 @@ export default function Editorage() {
     DisableNumberScroll()
     //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
 
-    if (!isLoaded) return null;
+    // if (!isLoaded) return null;
+    if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
+        <div className="animate-pulse text-xl">Loading Editor...</div>
+      </div>
+    );
+  }
 
     //   return <Editor />;
     return (
