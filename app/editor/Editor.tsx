@@ -1007,7 +1007,7 @@ function Editor({ id, editorId }: EditorProps) {
 
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
 
-      <ScreenMismatch />
+      {/* <ScreenMismatch /> */}
 
       {activeLoader && (<LoaderComp />)}
 

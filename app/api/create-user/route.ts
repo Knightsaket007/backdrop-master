@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
-        const { userId, useremail, } = await req.json();
+        const { userId, email,name, } = await req.json();
         if (!userId) return NextResponse.json(
             { error: "Missing userId" },
             { status: 400 }
@@ -14,15 +14,30 @@ export async function POST(req: Request) {
         await connectToDB();
 
         const user=await Createuser.findOne({userId});
-        console.
+        console.log("")
         
         if(user){
          return NextResponse.json({error:"User already exists"}, {status:400});    
         }
 
-        const newUser=await Createuser.insertOne({
+        const balance=0;
+        const createdAt=Date.now();
+        console.log('created date', createdAt)
 
+        const newUser=await Createuser.insertOne({
+            userId,
+            email,
+            name,
+            balance,
+            createdAt,
         })
+
+        if (!newUser) {
+            return NextResponse.json(
+                { error: "Failed to create user" },
+                { status: 500 }
+            );
+        }    
 
     }
     catch (err) {
