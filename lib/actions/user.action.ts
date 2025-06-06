@@ -38,6 +38,7 @@ export async function createUser(user: UserData) {
 
 export async function deleteUser(clerkId: string) {
   try {
+    await connectToDB()
     const deletedUser = await Createuser.findOneAndDelete({ clerkId });
     return deletedUser;
   } catch (err) {
@@ -46,3 +47,29 @@ export async function deleteUser(clerkId: string) {
   }
 }
 
+export async function updateUser(clerkId: string, updatedData: Partial<{
+  username: string;
+  firstName: string;
+  lastName: string;
+}>) {
+  try {
+    await connectToDB();
+
+    const updatedUser = await Createuser.findOneAndUpdate(
+      { clerkId },
+      { $set: updatedData },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.warn("User not found for update:", clerkId);
+      return null;
+    }
+
+    console.log("✅ User updated successfully:", updatedUser);
+    return updatedUser;
+  } catch (err) {
+    console.error("❌ Failed to update user in DB:", err);
+    throw err;
+  }
+}

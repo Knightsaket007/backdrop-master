@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { WebhookEvent } from "@clerk/nextjs/server";
 // import { clerkClient } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
-import { createUser, deleteUser } from "@/lib/actions/user.action";
+import { createUser, deleteUser, updateUser } from "@/lib/actions/user.action";
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
       console.log("✅ User created and stored in DB.");
     } catch (err) {
-      console.error("❌ Error processing user.created:", err);
+      console.error("Error processing user.created:", err);
     }
   }
 
@@ -86,6 +86,33 @@ export async function POST(req: Request) {
       console.error(" Error processing user.deleted:", err);
     }
   }
+
+  if (eventType === "user.updated") {
+  try {
+    const { id, username, first_name, last_name } = evt.data;
+
+    if (!id) {
+      return new Response("Missing user ID", { status: 400 });
+    }
+
+    // Build update payload (only fields you want to update)
+    const updatedData = {
+      ...(username && { username }),
+      ...(first_name && { firstName: first_name }),
+      ...(last_name && { lastName: last_name }),
+    };
+
+    const updatedUser = await updateUser(id, updatedData);
+
+    if (!updatedUser) {
+      console.warn("Clerk user exists, but not found in DB:", id);
+    } else {
+      console.log("User updated in DB successfully.");
+    }
+  } catch (err) {
+    console.error("Error processing user.updated:", err);
+  }
+}
 
 
   return NextResponse.json({ success: true });
