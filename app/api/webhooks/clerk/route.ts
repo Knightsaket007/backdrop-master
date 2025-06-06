@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { WebhookEvent } from "@clerk/nextjs/server";
 // import { clerkClient } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
-import { createUser } from "@/lib/actions/user.action";
+import { createUser, deleteUser } from "@/lib/actions/user.action";
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
@@ -73,6 +73,20 @@ export async function POST(req: Request) {
       console.error("❌ Error processing user.created:", err);
     }
   }
+
+  if (eventType === "user.deleted") {
+    try {
+      const { id } = evt.data;
+      console.log('delelte id is', id)
+      if(!id)return new Response("Missing user ID", { status: 400 });
+      await deleteUser(id);
+
+      console.log("🗑️ User deleted from DB successfully.");
+    } catch (err) {
+      console.error(" Error processing user.deleted:", err);
+    }
+  }
+
 
   return NextResponse.json({ success: true });
 }

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "@clerk/nextjs": "^6.15.0",
     "@giphy/react-components": "^10.0.1",
     "@imgly/background-removal": "^1.5.5",
@@ -35,6 +36,7 @@
     "react-spinners": "^0.15.0",
     "sonner": "^2.0.1",
     "styled-components": "^6.1.15",
+    "svix": "^1.66.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0"

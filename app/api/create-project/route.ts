@@ -1,4 +1,4 @@
-import Createuser from "@/app/models/CreateUser";
+import userSchema from "@/app/models/User.model";
 import InitialModel from "@/app/models/InitialProject";
 import { connectToDB } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
@@ -13,14 +13,13 @@ export async function POST(req: Request) {
 
         await connectToDB();
 
-        const user=await Createuser.findOne({userId});
-        console.
+        const user=await userSchema.findOne({userId});
         
         if(user){
          return NextResponse.json({error:"User already exists"}, {status:400});    
         }
 
-        const newUser=await Createuser.insertOne({
+        const newUser=await userSchema.insertOne({
 
         })
 

@@ -25,7 +25,6 @@ export async function createUser(user: UserData) {
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
-      photo: user.photo,
       balance: 0, // default balance
       createdAt: Date.now(),
     });
@@ -36,3 +35,14 @@ export async function createUser(user: UserData) {
     throw error;
   }
 }
+
+export async function deleteUser(clerkId: string) {
+  try {
+    const deletedUser = await Createuser.findOneAndDelete({ clerkId });
+    return deletedUser;
+  } catch (err) {
+    console.error("❌ Failed to delete user from DB:", err);
+    throw err;
+  }
+}
+
