@@ -44,6 +44,7 @@ export async function POST(req: Request) {
 
   console.log(`✅ Received event: ${eventType}`);
 
+  // =-=- create =-=-=//
   if (eventType === "user.created") {
     try {
       const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
@@ -74,11 +75,12 @@ export async function POST(req: Request) {
     }
   }
 
+  // =-=- Delete =-=-=//
   if (eventType === "user.deleted") {
     try {
       const { id } = evt.data;
       console.log('delelte id is', id)
-      if(!id)return new Response("Missing user ID", { status: 400 });
+      if (!id) return new Response("Missing user ID", { status: 400 });
       await deleteUser(id);
 
       console.log("🗑️ User deleted from DB successfully.");
@@ -87,32 +89,33 @@ export async function POST(req: Request) {
     }
   }
 
+  // =-=- Update =-=-=//
   if (eventType === "user.updated") {
-  try {
-    const { id, username, first_name, last_name } = evt.data;
+    try {
+      const { id, username, first_name, last_name } = evt.data;
 
-    if (!id) {
-      return new Response("Missing user ID", { status: 400 });
+      if (!id) {
+        return new Response("Missing user ID", { status: 400 });
+      }
+
+      // Build update payload (only fields you want to update)
+      const updatedData = {
+        ...(username && { username }),
+        ...(first_name && { firstName: first_name }),
+        ...(last_name && { lastName: last_name }),
+      };
+
+      const updatedUser = await updateUser(id, updatedData);
+
+      if (!updatedUser) {
+        console.warn("Clerk user exists, but not found in DB:", id);
+      } else {
+        console.log("User updated in DB successfully.");
+      }
+    } catch (err) {
+      console.error("Error processing user.updated:", err);
     }
-
-    // Build update payload (only fields you want to update)
-    const updatedData = {
-      ...(username && { username }),
-      ...(first_name && { firstName: first_name }),
-      ...(last_name && { lastName: last_name }),
-    };
-
-    const updatedUser = await updateUser(id, updatedData);
-
-    if (!updatedUser) {
-      console.warn("Clerk user exists, but not found in DB:", id);
-    } else {
-      console.log("User updated in DB successfully.");
-    }
-  } catch (err) {
-    console.error("Error processing user.updated:", err);
   }
-}
 
 
   return NextResponse.json({ success: true });

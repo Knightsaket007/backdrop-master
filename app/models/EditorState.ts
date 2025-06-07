@@ -19,7 +19,6 @@ const EditorStateSchema = new Schema({
     required: false,
     default: [],
   },
-
   backgroundImage: { type: String, required: true },
   bgremovedImage: { type: String, required: false },
   imgWidth: { type: Number, required: true },
@@ -32,7 +31,6 @@ const EditorStateSchema = new Schema({
     required: false,
     default: [],
   },
-
   texts: {
     type: [
       {
