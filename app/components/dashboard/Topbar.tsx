@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { Plus, Command, ChevronDown } from 'lucide-react';
 // import { Dropdown } from '../ui/Dropdown';
 
-export default function Topbar() {
+type TopbarProps = {
+  createProject: () => void;
+};
+
+export default function Topbar({createProject}:TopbarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-  const handleCreateNew = () => {
-    console.log('Create new project');
-  };
+
 
   return (
     <header className="bg-white border-b border-gray-100 px-6 h-16 flex items-center justify-between sticky top-0 z-50">
@@ -29,7 +31,7 @@ export default function Topbar() {
 
         {/* Create New Button */}
         <button
-          onClick={handleCreateNew}
+          onClick={createProject}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors"
         >
           <Plus size={20} />
