@@ -992,7 +992,7 @@ function Editor({ id, editorId }: EditorProps) {
     };
 
     const localInterval = setInterval(saveToLocal, 2000); // testing
-    const dbFlushInterval = setInterval(flushToDB, 10000); // save to DB every 10s only if needed
+    const dbFlushInterval = setInterval(flushToDB, 15000); // save to DB every 15s only if needed
 
     return () => {
       clearInterval(localInterval);
