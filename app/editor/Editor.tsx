@@ -134,6 +134,10 @@ function Editor({ id, editorId }: EditorProps) {
     const fth = async () => {
       try {
         const stateData = await fetchEditorState(editorId);
+        if (!stateData) {
+          setactiveLoader(true);
+          return;
+        }
         // setStateData(sD)
         // console.log('herer is all states..', sD)
         setBackgroundImage(stateData?.backgroundImage ?? null)
@@ -162,7 +166,7 @@ function Editor({ id, editorId }: EditorProps) {
     }
     fth()
 
-    
+
   }, [])
   // =-=-= fetch states Ended =-=-=-=//
 
@@ -963,9 +967,8 @@ function Editor({ id, editorId }: EditorProps) {
       if (!backgroundImageRef.current) return;
 
       const payload = {
-        userId: id,
-        // plan,
-        editorId,
+        // userId: id,
+        // editorId,
         backgroundImage: backgroundImageRef.current,
         bgremovedImage: bgremovedImageRef.current,
         imgWidth: imgWidthRef.current,
@@ -982,7 +985,10 @@ function Editor({ id, editorId }: EditorProps) {
     };
 
     const flushToDB = () => {
-      flushEditorBackupToDB(); // only if localStorage has data
+      flushEditorBackupToDB({
+        userId:id,
+        editorId
+      }); // only if localStorage has data
     };
 
     const localInterval = setInterval(saveToLocal, 2000); // testing
@@ -1007,7 +1013,7 @@ function Editor({ id, editorId }: EditorProps) {
 
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
 
-      {/* <ScreenMismatch /> */}
+      <ScreenMismatch />
 
       {activeLoader && (<LoaderComp />)}
 

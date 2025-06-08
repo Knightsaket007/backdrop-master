@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
       userId,
-      // plan,
       editorId,
       stickers,
       backgroundImage,
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
 
     console.log("inapi data..:", body);
 
-    const existing =await EditorState.findOne({ userId });
+    const existing =await EditorState.findOne({ _id:editorId });
     console.log("user found:", existing );
 
     if (existing) {

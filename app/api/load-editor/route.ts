@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if (!editorId) return NextResponse.json({ error: "Missing editorId" }, { status: 400 });
 
     await connectToDB();
-    const data = await EditorState.findOne({ editorId });
+    const data = await EditorState.findOne({ _id: editorId });
 
     if (!data) {
       return NextResponse.json({ message: "No editor state found" }, { status: 404 });

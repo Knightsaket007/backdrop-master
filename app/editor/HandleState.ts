@@ -1,3 +1,5 @@
+"use clientx"
+
 export interface Sticker {
   id: number;
   src: string;
@@ -27,9 +29,7 @@ export interface TextItem {
 }
 
 export interface EditorPayload {
-  userId: string;
-  // plan: string;
-  editorId: string;
+
   backgroundImage: string | null;
   bgremovedImage?: string;
   imgWidth: number;
@@ -59,9 +59,22 @@ export function saveEditorState(payload: EditorPayload) {
 }
 
 
-export async function flushEditorBackupToDB() {
+type flushParams={
+  userId:string,
+  editorId:string
+}
+
+export async function flushEditorBackupToDB({ userId, editorId }:flushParams) {
   const hasPending = localStorage.getItem("hasPendingSave");
   const raw = localStorage.getItem("unsavedEditorData");
+
+  const data = raw ? JSON.parse(raw) : {};
+
+  data.userId = userId;
+  data.editorId = editorId;
+
+  console.log('raw..', raw)
+  console.log('data..', data)
 
   // Only flush if there's something new
   if (!hasPending || !raw) return;
@@ -70,7 +83,7 @@ export async function flushEditorBackupToDB() {
     await fetch("/api/save-editor", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: raw,
+      body: JSON.stringify(data),
     });
 
     console.log("Flushed editor state to DB");
