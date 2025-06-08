@@ -31,7 +31,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Failed to create initial project" }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, data: created }, { status: 201 });
+        console.log('created..', created)
+
+        return NextResponse.json({ success: true, data: created._id }, { status: 201 });
     } catch (err) {
         console.error("Failed to create initial project:", err);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
