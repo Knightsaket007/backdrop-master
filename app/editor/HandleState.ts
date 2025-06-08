@@ -69,12 +69,8 @@ export async function flushEditorBackupToDB({ userId, editorId }:flushParams) {
   const raw = localStorage.getItem("unsavedEditorData");
 
   const data = raw ? JSON.parse(raw) : {};
-
   data.userId = userId;
   data.editorId = editorId;
-
-  console.log('raw..', raw)
-  console.log('data..', data)
 
   // Only flush if there's something new
   if (!hasPending || !raw) return;
