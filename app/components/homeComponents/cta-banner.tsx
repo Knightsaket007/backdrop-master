@@ -1,4 +1,9 @@
+import { useRouter } from "next/navigation";
+
 export function CtaBanner() {
+
+  const router = useRouter();
+
   return (
     <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 to-slate-900"></div>
@@ -19,7 +24,7 @@ export function CtaBanner() {
             <p className="text-xl text-gray-300 mb-8">
               Start creating professional backdrops in minutes. No design experience required!
             </p>
-            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg transition-all">
+            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg transition-all" onClick={()=>router.push('/dashboard')}>
               Open Editor Now
             </button>
           </div>

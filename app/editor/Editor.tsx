@@ -57,6 +57,7 @@ import ScreenMismatch from '../components/ScreenMismatch';
 import { flushEditorBackupToDB, saveEditorState } from './HandleState';
 // import { useEditorSave } from '../models/EditorState';
 import { fetchEditorState } from './FetchState';
+import { useRouter } from 'next/navigation';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -129,15 +130,18 @@ function Editor({ id, editorId }: EditorProps) {
   // const colorArray = Colors(selectedColor);
 
   // =-=-= fetch states =-=-=-=//
+  const router = useRouter();
   useEffect(() => {
     setactiveLoader(true);
     const fth = async () => {
       try {
-        const stateData = await fetchEditorState(editorId);
+        const stateData = await fetchEditorState(id, editorId);
         if (!stateData) {
           setactiveLoader(true);
+          router.push("/dashboard")
           return;
         }
+        console.log('state daaata..', stateData)
         // setStateData(sD)
         // console.log('herer is all states..', sD)
         setBackgroundImage(stateData?.backgroundImage ?? null)
@@ -517,19 +521,25 @@ function Editor({ id, editorId }: EditorProps) {
   };
 
   // Handle image drop
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onload = (event) => {
+
+      reader.onload = async (event) => {
         setImgWidth(0);
         setImgHeight(0);
-        setBackgroundImage(event.target?.result as string);
+        
+        const dataUrl = await blobUrlToDataUrl(event.target?.result as string);
+        setBackgroundImage(dataUrl);
       };
+
       reader.readAsDataURL(file);
     }
   };
+
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -592,6 +602,7 @@ function Editor({ id, editorId }: EditorProps) {
             setBgremovedImage(base64img)
             setactiveLoader(false)
             setIsDraggable(false);
+
           }
           else {
             toast('Some thing went worng', {
@@ -882,86 +893,6 @@ function Editor({ id, editorId }: EditorProps) {
 
 
 
-  // useEffect(() => {
-  //   const saveData = () => {
-  //     console.log('inside save state...', backgroundImageRef.current)
-  //     if (!backgroundImageRef.current) return;
-
-  //     const payload = {
-  //       userId: id,
-  //       plan: plan,
-  //       editorId: editorId,
-  //       backgroundImage: backgroundImageRef.current,
-  //       bgremovedImage: bgremovedImageRef.current,
-  //       imgWidth: imgWidthRef.current,
-  //       imgHeight: imgHeightRef.current,
-  //       brushColor: brushColorRef.current,
-  //       brushSize: brushSizeRef.current,
-  //       showFilters: showFiltersRef.current,
-  //       colorArray: colorArrayRef.current,
-  //       texts: textsRef.current,
-  //       stickers: stickersRef.current,
-  //     };
-
-  //     //==-=-= Try sendBeacon first=-===//
-  //     // if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-  //     //   // sendBeacon logic
-  //     //   const success = navigator.sendBeacon("/api/save-editor", JSON.stringify(payload));
-  //     // }
-
-  //     saveEditorState({
-  //       userId: id,
-  //       plan,
-  //       editorId,
-  //       backgroundImage: backgroundImageRef.current!,
-  //       bgremovedImage: bgremovedImageRef.current,
-  //       imgWidth: imgWidthRef.current!,
-  //       imgHeight: imgHeightRef.current!,
-  //       brushColor: brushColorRef.current,
-  //       brushSize: brushSizeRef.current,
-  //       showFilters: showFiltersRef.current,
-  //       colorArray: colorArrayRef.current,
-  //       texts: textsRef.current,
-  //       stickers: stickersRef.current,
-  //     });
-
-
-
-  //     //===-=-=If beacon fails or is not supported, fallback to fetch-===//
-  //     // if (!success) {
-  //     //   // Fallback
-  //     //   fetch("/api/save-editor", {
-  //     //     method: "POST",
-  //     //     body: JSON.stringify(payload),
-  //     //     headers: { "Content-Type": "application/json" },
-  //     //     keepalive: true,
-  //     //   }).catch((err) => {
-  //     //     console.warn("Fallback fetch failed:", err);
-  //     //   });
-  //     // }
-
-
-  //   };
-
-  //   //=---=-=-=- Save on tab/browser close =-=-=-=-//
-  //   window.addEventListener("beforeunload", saveData);
-
-  //   //=-=-=-=--=-=- Save on tab switch / minimize=-=-=-=-=-=///
-  //   const handleVisibilityChange = () => {
-  //     if (document.visibilityState === "hidden") {
-  //       saveData();
-  //     }
-  //   };
-  //   document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  //   // Cleanup
-  //   return () => {
-  //     window.removeEventListener("beforeunload", saveData);
-  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
-  //   };
-  // }, []);
-
-
   useEffect(() => {
     const saveToLocal = () => {
       if (!backgroundImageRef.current) return;
@@ -986,7 +917,7 @@ function Editor({ id, editorId }: EditorProps) {
 
     const flushToDB = () => {
       flushEditorBackupToDB({
-        userId:id,
+        userId: id,
         editorId
       }); // only if localStorage has data
     };
@@ -1002,6 +933,9 @@ function Editor({ id, editorId }: EditorProps) {
 
 
 
+  if (bgremovedImage) {
+    console.log('yes, both are')
+  }
 
 
   console.log('text....', texts)

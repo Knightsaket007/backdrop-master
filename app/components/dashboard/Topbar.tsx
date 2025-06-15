@@ -1,17 +1,12 @@
-import { useState } from 'react';
-import { Plus, Command, ChevronDown } from 'lucide-react';
+import { Plus, Command } from 'lucide-react';
+import { SignedIn, UserButton } from '@clerk/nextjs';
 // import { Dropdown } from '../ui/Dropdown';
 
 type TopbarProps = {
   createProject: () => void;
 };
 
-export default function Topbar({createProject}:TopbarProps) {
-  const [showDropdown, setShowDropdown] = useState(false);
-  
-  const toggleDropdown = () => setShowDropdown(!showDropdown);
-
-
+export default function Topbar({ createProject }: TopbarProps) {
 
   return (
     <header className="bg-white border-b border-gray-100 px-6 h-16 flex items-center justify-between sticky top-0 z-50">
@@ -20,7 +15,7 @@ export default function Topbar({createProject}:TopbarProps) {
         <Command className="h-6 w-6 text-indigo-600" />
         <span className="text-xl font-semibold text-gray-800">Backdrop Master</span>
       </div>
-      
+
       {/* Right Section */}
       <div className="flex items-center gap-6">
         {/* Balance */}
@@ -37,19 +32,19 @@ export default function Topbar({createProject}:TopbarProps) {
           <Plus size={20} />
           <span className="hidden sm:inline">Create New</span>
         </button>
-        
+
         {/* User Profile */}
         <div className="relative">
-          <button 
-            onClick={toggleDropdown}
-            className="flex items-center gap-2 hover:bg-gray-50 p-1 rounded-lg transition-colors"
-          >
-            <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
-              A
-            </div>
-            <ChevronDown size={16} className="text-gray-500" />
-          </button>
-          
+
+          <SignedIn>
+            <UserButton
+            // userProfileMode="navigation"
+            // userProfileUrl="/profile"
+            // redirectUrl="/"
+            />
+          </SignedIn>
+
+
           {/* {showDropdown && (
             <Dropdown 
               items={[
