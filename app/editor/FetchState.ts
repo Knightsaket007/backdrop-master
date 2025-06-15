@@ -1,11 +1,11 @@
 
-export async function fetchEditorState(editorId: string): Promise<EditorPayload | null> {
+export async function fetchEditorState(id:string, editorId: string): Promise<EditorPayload | null> {
 //  console.log("Editor id..", editorId);
   try {
     const res = await fetch("/api/load-editor", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ editorId }),
+      body: JSON.stringify({ id, editorId }),
     });
 
     if (!res.ok) throw new Error("Failed to fetch from DB");

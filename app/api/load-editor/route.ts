@@ -5,16 +5,19 @@ import EditorState from "@/app/models/EditorState";
 
 export async function POST(req: Request) {
   try {
-    const { editorId } = await req.json();
+    const { id, editorId } = await req.json();
 
     if (!editorId) return NextResponse.json({ error: "Missing editorId" }, { status: 400 });
 
     await connectToDB();
     const data = await EditorState.findOne({ _id: editorId });
-
-    if (!data) {
-      return NextResponse.json({ message: "No editor state found" }, { status: 404 });
+    if (!data.userId === id){
+      return NextResponse.json({message:"Unauthorize user for this project"}, {status:404})
     }
+
+      if (!data) {
+        return NextResponse.json({ message: "No editor state found" }, { status: 404 });
+      }
 
     return NextResponse.json(data);
   } catch (err) {
