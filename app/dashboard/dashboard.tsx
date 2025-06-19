@@ -77,7 +77,7 @@ export default function Dashboard() {
       }
 
       setopenloader(false);
-      window.open(`/editor/${data?.data}`, '_blank')
+      // window.open(`/editor/${data?.data}`, '_blank')
       console.log("✅ Project created:", data.data);
     } catch (err) {
       console.error("Error:", err);
