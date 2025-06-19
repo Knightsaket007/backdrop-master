@@ -9,6 +9,9 @@ import LoaderComp from "../components/LoaderComp";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 
+import { useRouter } from "next/navigation";
+
+  const router = useRouter();
 // Sample project data
 const sampleProjects = [
   {
