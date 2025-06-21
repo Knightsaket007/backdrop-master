@@ -1,4 +1,4 @@
-"use clientx"
+"use client"
 
 export interface Sticker {
   id: number;
@@ -44,6 +44,7 @@ export interface EditorPayload {
 
 export function saveEditorState(payload: EditorPayload) {
   try {
+    console.log("inside saveeditor")
     const newJson = JSON.stringify(payload);
     const lastJson = localStorage.getItem("unsavedEditorData");
 
