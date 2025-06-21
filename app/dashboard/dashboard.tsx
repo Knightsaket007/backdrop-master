@@ -8,10 +8,8 @@ import { useAuth } from "@clerk/nextjs";
 import LoaderComp from "../components/LoaderComp";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-
 import { useRouter } from "next/navigation";
 
-  const router = useRouter();
 // Sample project data
 const sampleProjects = [
   {
@@ -55,6 +53,7 @@ export default function Dashboard() {
   };
 
 
+  const router = useRouter();
   const createProject = async () => {
     setopenloader(true);
     if (!userId || !isLoaded) {
@@ -81,6 +80,7 @@ export default function Dashboard() {
 
       setopenloader(false);
       // window.open(`/editor/${data?.data}`, '_blank')
+      router.push(`/editor/${data?.data}`)
       console.log("✅ Project created:", data.data);
     } catch (err) {
       console.error("Error:", err);
