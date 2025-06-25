@@ -1,8 +1,12 @@
 'use client'
 import React, { useEffect } from 'react';
 import Editor from '../Editor';
-import { SignedIn, SignedOut, RedirectToSignIn,useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { fetchEditorState } from '../FetchState';
+import { toast, Toaster } from 'sonner';
+
 
 function DisableNumberScroll() {
     useEffect(() => {
@@ -38,6 +42,7 @@ export default function Editorage() {
     const params = useParams();
     const editorId = params?.id as string;
     const { isLoaded, isSignedIn, user } = useUser();
+    const [payloadData, setpayloadData] = useState(null)
 
     console.log('Editor ID:', editorId)
 
@@ -71,6 +76,49 @@ export default function Editorage() {
 
 
 
+    // =-=-=-=-=-Loader-=-=-=-=-//
+    const commanloader=()=>{
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
+                <div className="animate-pulse text-xl">Loading Editor...</div>
+            </div>
+        );
+    }
+    // =-=-=-=-=-Loader-=-=-=-=-//
+
+
+    // =-=-=-= load editor -=-=-=-//
+    // =-=-= fetch states =-=-=-=//
+    const router = useRouter();
+    useEffect(() => {
+        const fth = async () => {
+            console.log('user id', user?.id)
+            console.log('editor id', editorId)
+            try {
+                commanloader();
+                const stateData = await fetchEditorState(user?.id || "guest" as string, editorId);
+                console.log('state data is..', stateData)
+                if (!stateData) {
+                    // setactiveLoader(true);
+                    // commanloader();
+                    router.push("/dashboard")
+                    return;
+                }
+                setpayloadData(stateData);
+                console.log('state daaata..', stateData)
+            }
+            catch (error) {
+                console.log('error in fetching editor state', error)
+                toast("Error fetching editor state. Please try again later.");
+            }
+
+        }
+        fth()
+
+
+    }, [])
+    // =-=-=-= load editor -=-=-=-//
+
 
     //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
     DisableNumberScroll()
@@ -78,22 +126,25 @@ export default function Editorage() {
 
     // if (!isLoaded) return null;
     if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
-        <div className="animate-pulse text-xl">Loading Editor...</div>
-      </div>
-    );
-  }
+        return commanloader();
+        // return (
+        //     <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
+        //         <div className="animate-pulse text-xl">Loading Editor...</div>
+        //     </div>
+        // );
+    }
 
     //   return <Editor />;
     return (
         <>
             <SignedIn>
-                <Editor id={user?.id || "guest"}  editorId={editorId}/>
+                <Editor id={user?.id || "guest"} editorId={editorId} payloadData={payloadData}/>
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />
             </SignedOut>
+
+             <Toaster position='top-center' theme='light' />
         </>
     );
 }
