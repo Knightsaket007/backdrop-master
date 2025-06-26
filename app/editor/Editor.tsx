@@ -55,8 +55,6 @@ import * as htmlToImage from 'html-to-image';
 import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
 import { flushEditorBackupToDB, saveEditorState } from './HandleState';
-// import { useEditorSave } from '../models/EditorState';
-import { fetchEditorState } from './FetchState';
 import { useRouter } from 'next/navigation';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
