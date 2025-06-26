@@ -68,9 +68,9 @@ type EditorProps = {
   id: string;
   // plan: string;
   editorId: string;
-  payloadData: EditorPayload;
+  stateData: EditorPayload;
 };
-function Editor({ id, editorId, payloadData }: EditorProps) {
+function Editor({ id, editorId, stateData }: EditorProps) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [selectedTool, setSelectedTool] = useState<Tool>('none');
@@ -131,48 +131,48 @@ function Editor({ id, editorId, payloadData }: EditorProps) {
   // const colorArray = Colors(selectedColor);
 
   // =-=-= fetch states =-=-=-=//
-  // const router = useRouter();
-  // useEffect(() => {
-  //   setactiveLoader(true);
-  //   const fth = async () => {
-  //     try {
-  //       const stateData = await fetchEditorState(id, editorId);
-  //       if (!stateData) {
-  //         setactiveLoader(true);
-  //         router.push("/dashboard")
-  //         return;
-  //       }
-  //       console.log('state daaata..', stateData)
-  //       // setStateData(sD)
-  //       // console.log('herer is all states..', sD)
-  //       setBackgroundImage(stateData?.backgroundImage ?? null)
-  //       setBgremovedImage(stateData?.bgremovedImage ?? "")
-  //       setBrushColor(stateData?.brushColor ?? "")
-  //       setBrushSize(stateData?.brushSize ?? 3)
-  //       setcolorArray(
-  //         (stateData?.colorArray ?? []) ?
-  //           stateData?.colorArray ?? [] :
-  //           Colors(selectedColor)
-  //       )
-  //       setImgHeight(stateData?.imgHeight ?? 0)
-  //       setImgWidth(stateData?.imgWidth ?? 0)
-  //       setFilters(stateData?.showFilters ?? '')
-  //       setStickers(stateData?.stickers ?? [])
-  //       setTexts(stateData?.texts ?? []);
-  //       setActiveTextId(stateData?.texts?.[0]?.id ?? null);
+  const router = useRouter();
+  useEffect(() => {
+    setactiveLoader(true);
+    const fth = async () => {
+      try {
+        // const stateData = await fetchEditorState(id, editorId);
+        if (!stateData) {
+          setactiveLoader(true);
+          router.push("/dashboard")
+          return;
+        }
+        console.log('state daaata..', stateData)
+        // setStateData(sD)
+        // console.log('herer is all states..', sD)
+        setBackgroundImage(stateData?.backgroundImage ?? null)
+        setBgremovedImage(stateData?.bgremovedImage ?? "")
+        setBrushColor(stateData?.brushColor ?? "")
+        setBrushSize(stateData?.brushSize ?? 3)
+        setcolorArray(
+          (stateData?.colorArray ?? []) ?
+            stateData?.colorArray ?? [] :
+            Colors(selectedColor)
+        )
+        setImgHeight(stateData?.imgHeight ?? 0)
+        setImgWidth(stateData?.imgWidth ?? 0)
+        setFilters(stateData?.showFilters ?? '')
+        setStickers(stateData?.stickers ?? [])
+        setTexts(stateData?.texts ?? []);
+        setActiveTextId(stateData?.texts?.[0]?.id ?? null);
 
-  //       setactiveLoader(false);
-  //     }
-  //     catch (error) {
-  //       console.error('error in fetching editor state', error)
-  //       toast("Error fetching editor state. Please try again later.");
-  //     }
+        setactiveLoader(false);
+      }
+      catch (error) {
+        console.error('error in fetching editor state', error)
+        toast("Error fetching editor state. Please try again later.");
+      }
 
-  //   }
-  //   fth()
+    }
+    fth()
 
 
-  // }, [])
+  }, [])
   // =-=-= fetch states Ended =-=-=-=//
 
 

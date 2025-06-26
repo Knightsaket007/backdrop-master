@@ -138,7 +138,11 @@ export default function Editorage() {
     return (
         <>
             <SignedIn>
-                <Editor id={user?.id || "guest"} editorId={editorId} payloadData={payloadData}/>
+                {payloadData && 
+                (
+                <Editor id={user?.id || "guest"} editorId={editorId} stateData={payloadData}/>
+                )
+                }
             </SignedIn>
             <SignedOut>
                 <RedirectToSignIn />

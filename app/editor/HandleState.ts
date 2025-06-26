@@ -45,11 +45,11 @@ export interface EditorPayload {
 export function saveEditorState(payload: EditorPayload) {
   try {
     console.log("inside saveeditor")
-    // const newJson = JSON.stringify(payload);
-    // const lastJson = localStorage.getItem("unsavedEditorData");
+    const newJson = JSON.stringify(payload);
+    const lastJson = localStorage.getItem("unsavedEditorData");
 
     // Skip if no change in data
-    if (lastJson === newJson) return false;
+    if (lastJson === newJson) return;
 
     // Store updated data
     localStorage.setItem("unsavedEditorData", newJson);
