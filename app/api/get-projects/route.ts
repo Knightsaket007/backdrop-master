@@ -7,8 +7,6 @@ export async function GET(req: Request) {
   try {
     const { id } = await req.json();
 
-    // if (!editorId) return NextResponse.json({ error: "Missing editorId" }, { status: 400 });
-
     await connectToDB();
     const data = await EditorState.find({ _id: id });
      console.log("data", data)
