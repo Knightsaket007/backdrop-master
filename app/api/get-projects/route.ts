@@ -6,7 +6,7 @@ import EditorState from "@/app/models/EditorState";
 export async function GET(req: Request) {
   try {
     const { id } = await req.json();
-
+    if (!id) return NextResponse.json({ error: "Missing editor ID" }, { status: 400 });
     await connectToDB();
     const data = await EditorState.find({ _id: id });
      console.log("data", data)
