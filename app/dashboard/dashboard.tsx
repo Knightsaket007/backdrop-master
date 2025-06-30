@@ -36,7 +36,8 @@ const sampleProjects = [
 ];
 
 export default function Dashboard() {
-  const [projects, setProjects] = useState(sampleProjects);
+  // const [projects, setProjects] = useState(sampleProjects);
+  const [projects, setProjects] = useState([]);
   const { userId, isLoaded } = useAuth();
   const [openloader, setopenloader] = useState(false)
 
@@ -48,11 +49,12 @@ export default function Dashboard() {
         const result = await fetch(`/api/get-projects?id=${userId}`);
         const res = await result.json();
         console.log("result is..", res)
+        // setProjects(res);
       }
     }
 
    fetchProjects(); 
-  })
+  },[userId])
 
   const handleCreateNew = () => {
     console.log("Creating new project");
@@ -63,7 +65,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = (id: string) => {
-    setProjects(projects.filter((project) => project.id !== id));
+    setProjects(projects.filter((project) => project._id !== id));
   };
 
 
@@ -112,7 +114,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

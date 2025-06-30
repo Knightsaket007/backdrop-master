@@ -19,7 +19,7 @@ export default function ProjectCard({ project, onEdit, onDelete }: ProjectCardPr
 
   const handleDelete = () => {
     if (showDeleteConfirm) {
-      onDelete(project.id);
+      onDelete(project._id);
     } else {
       setShowDeleteConfirm(true);
     }
