@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Topbar from "@/app/components/dashboard/Topbar";
 import ProjectCard from "@/app/components/dashboard/ProjectCard";
 import EmptyState from "@/app/components/dashboard/EmptyState";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import LoaderComp from "../components/LoaderComp";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -39,6 +39,20 @@ export default function Dashboard() {
   const [projects, setProjects] = useState(sampleProjects);
   const { userId, isLoaded } = useAuth();
   const [openloader, setopenloader] = useState(false)
+
+  useEffect(()=>{
+
+    console.log("userId isss..", userId)
+    const fetchProjects =async ()=>{
+      if(userId ){
+        const result = await fetch(`/api/get-projects?id=${userId}`);
+        const res = await result.json();
+        console.log("result is..", res)
+      }
+    }
+
+   fetchProjects(); 
+  })
 
   const handleCreateNew = () => {
     console.log("Creating new project");
