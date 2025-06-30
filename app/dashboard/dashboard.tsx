@@ -35,17 +35,24 @@ const sampleProjects = [
   },
 ];
 
+type Project = {
+  _id: string;
+  title: string;
+  imageUrl: string;
+  createdAt: string;
+};
+
 export default function Dashboard() {
   // const [projects, setProjects] = useState(sampleProjects);
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const { userId, isLoaded } = useAuth();
   const [openloader, setopenloader] = useState(false)
 
-  useEffect(()=>{
+  useEffect(() => {
 
     console.log("userId isss..", userId)
-    const fetchProjects =async ()=>{
-      if(userId ){
+    const fetchProjects = async () => {
+      if (userId) {
         const result = await fetch(`/api/get-projects?id=${userId}`);
         const res = await result.json();
         console.log("result is..", res)
@@ -53,8 +60,8 @@ export default function Dashboard() {
       }
     }
 
-   fetchProjects(); 
-  },[userId])
+    fetchProjects();
+  }, [userId])
 
   const handleCreateNew = () => {
     console.log("Creating new project");
