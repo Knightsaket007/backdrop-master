@@ -10,36 +10,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-// Sample project data
-const sampleProjects = [
-  {
-    id: "1",
-    title: "Summer Collection Backdrop",
-    imageUrl:
-      "https://images.pexels.com/photos/5876695/pexels-photo-5876695.jpeg",
-    createdAt: "2 days ago",
-  },
-  {
-    id: "2",
-    title: "Product Showcase",
-    imageUrl:
-      "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
-    createdAt: "1 week ago",
-  },
-  {
-    id: "3",
-    title: "Portrait Setup",
-    imageUrl:
-      "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
-    createdAt: "2 weeks ago",
-  },
-];
 
 type Project = {
   _id: string;
   title: string;
-  imageUrl: string;
-  createdAt: string;
+  backgroundImage: string;
 };
 
 export default function Dashboard() {
@@ -48,31 +23,40 @@ export default function Dashboard() {
   const { userId, isLoaded } = useAuth();
   const [openloader, setopenloader] = useState(false)
 
+  const fetchProjects = async () => {
+    if (userId) {
+      const result = await fetch(`/api/get-projects?id=${userId}`);
+      const res = await result.json();
+      console.log("result is..", res)
+      setProjects(res);
+    }
+  }
+
   useEffect(() => {
 
-    console.log("userId isss..", userId)
-    const fetchProjects = async () => {
-      if (userId) {
-        const result = await fetch(`/api/get-projects?id=${userId}`);
-        const res = await result.json();
-        console.log("result is..", res)
-        // setProjects(res);
-      }
-    }
-
-    fetchProjects();
+     fetchProjects();
   }, [userId])
 
   const handleCreateNew = () => {
     console.log("Creating new project");
   };
 
-  const handleEdit = (id: string) => {
-    console.log("Editing project:", id);
-  };
 
-  const handleDelete = (id: string) => {
-    setProjects(projects.filter((project) => project._id !== id));
+  const handleDelete = async (id: string) => {
+    const result = await fetch("/api/delete-project", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: userId, id }),
+    });
+
+    if (!result.ok) {
+
+      toast("Failed to delete project")
+      return;
+    }
+    toast("Project deleted successfully")
+    console.log("result is..", result)
+
   };
 
 
@@ -123,7 +107,6 @@ export default function Dashboard() {
               <ProjectCard
                 key={project._id}
                 project={project}
-                onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             ))}
@@ -137,7 +120,10 @@ export default function Dashboard() {
         )
       }
 
+
+      {/*=-=--=- shadcn components -=-=-=-=-*/}
       <Toaster position='top-center' theme='light' />
+
 
     </div>
   );

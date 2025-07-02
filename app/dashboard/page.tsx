@@ -6,7 +6,7 @@ import Dashboard from './dashboard';
 
 const DashboardPage = () => {
 
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded} = useUser();
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
@@ -19,8 +19,7 @@ const DashboardPage = () => {
     <>
 
       <SignedIn>
-        {/* <Editor id={user?.id || "guest"} editorId={editorId} /> */}
-        <Dashboard userid={user?.id} />
+        <Dashboard />
       </SignedIn>
       <SignedOut>
         <RedirectToSignIn />
