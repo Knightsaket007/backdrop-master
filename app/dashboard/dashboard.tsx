@@ -24,17 +24,26 @@ export default function Dashboard() {
   const [openloader, setopenloader] = useState(false)
 
   const fetchProjects = async () => {
-    if (userId) {
-      const result = await fetch(`/api/get-projects?id=${userId}`);
-      const res = await result.json();
-      console.log("result is..", res)
-      setProjects(res);
+    try {
+      if (userId) {
+        const result = await fetch(`/api/get-projects?id=${userId}`);
+        const res = await result.json();
+        console.log("result is..", res)
+        setProjects(res);
+        setopenloader(false);
+      }
     }
+    catch (error) {
+      console.error("Error fetching projects:", error);
+      toast("Failed to fetch projects");
+      return;
+    }
+
   }
 
   useEffect(() => {
-
-     fetchProjects();
+    setopenloader(true);
+    fetchProjects();
   }, [userId])
 
   const handleCreateNew = () => {
@@ -100,7 +109,7 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {projects.length === 0 ? (
-          <EmptyState onCreateNew={handleCreateNew} />
+          <EmptyState onCreateNew={createProject} />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
