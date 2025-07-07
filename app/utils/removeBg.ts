@@ -1,3 +1,4 @@
+'use client';
 import { removeBackground } from "@imgly/background-removal";
 
 // Helper function to fetch with retries
