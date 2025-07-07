@@ -34,6 +34,8 @@ export async function POST(req: Request) {
 
       console.log("📝 User found, updating state...");
 
+      const timestamp = new Date().toISOString();
+
       await EditorState.findByIdAndUpdate(existing._id, {
         // plan,
         editorId,
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
         showFilters,
         colorArray,
         texts,
+        updatedAt: timestamp,
       });
 
       // await user.save();

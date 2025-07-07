@@ -64,7 +64,7 @@ const EditorStateSchema = new Schema({
     },
     default: [],
   },
-
+  updatedAt: { type: String, require: true },
   //   userId: { type: String, required: true },
   //   texts: { type: Array, required: true },
   //   createdAt: { type: Date, default: Date.now },
