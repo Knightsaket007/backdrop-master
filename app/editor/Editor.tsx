@@ -594,6 +594,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
       if (backgroundImage && !bgremovedImage) {
         setactiveLoader(true);
         const removed = await removeBg(backgroundImage);
+        console.log('bg removed...')
+        console.log("..", removed)
         setSelectedTool('text');
         try {
           if (removed) {

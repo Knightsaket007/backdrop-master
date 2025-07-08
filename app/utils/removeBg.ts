@@ -1,4 +1,3 @@
-'use client';
 import { removeBackground } from "@imgly/background-removal";
 
 // Helper function to fetch with retries
@@ -15,7 +14,7 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<B
       await new Promise((resolve) => setTimeout(resolve, delay));
       return fetchWithRetry(url, retries - 1, delay);
     } else {
-      throw error; // Re-throw the error if all retries fail
+      throw error; 
     }
   }
 }
