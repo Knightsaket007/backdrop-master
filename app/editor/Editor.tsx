@@ -56,6 +56,7 @@ import { blobUrlToDataUrl } from '@/lib/blobToBase64';
 import ScreenMismatch from '../components/ScreenMismatch';
 import { flushEditorBackupToDB, saveEditorState } from './HandleState';
 import { useRouter } from 'next/navigation';
+import { uploadImage } from '../utils/upload';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -532,7 +533,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         setImgHeight(0);
         
         const dataUrl = await blobUrlToDataUrl(event.target?.result as string);
-        setBackgroundImage(dataUrl);
+       const uploadedurl= uploadImage(dataUrl, 'other')
+        setBackgroundImage(uploadedurl);
       };
 
       reader.readAsDataURL(file);
