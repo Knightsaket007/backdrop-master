@@ -24,7 +24,6 @@ const Page = () => {
 
   return (
     <>
-    
       <Navbar />
       <Hero />
       <Features />

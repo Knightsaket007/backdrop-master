@@ -10,7 +10,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-
 type Project = {
   _id: string;
   title: string;
