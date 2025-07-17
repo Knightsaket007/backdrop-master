@@ -521,7 +521,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   };
 
   // Handle image drop
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {  
     e.preventDefault();
 
     const file = e.dataTransfer.files[0];
@@ -533,7 +533,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         setImgHeight(0);
         
         const dataUrl = await blobUrlToDataUrl(event.target?.result as string);
-       const uploadedurl= uploadImage(dataUrl, 'other')
+       const uploadedurl= await uploadImage(dataUrl, 'other')
+       
         setBackgroundImage(uploadedurl);
       };
 
