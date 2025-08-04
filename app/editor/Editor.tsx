@@ -604,8 +604,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         try {
           if (removed) {
             const base64img = await blobUrlToDataUrl(removed)
-            
-            setBgremovedImage(base64img)
+             const uploadedurl = await uploadImage(base64img, 'other')
+            setBgremovedImage(uploadedurl)
             setactiveLoader(false)
             setIsDraggable(false);
 
