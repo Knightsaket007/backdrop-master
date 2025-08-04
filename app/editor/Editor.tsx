@@ -521,7 +521,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   };
 
   // Handle image drop
-  const handleDrop = async (e: React.DragEvent) => {  
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
 
     const file = e.dataTransfer.files[0];
@@ -531,10 +531,10 @@ function Editor({ id, editorId, stateData }: EditorProps) {
       reader.onload = async (event) => {
         setImgWidth(0);
         setImgHeight(0);
-        
+
         const dataUrl = await blobUrlToDataUrl(event.target?.result as string);
-       const uploadedurl= await uploadImage(dataUrl, 'other')
-       
+        const uploadedurl = await uploadImage(dataUrl, 'other')
+        console.log('uploaded url...', uploadedurl);
         setBackgroundImage(uploadedurl);
       };
 
@@ -548,7 +548,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   };
 
 
-  const clickHandler = () => {
+  const clickHandler = async() => {
 
     if (backgroundImage || showStickers || showText) return;
 
@@ -560,11 +560,12 @@ function Editor({ id, editorId, stateData }: EditorProps) {
       const file = (event.target as HTMLInputElement)?.files?.[0];
       if (file && file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async(event) => {
           setImgWidth(0);
           setImgHeight(0)
-
-          setBackgroundImage(event.target?.result as string);
+          // setBackgroundImage(event.target?.result as string);
+          const uploadedurl = await uploadImage(event.target?.result as string, 'other')
+          setBackgroundImage(uploadedurl);
         };
         reader.readAsDataURL(file);
       }
@@ -603,6 +604,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         try {
           if (removed) {
             const base64img = await blobUrlToDataUrl(removed)
+            
             setBgremovedImage(base64img)
             setactiveLoader(false)
             setIsDraggable(false);

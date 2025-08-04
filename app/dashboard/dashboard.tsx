@@ -64,6 +64,7 @@ export default function Dashboard() {
       return;
     }
     toast("Project deleted successfully")
+    
     console.log("result is..", result)
 
   };
