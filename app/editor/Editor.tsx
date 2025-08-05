@@ -30,6 +30,7 @@ import {
   ToggleRight,
   BrushIcon,
   EraserIcon,
+  RotateCcwSquare,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp';
@@ -969,6 +970,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
           <>
             {[
               { icon: <ImagePlus size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
+              { icon: <RotateCcwSquare size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
               { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
               // { icon: <Shapes size={24} />, tooltip: "Shapes", tool: 'none' as Tool },
