@@ -59,7 +59,7 @@ import { flushEditorBackupToDB, saveEditorState } from './HandleState';
 import { useRouter } from 'next/navigation';
 import { uploadImage } from '../utils/upload';
 
-type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none';
+type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none' | 'logo';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
 
 // Initialize GIPHY API
@@ -329,9 +329,13 @@ function Editor({ id, editorId, stateData }: EditorProps) {
 
   // Handle tool selection
   const handleToolClick = (tool: Tool) => {
-    console.log('selected toollll..', selectedTool)
+    // console.log('selected toollll..', selectedTool)
+
+    if(tool === 'logo') router.push('/dashboard')
+
     if (!backgroundImage) return;
     setSelectedTool(tool);
+
     if (tool === 'sticker') {
       setShowStickers((state) => {
         return !state
@@ -969,7 +973,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         {leftSidebarOpen && (
           <>
             {[
-              { icon: <ImagePlus size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
+              { icon: <img width="32" height="32" src="https://img.icons8.com/windows/32/huawei-logo.png" alt="huawei-logo"/>, tooltip: "", tool: "logo" as Tool },
               { icon: <RotateCcwSquare size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
               { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
