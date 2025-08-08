@@ -973,8 +973,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         {leftSidebarOpen && (
           <>
             {[
-              { icon: <img width="32" height="32" src="https://img.icons8.com/windows/32/huawei-logo.png" alt="huawei-logo"/>, tooltip: "", tool: "logo" as Tool },
-              { icon: <RotateCcwSquare size={24} />, tooltip: "Add Image", tool: 'none' as Tool },
+              { icon: <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo"/>, tooltip: "", tool: "logo" as Tool },
+              { icon: <RotateCcwSquare size={24} />, tooltip: "Replace Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
               { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
               // { icon: <Shapes size={24} />, tooltip: "Shapes", tool: 'none' as Tool },
@@ -988,7 +988,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
                 key={index}
                 onClick={() => handleToolClick(item.tool)}
                 className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110
-                  ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
+                  ${selectedTool === item.tool ? 'bg-indigo-600' :  'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
                   ${!backgroundImage && 'opacity-50 bg-transparent'} 
                   
                   `}
