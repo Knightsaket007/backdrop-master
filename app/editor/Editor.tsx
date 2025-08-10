@@ -972,8 +972,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         </button>
         {leftSidebarOpen && (
           <>
+          <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo"/>
             {[
-              { icon: <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo"/>, tooltip: "", tool: "logo" as Tool },
               { icon: <RotateCcwSquare size={24} />, tooltip: "Replace Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
               { icon: <Eraser size={24} />, tooltip: "Eraser", tool: 'eraser' as Tool },
