@@ -45,7 +45,7 @@ const PricingPage = () => {
         'Priority email & chat support'
       ],
       popular: true,
-      buttonText: 'Start Free Trial'
+      buttonText: 'Start Free'
     }
   ];
 
@@ -203,7 +203,7 @@ const PricingPage = () => {
           <p className="text-xl text-indigo-100 mb-8">Join creators and businesses already using Backdrop Master to level up their visuals.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
-              Start Free Trial
+              Start Free
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition-all">
               View Demo
