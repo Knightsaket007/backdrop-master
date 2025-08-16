@@ -53,7 +53,12 @@ const PricingPage = () => {
     return billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
   };
 
- 
+  const getSavings = (plan) => {
+    if (plan.monthlyPrice === 0) return 0;
+    const monthlyCost = plan.monthlyPrice * 12;
+    const yearlyCost = plan.yearlyPrice;
+    return Math.round(((monthlyCost - yearlyCost) / monthlyCost) * 100);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
