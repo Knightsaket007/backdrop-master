@@ -6,18 +6,31 @@ const PricingPage = () => {
 
   const pricingPlans = [
     {
+      name: 'Free',
+      description: 'Get started with essential features at no cost',
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      features: [
+        '3 background edits per month',
+        'Basic fonts & filters',
+        'Standard resolution export',
+      ],
+      popular: false,
+      buttonText: 'Get Started Free'
+    },
+    {
       name: 'Starter',
       description: 'Perfect for hobby projects & personal use',
       monthlyPrice: 9,
       yearlyPrice: 90,
       features: [
-        '5 background edits per month',
-        'Basic fonts & filters',
-        'Standard resolution export',
+        '20 background edits per month',
+        'Full Google Fonts library',
+        'HD exports',
         'Email support'
       ],
       popular: false,
-      buttonText: 'Get Started'
+      buttonText: 'Upgrade to Starter'
     },
     {
       name: 'Pro',
@@ -26,7 +39,6 @@ const PricingPage = () => {
       yearlyPrice: 190,
       features: [
         'Unlimited background edits',
-        'Full Google Fonts library',
         'Advanced filters & effects',
         'High-resolution exports (up to 4K)',
         'Sticker library & crop tools',
@@ -34,21 +46,6 @@ const PricingPage = () => {
       ],
       popular: true,
       buttonText: 'Start Free Trial'
-    },
-    {
-      name: 'Business',
-      description: 'For teams & commercial projects',
-      monthlyPrice: 49,
-      yearlyPrice: 490,
-      features: [
-        'Everything in Pro',
-        'Team collaboration (up to 5 users)',
-        'Custom branding (watermark removal)',
-        'API access for automation',
-        'Dedicated account manager'
-      ],
-      popular: false,
-      buttonText: 'Contact Sales'
     }
   ];
 
@@ -56,11 +53,7 @@ const PricingPage = () => {
     return billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
   };
 
-  const getSavings = (plan) => {
-    const monthlyCost = plan.monthlyPrice * 12;
-    const yearlyCost = plan.yearlyPrice;
-    return Math.round(((monthlyCost - yearlyCost) / monthlyCost) * 100);
-  };
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
@@ -74,7 +67,7 @@ const PricingPage = () => {
             Choose Your Perfect Plan
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Get the best tools to create stunning backdrops. Start with a free trial and upgrade anytime.
+            Get the best tools to create stunning backdrops. Start for free and upgrade anytime.
           </p>
 
           {/* Billing Toggle */}
@@ -127,12 +120,18 @@ const PricingPage = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h2>
                   <p className="text-gray-600 mb-6">{plan.description}</p>
                   <div>
-                    <span className="text-5xl font-bold text-gray-900">${getPrice(plan)}</span>
-                    <span className="text-gray-600">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
-                    {billingCycle === 'yearly' && (
-                      <div className="text-sm text-green-600 font-medium mt-1">
-                        Save {getSavings(plan)}% annually
-                      </div>
+                    {plan.monthlyPrice === 0 ? (
+                      <span className="text-4xl font-bold text-gray-900">Free</span>
+                    ) : (
+                      <>
+                        <span className="text-5xl font-bold text-gray-900">${getPrice(plan)}</span>
+                        <span className="text-gray-600">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                        {billingCycle === 'yearly' && (
+                          <div className="text-sm text-green-600 font-medium mt-1">
+                            Save {getSavings(plan)}% annually
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -178,11 +177,11 @@ const PricingPage = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Do you offer a free trial?</h3>
-              <p className="text-gray-600">Yes, we offer a 7-day free trial on all paid plans. No credit card required.</p>
+              <p className="text-gray-600">Yes, we offer a 7-day free trial on the Pro plan. No credit card required.</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">What payment methods are accepted?</h3>
-              <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers for annual Business plans.</p>
+              <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Can I cancel anytime?</h3>
