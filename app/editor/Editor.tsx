@@ -58,6 +58,7 @@ import ScreenMismatch from '../components/ScreenMismatch';
 import { flushEditorBackupToDB, saveEditorState } from './HandleState';
 import { useRouter } from 'next/navigation';
 import { uploadImage } from '../utils/upload';
+import Link from 'next/link';
 
 type Tool = 'brush' | 'eraser' | 'text' | 'sticker' | 'crop' | 'filters' | 'none' | 'logo';
 type Sticker = { id: number; src: string; x: number; y: number; size: number };
@@ -972,7 +973,10 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         </button>
         {leftSidebarOpen && (
           <>
+          <Link href="/dashboard">
           <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo"/>
+          </Link>
+          
             {[
               { icon: <RotateCcwSquare size={24} />, tooltip: "Replace Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
