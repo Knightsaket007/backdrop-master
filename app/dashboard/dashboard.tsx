@@ -64,6 +64,8 @@ export default function Dashboard() {
       return;
     }
     toast("Project deleted successfully")
+    setopenloader(true);
+    fetchProjects()
     
     console.log("result is..", result)
 
