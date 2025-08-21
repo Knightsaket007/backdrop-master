@@ -44,7 +44,7 @@ const LoaderComp = () => {
         {/* Show additional text after 2 minutes */}
         {showAdditionalText && (
           <p className="mt-2 text-lg text-indigo-400 font-medium">
-            We're almost there! Thanks for your patience.
+            {`We're almost there! Thanks for your patience.`}
           </p>
         )}
       </div>

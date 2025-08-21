@@ -1,6 +1,5 @@
 import { connectToDB } from "@/lib/mongodb";
 import EditorState from "@/app/models/EditorState";
-import { error } from "console";
 
 export async function POST(req: Request) {
   await connectToDB();
