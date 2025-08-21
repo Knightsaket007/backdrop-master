@@ -1,6 +1,16 @@
 'use client'
 import React, { useState } from 'react';
 
+type Plan = {
+  name: string;
+  description: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  features: string[];
+  popular: boolean;
+  buttonText: string;
+};
+
 const PricingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
 
@@ -49,11 +59,13 @@ const PricingPage = () => {
     }
   ];
 
-  const getPrice = (plan) => {
+  const getPrice = (plan:Plan) => {
+    console.log('plan is', plan)
     return billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
   };
 
-  const getSavings = (plan) => {
+  const getSavings = (plan:Plan) => {
+    console.log('plan is22', plan)
     if (plan.monthlyPrice === 0) return 0;
     const monthlyCost = plan.monthlyPrice * 12;
     const yearlyCost = plan.yearlyPrice;
