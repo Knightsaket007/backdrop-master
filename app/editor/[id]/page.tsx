@@ -41,7 +41,7 @@ export default function Editorage() {
 
     const params = useParams();
     const editorId = params?.id as string;
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { isLoaded, user } = useUser();
     const [payloadData, setpayloadData] = useState(null)
 
     console.log('Editor ID:', editorId)

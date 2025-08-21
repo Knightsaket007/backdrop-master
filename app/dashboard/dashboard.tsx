@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Topbar from "@/app/components/dashboard/Topbar";
 import ProjectCard from "@/app/components/dashboard/ProjectCard";
 import EmptyState from "@/app/components/dashboard/EmptyState";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth} from "@clerk/nextjs";
 import LoaderComp from "../components/LoaderComp";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -46,9 +46,6 @@ export default function Dashboard() {
     fetchProjects();
   }, [userId])
 
-  const handleCreateNew = () => {
-    console.log("Creating new project");
-  };
 
 
   const handleDelete = async (id: string) => {

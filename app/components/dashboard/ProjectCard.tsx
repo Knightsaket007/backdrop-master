@@ -1,6 +1,7 @@
 'use client'
 
-import { Pencil, Trash2, MoreVertical } from 'lucide-react';
+// import { Pencil, Trash2, MoreVertical } from 'lucide-react';
+import {Trash2} from 'lucide-react';
 import { useState } from 'react';
 
 import {

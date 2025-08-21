@@ -54,8 +54,8 @@ export const upscaleImage = (src: string, scale = 2): Promise<string> => {
               finalCtx.drawImage(finalCanvas, 0, 0);
               finalCtx.globalCompositeOperation = 'source-over';
               finalCtx.filter = 'none';
-            } catch (e) {
-              console.log('Filter not supported in this browser');
+            } catch (err:unknown) {
+              console.log('Filter not supported in this browser', err);
             }
           }
           

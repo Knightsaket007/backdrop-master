@@ -6,7 +6,7 @@ import { UserButton, SignedIn } from "@clerk/nextjs";
 import {
   Type,
   Palette,
-  ImagePlus,
+  // ImagePlus,
   Undo,
   Redo,
   Download,
