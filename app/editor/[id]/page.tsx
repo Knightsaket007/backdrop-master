@@ -106,7 +106,7 @@ export default function Editorage() {
                     router.push("/dashboard")
                     return;
                 }
-                setpayloadData(stateData);
+                setpayloadData(stateData as EditorPayload);
                 console.log('state daaata..', stateData)
             }
             catch (error) {
