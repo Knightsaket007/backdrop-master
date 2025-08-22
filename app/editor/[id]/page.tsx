@@ -42,7 +42,8 @@ export default function Editorage() {
     const params = useParams();
     const editorId = params?.id as string;
     const { isLoaded, user } = useUser();
-    const [payloadData, setpayloadData] = useState(null)
+    // const [payloadData, setpayloadData] = useState(null)
+    const [payloadData, setpayloadData] = useState<EditorPayload>({} as EditorPayload);
 
     console.log('Editor ID:', editorId)
 
@@ -104,7 +105,7 @@ export default function Editorage() {
                     router.push("/dashboard")
                     return;
                 }
-                setpayloadData(stateData);
+                setpayloadData(stateData as EditorPayload);
                 console.log('state daaata..', stateData)
             }
             catch (error) {
