@@ -332,7 +332,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   const handleToolClick = (tool: Tool) => {
     // console.log('selected toollll..', selectedTool)
 
-    if(tool === 'logo') router.push('/dashboard')
+    if (tool === 'logo') router.push('/dashboard')
 
     if (!backgroundImage) return;
     setSelectedTool(tool);
@@ -554,7 +554,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   };
 
 
-  const clickHandler = async() => {
+  const clickHandler = async () => {
 
     if (backgroundImage || showStickers || showText) return;
 
@@ -566,7 +566,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
       const file = (event.target as HTMLInputElement)?.files?.[0];
       if (file && file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = async(event) => {
+        reader.onload = async (event) => {
           setImgWidth(0);
           setImgHeight(0)
           // setBackgroundImage(event.target?.result as string);
@@ -610,11 +610,11 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         try {
           if (removed) {
             const base64img = await blobUrlToDataUrl(removed)
-             const uploadedurl = await uploadImage(base64img, 'other')
+            const uploadedurl = await uploadImage(base64img, 'other')
             setBgremovedImage(uploadedurl)
             setactiveLoader(false)
             setIsDraggable(false);
-
+            addText();
           }
           else {
             toast('Some thing went worng', {
@@ -973,10 +973,10 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         </button>
         {leftSidebarOpen && (
           <>
-          <Link href="/dashboard">
-          <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo"/>
-          </Link>
-          
+            <Link href="/dashboard">
+              <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo" />
+            </Link>
+
             {[
               { icon: <RotateCcwSquare size={24} />, tooltip: "Replace Image", tool: 'none' as Tool },
               { icon: <Brush size={24} />, tooltip: "Brush", tool: 'brush' as Tool },
@@ -992,7 +992,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
                 key={index}
                 onClick={() => handleToolClick(item.tool)}
                 className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110
-                  ${selectedTool === item.tool ? 'bg-indigo-600' :  'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
+                  ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
                   ${!backgroundImage && 'opacity-50 bg-transparent'} 
                   
                   `}
