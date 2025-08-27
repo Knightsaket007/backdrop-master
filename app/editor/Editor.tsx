@@ -211,37 +211,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
 
   // -=-=-=-=For text-=-=-=-//
   // -=-=-=-=For text-=-=-=-//
-  const addText = () => {
-    if (texts.length < 4) {
-      const newText = {
-        id: Date.now(),
-        content: "New Text",
-        fontFamily: 'Inter, sans-serif',
-        size: 'clamp(12px, 3vw, 100px)',
-        bold: false,
-        italic: false,
-        color: '#000000',
-        top: '',
-        left: '',
-        rotate: 0,
-        width: '',
-        height: '',
-        shadow: [4, 4, 4, 'black'] as [number, number, number, string],
-        hasShadow: true,
-        textImage: "",
-        gradient: [90, '#FF6B6B', "#4A90E2"] as [number, string, string],
-        isgradient: true
-      };
-      setTexts([...texts, newText]);
-      setActiveTextId(newText.id);
 
-    } else {
-      // alert("Max 10 text layers allowed!");
-      toast("Maximum 4 text layers allowed!", {
-        description: 'Subscribe for more layers'
-      })
-    }
-  };
 
   // const updateText = (id: number, newContent: string) => {
   //   setTexts((prev) =>
