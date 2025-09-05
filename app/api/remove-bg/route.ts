@@ -1,7 +1,8 @@
 // app/api/remove-bg/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const TIMEOUT = 20000;
+// const TIMEOUT = 20000;
+const TIMEOUT = 10000;
 
 async function fetchWithTimeout(url: string, options: RequestInit) {
   const ctrl = new AbortController();
@@ -18,9 +19,9 @@ async function fetchWithTimeout(url: string, options: RequestInit) {
 export async function POST(req: NextRequest) {
   try {
     const { imageUrl } = await req.json();
-    // if (!imageUrl) {
-    //   return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
-    // }
+    if (!imageUrl) {
+      return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
+    }
 
     // 1. Try PhotoRoom
     try {
