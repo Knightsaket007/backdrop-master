@@ -42,12 +42,7 @@ export async function POST(req: NextRequest) {
       console.warn("PhotoRoom failed, falling back → Dezgo:", err);
     }
 
-    // 2. Fallback → Dezgo
-    // const res = await fetchWithTimeout("https://api.dezgo.com/remove-background", {
-    //   method: "POST",
-    //   headers: { "X-Dezgo-Key": process.env.DEZGO_API_KEY! },
-    //   body: JSON.stringify({ image_url: imageUrl }),
-    // });
+    
 
     // const blob = await res.blob();
     return new NextResponse(blob, {
