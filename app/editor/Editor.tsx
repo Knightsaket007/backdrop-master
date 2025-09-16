@@ -225,8 +225,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         left: '',
         rotate: 0,
         width: '',
-        height: '',npm run dev
-        
+        height: '',
         shadow: [4, 4, 4, 'black'] as [number, number, number, string],
         hasShadow: true,
         textImage: "",
