@@ -28,7 +28,6 @@ export default function Dashboard() {
       if (userId) {
         const result = await fetch(`/api/get-projects?id=${userId}`);
         const res = await result.json();
-        console.log("result is..", res)
         setProjects(res);
         setopenloader(false);
       }
@@ -64,7 +63,6 @@ export default function Dashboard() {
     setopenloader(true);
     fetchProjects()
     
-    console.log("result is..", result)
 
   };
 
@@ -73,7 +71,6 @@ export default function Dashboard() {
   const createProject = async () => {
     setopenloader(true);
     if (!userId || !isLoaded) {
-      console.log("User not authenticated");
       setopenloader(false);
       toast("User not authenticated")
       return;
@@ -95,9 +92,7 @@ export default function Dashboard() {
       }
 
       setopenloader(false);
-      // window.open(`/editor/${data?.data}`, '_blank')
       router.push(`/editor/${data?.data}`)
-      console.log("✅ Project created:", data.data);
     } catch (err) {
       console.error("Error:", err);
     }
@@ -111,7 +106,7 @@ export default function Dashboard() {
         {projects.length === 0 ? (
           <EmptyState onCreateNew={createProject} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
             {projects.map((project) => (
               <ProjectCard
                 key={project._id}

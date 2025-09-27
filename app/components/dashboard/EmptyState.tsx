@@ -6,7 +6,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({ onCreateNew }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4">
+    <div className="flex flex-col items-center justify-center py-10 px-4">
       <div className="bg-indigo-50 p-4 rounded-full mb-4">
         <FolderPlus size={32} className="text-indigo-600" />
       </div>
