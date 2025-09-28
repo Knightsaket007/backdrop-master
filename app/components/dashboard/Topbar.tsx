@@ -13,7 +13,7 @@ export default function Topbar({ createProject }: TopbarProps) {
       {/* Logo */}
       <div className="flex items-center gap-2">
         <Command className="h-6 w-6 text-indigo-600" />
-        <span className="text-xl font-semibold text-gray-800">Backdrop Master</span>
+        <span className="text-xl font-semibold text-gray-800">Picfer</span>
       </div>
 
       {/* Right Section */}

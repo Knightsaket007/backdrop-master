@@ -16,7 +16,7 @@ export function Hero() {
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
           Welcome to{" "}
           <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Backdrop Master
+            Picfer
           </span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">

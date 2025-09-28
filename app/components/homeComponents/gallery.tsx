@@ -1,9 +1,10 @@
 import Image from "next/image"
+import spidy from "@/public/assets/imgs/spidy.png"
 
 export function Gallery() {
   const images = [
     {
-      src: "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src: spidy,
       alt: "Portrait with colorful backdrop",
     },
     {

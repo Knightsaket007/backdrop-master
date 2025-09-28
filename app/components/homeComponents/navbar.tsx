@@ -31,7 +31,9 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="#" className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Backdrop Master
+                  {/* <Command className="h-6 w-6 text-indigo-600" /> */}
+
+            Picfer <span className="text-white text-sm bg-green-500 rounded-md px-3 py-0.5">Beta</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
