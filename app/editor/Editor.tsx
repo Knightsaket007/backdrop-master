@@ -656,6 +656,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
     const canvas = document.createElement('canvas');
     // const image = new Image();
     const image = new window.Image();
+    image.crossOrigin = "anonymous";
     image.src = backgroundImage;
 
     await new Promise(resolve => (image.onload = resolve));

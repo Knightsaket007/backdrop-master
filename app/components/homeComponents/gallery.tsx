@@ -1,5 +1,6 @@
 import Image from "next/image"
 import spidy from "@/public/assets/imgs/spidy.png"
+import robo from "@/public/assets/imgs/robo.png"
 
 export function Gallery() {
   const images = [
@@ -8,7 +9,7 @@ export function Gallery() {
       alt: "Portrait with colorful backdrop",
     },
     {
-      src: "https://images.pexels.com/photos/2387793/pexels-photo-2387793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src:robo,
       alt: "Abstract studio backdrop",
     },
     {
