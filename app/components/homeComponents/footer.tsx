@@ -27,7 +27,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="mb-6 md:mb-0">
             <Link href="#" className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Backdrop Master
+              Picfer
             </Link>
             <p className="mt-2 text-gray-400 max-w-md">
               Create stunning, professional backgrounds for your photos and videos with our powerful editor.
@@ -64,7 +64,7 @@ export function Footer() {
           </div>
           
           <div className="text-gray-500 text-sm">
-            &copy; {currentYear} Backdrop Master. All rights reserved.
+            &copy; {currentYear} Picfer. All rights reserved.
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ export function Features() {
     },
     {
       title: "AI Auto Backdrop",
-      description: "Let our AI generate the perfect backdrop based on your image.",
+      description: "Perfectly layer text beside image.",
       icon: <Sparkles className="h-10 w-10 text-indigo-500" />,
     },
   ]
