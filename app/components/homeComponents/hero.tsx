@@ -20,7 +20,7 @@ export function Hero() {
           </span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-          Create stunning, professional backgrounds for your photos and videos with our powerful, easy-to-use editor.
+          Create stunning, professional backgrounds for your photos with our powerful, easy-to-use editor.
         </p>
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg transition-all" onClick={() => router.push('/dashboard')}>
          {`Start Now - It's free`} 
