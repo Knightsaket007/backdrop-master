@@ -1,3 +1,4 @@
+"use client"
 import { removeBackground } from "@imgly/background-removal";
 
 // Helper function to fetch with retries
@@ -34,3 +35,21 @@ export const removeBg = async (imageUrl: string): Promise<string | null> => {
     return null;
   }
 };
+
+
+
+// export const removeBg = async (imageUrl: string): Promise<string | null> => {
+//   try {
+//     const response = await fetch(imageUrl, { mode: "cors" });
+//     const blob = await response.blob();
+
+//     const imageBlob = await removeBackground(blob, {
+//       debug: true, // optional, logs details in console
+//     });
+
+//     return URL.createObjectURL(imageBlob);
+//   } catch (error) {
+//     console.error("Background Removal Error:", error);
+//     return null;
+//   }
+// };

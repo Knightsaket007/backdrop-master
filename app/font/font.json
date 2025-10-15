@@ -98,42 +98,42 @@
   {
     "label": "playwrite",
     "value": "'playwrite-cc-es-deco', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "joschmi",
     "value": "'joschmi', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "UnifontexMono",
     "value": "'UnifontexMono', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "CreamySugar",
     "value": "'CreamySugar', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "Dangernight",
     "value": "'Dangernight', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "CrotahFreeVersionItalic",
     "value": "'CrotahFreeVersionItalic', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "Android",
     "value": "'AndroidInsomniaRegular', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "Ava",
     "value": "'Ava', sans-serif",
-    "premium": true
+    "premium": false
   },
   {
     "label": "AdamasRegular",
