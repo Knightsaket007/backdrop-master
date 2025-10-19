@@ -30,7 +30,7 @@ export function Footer() {
               Picfer
             </Link>
             <p className="mt-2 text-gray-400 max-w-md">
-              Create stunning, professional backgrounds for your photos and videos with our powerful editor.
+              Create stunning, professional backgrounds for your photos with our powerful editor.
             </p>
           </div>
           

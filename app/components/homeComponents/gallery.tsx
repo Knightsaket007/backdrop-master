@@ -1,6 +1,10 @@
 import Image from "next/image"
 import spidy from "@/public/assets/imgs/spidy.png"
 import robo from "@/public/assets/imgs/robo.png"
+import icecream from "@/public/assets/imgs/icecream.png"
+import kitty from "@/public/assets/imgs/kitty.png"
+import mockup from "@/public/assets/imgs/mockup.png"
+import cheese from "@/public/assets/imgs/cheese.png"
 
 export function Gallery() {
   const images = [
@@ -13,19 +17,19 @@ export function Gallery() {
       alt: "Abstract studio backdrop",
     },
     {
-      src: "https://images.pexels.com/photos/1183434/pexels-photo-1183434.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src: icecream,
       alt: "Professional photoshoot backdrop",
     },
     {
-      src: "https://images.pexels.com/photos/3379943/pexels-photo-3379943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src: kitty,
       alt: "Creative light backdrop",
     },
     {
-      src: "https://images.pexels.com/photos/1038041/pexels-photo-1038041.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src: mockup,
       alt: "Nature-inspired backdrop",
     },
     {
-      src: "https://images.pexels.com/photos/3812944/pexels-photo-3812944.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      src: cheese,
       alt: "Minimalist studio backdrop",
     },
   ]
