@@ -17,11 +17,11 @@ export function Navbar() {
   }, [])
 
   const navLinks = [
-    { name: "Home", href: "#" },
+    // { name: "Home", href: "/" },
     { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#" },
-    { name: "About", href: "#" },
-    { name: "Contact", href: "#" },
+    { name: "Pricing", href: "/Pricing" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ]
 
   return (
