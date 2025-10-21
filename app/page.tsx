@@ -26,8 +26,8 @@ const Page = () => {
     <>
       <Navbar />
       <Hero />
-      <Features />
       <Gallery />
+      <Features />
       <CtaBanner />
       <Footer />
     </>
