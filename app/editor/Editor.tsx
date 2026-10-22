@@ -120,6 +120,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   const isPremiumUser = false;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasFrameRef = useRef<HTMLDivElement | null>(null);
+  const replaceImageInputRef = useRef<HTMLInputElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [aspect, setAspect] = useState(1);
 
@@ -370,6 +372,58 @@ function Editor({ id, editorId, stateData }: EditorProps) {
     }
   };
 
+  const uploadBackgroundFile = async (file?: File) => {
+    if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      toast.error('Please choose a PNG, JPEG, or WebP image.');
+      return;
+    }
+
+    setactiveLoader(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Could not read image'));
+        reader.onerror = () => reject(new Error('Could not read image'));
+        reader.readAsDataURL(file);
+      });
+      // Guest projects stay entirely in this browser. Signed-in projects keep
+      // using Cloudinary so their existing saved-project flow is unchanged.
+      const imageSource = id === 'guest'
+        ? dataUrl
+        : await uploadImage(dataUrl, 'other', file.name);
+      setBackgroundImage(imageSource);
+      setBgremovedImage(undefined);
+      setImgWidth(0);
+      setImgHeight(0);
+      setSelectedTool('none');
+      setIsCropping(false);
+      setCroppingModeOn(false);
+      toast.success('Image replaced.');
+    } catch (error) {
+      console.error('Image replacement failed', error);
+      toast.error(error instanceof Error ? error.message : 'Could not replace image. Please try again.');
+    } finally {
+      setactiveLoader(false);
+    }
+  };
+
+  const handleReplaceImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    // Allow choosing the same file again after replacing it.
+    event.target.value = '';
+    void uploadBackgroundFile(file);
+  };
+
+  const handleBackgroundImageLoad = (img: HTMLImageElement) => {
+    const frame = canvasFrameRef.current;
+    const availableWidth = frame?.clientWidth || 900;
+    const availableHeight = frame?.clientHeight || 675;
+    const scale = Math.min(availableWidth / img.naturalWidth, availableHeight / img.naturalHeight, 1);
+    setImgWidth(Math.round(img.naturalWidth * scale));
+    setImgHeight(Math.round(img.naturalHeight * scale));
+  };
+
   // Handle sticker movement
   // const handleStickerMouseDown = (e: React.MouseEvent, id: number) => {
   //   if (selectedTool !== 'none') return;
@@ -530,23 +584,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
   // Handle image drop
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
-
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-
-      reader.onload = async (event) => {
-        setImgWidth(0);
-        setImgHeight(0);
-
-        const dataUrl = await blobUrlToDataUrl(event.target?.result as string);
-        const uploadedurl = await uploadImage(dataUrl, 'other')
-        console.log('uploaded url...', uploadedurl);
-        setBackgroundImage(uploadedurl);
-      };
-
-      reader.readAsDataURL(file);
-    }
+    await uploadBackgroundFile(e.dataTransfer.files[0]);
   };
 
 
@@ -565,17 +603,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
 
     input.onchange = (event) => {
       const file = (event.target as HTMLInputElement)?.files?.[0];
-      if (file && file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          setImgWidth(0);
-          setImgHeight(0)
-          // setBackgroundImage(event.target?.result as string);
-          const uploadedurl = await uploadImage(event.target?.result as string, 'other')
-          setBackgroundImage(uploadedurl);
-        };
-        reader.readAsDataURL(file);
-      }
+      void uploadBackgroundFile(file);
     };
 
     input.click();
@@ -611,8 +639,10 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         try {
           if (removed) {
             const base64img = await blobUrlToDataUrl(removed)
-            const uploadedurl = await uploadImage(base64img, 'other')
-            setBgremovedImage(uploadedurl)
+            const processedImage = id === 'guest'
+              ? base64img
+              : await uploadImage(base64img, 'other')
+            setBgremovedImage(processedImage)
             setactiveLoader(false)
             setIsDraggable(false);
             addText();
@@ -993,7 +1023,15 @@ function Editor({ id, editorId, stateData }: EditorProps) {
             ].map((item, index) => (
               <button
                 key={index}
-                onClick={() => handleToolClick(item.tool)}
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (item.tooltip === 'Replace Image') {
+                    replaceImageInputRef.current?.click();
+                    return;
+                  }
+                  handleToolClick(item.tool);
+                }}
                 className={`p-2 rounded-lg transition-all duration-200 group relative hover:scale-110
                   ${selectedTool === item.tool ? 'bg-indigo-600' : 'hover:bg-indigo-600'}  ${(bgremovedImage && item.tool === 'crop') ? 'opacity-50 bg-transparent hover:bg-transparent' : ''}
                   ${!backgroundImage && 'opacity-50 bg-transparent'} 
@@ -1011,6 +1049,14 @@ function Editor({ id, editorId, stateData }: EditorProps) {
 
 
             ))}
+
+            <input
+              ref={replaceImageInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleReplaceImage}
+            />
 
             <div className='absolute bottom-2 flex flex-col gap-2 items-center'>
 
@@ -1132,6 +1178,7 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         <div className="flex-1 flex min-h-0">
           <div className="flex-1 bg-[#1a1a1a] p-4 md:p-8 flex items-center justify-center overflow-auto" >
             <div
+              ref={canvasFrameRef}
               id='final-preview'
               className="relative w-full max-w-[900px] aspect-[4/3] bg-white rounded-xl shadow-2xl flex items-center justify-center text-gray-400 group" style={{ marginTop: '150px' }}
               onDrop={isDraggable ? handleDrop : undefined}  // 🔥 Disable drag events
@@ -1147,29 +1194,11 @@ function Editor({ id, editorId, stateData }: EditorProps) {
                     <div id='final-preview' className="relative w-full h-full flex items-center justify-center overflow-hidden" style={(imgHeight && imgWidth) ? { width: imgWidth + 'px', height: imgHeight + 'px' } : {}}>
                       {/* Background Image */}
                       <img
+                        key={backgroundImage}
                         src={backgroundImage}
                         alt="Background"
                         className="max-w-full max-h-full object-contain z-10"
-                        onLoad={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          const parent = img.parentElement;
-                          if (parent) {
-                            const parentWidth = parent.clientWidth;
-                            const parentHeight = parent.clientHeight;
-                            const imgRatio = img.naturalWidth / img.naturalHeight;
-                            const parentRatio = parentWidth / parentHeight;
-
-                            if (imgRatio > parentRatio) {
-                              // Fit width-wise
-                              setImgWidth(parentWidth);
-                              setImgHeight(parentWidth / imgRatio);
-                            } else {
-                              // Fit height-wise
-                              setImgWidth(parentHeight * imgRatio);
-                              setImgHeight(parentHeight);
-                            }
-                          }
-                        }}
+                        onLoad={(e) => handleBackgroundImageLoad(e.currentTarget)}
                         style={{ width: imgWidth, height: imgHeight }}
                       />
 

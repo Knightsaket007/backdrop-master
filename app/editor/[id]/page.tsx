@@ -5,6 +5,7 @@ import { SignedIn, SignedOut, RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import { fetchEditorState } from '../FetchState';
+import { loadGuestEditorState } from '../HandleState';
 import { toast, Toaster } from 'sonner';
 
 
@@ -107,13 +108,14 @@ export default function Editorage() {
                 texts: [],
                 stickers: [],
             };
-            try {
-                const savedProject = localStorage.getItem('guestEditorState');
-                setpayloadData(savedProject ? { ...emptyProject, ...JSON.parse(savedProject) } : emptyProject);
-            } catch (error) {
-                console.warn('Could not restore the guest project from this browser.', error);
-                setpayloadData(emptyProject);
-            }
+            void loadGuestEditorState()
+                .then((savedProject) => {
+                    setpayloadData(savedProject ? { ...emptyProject, ...savedProject } as EditorPayload : emptyProject);
+                })
+                .catch((error) => {
+                    console.warn('Could not restore the guest project from this browser.', error);
+                    setpayloadData(emptyProject);
+                });
             return;
         }
 
