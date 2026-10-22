@@ -42,8 +42,8 @@ export default function Editorage() {
     const params = useParams();
     const editorId = params?.id as string;
     const { isLoaded, user } = useUser();
-    // const [payloadData, setpayloadData] = useState<EditorPayload>({} as EditorPayload);
     const [payloadData, setpayloadData] = useState<EditorPayload | null>(null);
+    const isGuest = editorId === 'guest';
 
     console.log('Editor ID:', editorId)
 
@@ -92,32 +92,49 @@ export default function Editorage() {
     // =-=-= fetch states =-=-=-=//
     const router = useRouter();
     useEffect(() => {
-        const fth = async () => {
-            console.log('user id', user?.id)
-            console.log('editor id', editorId)
+        if (isGuest) {
+            const emptyProject: EditorPayload = {
+                userId: 'guest',
+                plan: 'guest',
+                editorId: 'guest',
+                backgroundImage: null,
+                imgWidth: 0,
+                imgHeight: 0,
+                brushColor: '#000000',
+                brushSize: 3,
+                showFilters: 'none',
+                colorArray: [],
+                texts: [],
+                stickers: [],
+            };
             try {
-                commanloader();
-                const stateData = await fetchEditorState(user?.id || "guest" as string, editorId);
-                console.log('state data is..', stateData)
+                const savedProject = localStorage.getItem('guestEditorState');
+                setpayloadData(savedProject ? { ...emptyProject, ...JSON.parse(savedProject) } : emptyProject);
+            } catch (error) {
+                console.warn('Could not restore the guest project from this browser.', error);
+                setpayloadData(emptyProject);
+            }
+            return;
+        }
+
+        if (!isLoaded || !user || !editorId) return;
+
+        const loadProject = async () => {
+            try {
+                const stateData = await fetchEditorState(user.id, editorId);
                 if (!stateData) {
-                    // setactiveLoader(true);
-                    // commanloader();
-                    router.push("/dashboard")
+                    router.push('/dashboard');
                     return;
                 }
                 setpayloadData(stateData as EditorPayload);
-                console.log('state daaata..', stateData)
+            } catch (error) {
+                console.error('Error fetching editor state', error);
+                toast('Error fetching editor state. Please try again later.');
             }
-            catch (error) {
-                console.log('error in fetching editor state', error)
-                toast("Error fetching editor state. Please try again later.");
-            }
+        };
 
-        }
-        fth()
-
-
-    }, [])
+        void loadProject();
+    }, [editorId, isGuest, isLoaded, router, user]);
     // =-=-=-= load editor -=-=-=-//
 
 
@@ -126,25 +143,23 @@ export default function Editorage() {
     //=-=-=-=-= Mouse Scroll ko disable for input type number=-=-=-=-=//
 
     // if (!isLoaded) return null;
-    if (!isLoaded) {
+    if (!isGuest && !isLoaded) {
         return commanloader();
     }
 
     //   return <Editor />;
-    return (
-        <>
-            <SignedIn>
-                {payloadData && 
-                (
-                <Editor id={user?.id || "guest"} editorId={editorId} stateData={payloadData}/>
-                )
-                }
-            </SignedIn>
-            <SignedOut>
-                <RedirectToSignIn />
-            </SignedOut>
+    if (isGuest) {
+        return <>
+            {payloadData ? <Editor id="guest" editorId="guest" stateData={payloadData} /> : commanloader()}
+            <Toaster position='top-center' theme='light' />
+        </>;
+    }
 
-             <Toaster position='top-center' theme='light' />
-        </>
-    );
+    return <>
+        <SignedIn>
+            {payloadData && <Editor id={user?.id || ''} editorId={editorId} stateData={payloadData} />}
+        </SignedIn>
+        <SignedOut><RedirectToSignIn /></SignedOut>
+        <Toaster position='top-center' theme='light' />
+    </>;
 }

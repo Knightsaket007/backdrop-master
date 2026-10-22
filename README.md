@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BackdropMaster
 
-## Getting Started
+BackdropMaster is a browser-based editor for creating cleaner, more considered product and portrait images. Remove a photo background, build a new composition, then finish it with text, stickers, filters, and simple image tools.
 
-First, run the development server:
+Try the editor without an account at `/editor/guest`. Guest work is stored in that browser. Sign in to create projects that are saved to your account.
+
+**Repository:** [github.com/Knightsaket007/backdrop-master](https://github.com/Knightsaket007/backdrop-master)
+
+## What you can do
+
+- Remove image backgrounds with the browser-based `@imgly/background-removal` package.
+- Add text and stickers, adjust colors, draw or erase, crop images, and apply filters.
+- Export finished compositions from the editor.
+- Try the editor as a guest, or sign in to save and reopen projects.
+- Upload images to Cloudinary and browse stickers through Pixabay.
+
+## Built with
+
+Next.js App Router, React, TypeScript, Tailwind CSS, Clerk, MongoDB with Mongoose, Cloudinary, and `@imgly/background-removal`.
+
+## Run locally
+
+Use Node.js 20 or later and npm.
+
+1. Clone the repository and install dependencies:
+
+   ```bash
+   git clone https://github.com/Knightsaket007/backdrop-master.git
+   cd backdrop-master
+   npm install
+   ```
+
+2. Create a `.env.local` file in the project root and add the credentials for the services you plan to use. See [Environment variables](#environment-variables) below.
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000).
+
+To create and run a production build:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Keep secrets in `.env.local`. Do not commit that file or expose private keys with a `NEXT_PUBLIC_` prefix.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Used for |
+| --- | --- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk sign-in and account UI |
+| `CLERK_SECRET_KEY` | Clerk server-side authentication |
+| `MONGODB_URI` | MongoDB connection for user projects |
+| `CLOUDINARY_ASSETS_CLOUD_NAME` | Cloudinary uploads for project images |
+| `CLOUDINARY_ASSETS_API_KEY` | Cloudinary project-image uploads |
+| `CLOUDINARY_ASSETS_API_SECRET` | Cloudinary project-image uploads |
+| `CLOUDINARY_STICKER_CLOUD_NAME` | Cloudinary sticker uploads |
+| `CLOUDINARY_STICKER_API_KEY` | Cloudinary sticker uploads |
+| `CLOUDINARY_STICKER_API_SECRET` | Cloudinary sticker uploads |
+| `NEXT_PUBLIC_PIXABAY_API_KEY` | Sticker search in the editor |
+| `WEBHOOK_SECRET` | Verifying Clerk webhook events at `/api/webhooks/clerk` |
 
-## Learn More
+Clerk keys are needed for account features. MongoDB and Cloudinary credentials are needed for signed-in project persistence and image uploads. Pixabay is used for sticker search. Configure the Clerk webhook secret when connecting the webhook in your Clerk dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+## Routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Route | Purpose |
+| --- | --- |
+| `/` | Product home page and gallery |
+| `/editor/guest` | Editor without sign-in; project state stays in the current browser |
+| `/dashboard` | Signed-in user's saved projects |
+| `/editor/[id]` | A saved editor project |
+| `/sign-in` and `/sign-up` | Clerk authentication |
+| `/Pricing` | Pricing information |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project layout
 
-## Deploy on Vercel
+```text
+app/
+  api/                 Upload, project, and Clerk webhook routes
+  components/          Home page, dashboard, and shared UI
+  dashboard/           Saved project list
+  editor/              Image editor and editor state handling
+  models/              Mongoose models
+  sign-in/             Clerk sign-in page
+  sign-up/             Clerk sign-up page
+lib/                   Database connection and upload helpers
+public/assets/imgs/    Images used in the home page gallery
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Guest editor state is saved in local storage and is not added to the signed-in project database.
+- Background removal runs in the browser. The first use may take a little longer while its model assets load.
+- Uploaded images use the configured Cloudinary account.

@@ -1,4 +1,4 @@
-import { Plus, Command } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { SignedIn, UserButton } from '@clerk/nextjs';
 // import { Dropdown } from '../ui/Dropdown';
 
@@ -12,18 +12,11 @@ export default function Topbar({ createProject }: TopbarProps) {
     <header className="bg-white border-b border-gray-100 px-6 h-16 flex items-center justify-between sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <Command className="h-6 w-6 text-indigo-600" />
-        <span className="text-xl font-semibold text-gray-800">Picfer</span>
+        <span className="text-xl font-semibold tracking-tight text-gray-800">BackdropMaster</span>
       </div>
 
       {/* Right Section */}
       <div className="flex items-center gap-6">
-        {/* Balance */}
-        <div className="hidden sm:block">
-          <p className="text-sm text-gray-500">Available Credits</p>
-          <p className="text-sm font-semibold text-gray-800">2,500</p>
-        </div>
-
         {/* Create New Button */}
         <button
           onClick={createProject}

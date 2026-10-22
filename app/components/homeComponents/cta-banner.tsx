@@ -1,34 +1,16 @@
-import { useRouter } from "next/navigation";
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 
 export function CtaBanner() {
-
-  const router = useRouter();
-
   return (
-    <section className="py-20 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 to-slate-900"></div>
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full filter blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/20 rounded-full filter blur-[100px]"></div>
-      </div>
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm p-8 md:p-12 shadow-2xl border border-slate-700/50">
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to Create Your Own{" "}
-              <span className="bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
-                Masterpiece?
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Start creating professional backdrops in minutes. No design experience required!
-            </p>
-            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg transition-all" onClick={()=>router.push('/dashboard')}>
-              Open Editor Now
-            </button>
-          </div>
+    <section className="bg-[#17161d] px-5 py-20 text-white sm:px-8 sm:py-24">
+      <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#282138] to-[#1d1b24] px-6 py-8 sm:flex-row sm:items-center sm:px-9 sm:py-9">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-40 h-72 w-72 rounded-full bg-violet-500/15 blur-[90px]" />
+        <div className="relative">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Make your next image stand out.</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">Open the editor and try a new backdrop, no account required.</p>
         </div>
+        <Link href="/editor/guest" className="relative inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#17151d] transition hover:bg-violet-100">Try the editor <ArrowRight size={16} /></Link>
       </div>
     </section>
   )

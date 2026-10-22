@@ -31,6 +31,7 @@ import {
   BrushIcon,
   EraserIcon,
   RotateCcwSquare,
+  LayoutDashboard,
 } from 'lucide-react';
 import { removeBg } from '../utils/removeBg';
 import LoaderComp from '../components/LoaderComp';
@@ -925,10 +926,11 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         stickers: stickersRef.current,
       };
 
-      saveEditorState(payload); // localStorage only
+      saveEditorState(payload, id === "guest"); // Guest projects stay in this browser.
     };
 
     const flushToDB = () => {
+      if (id === "guest") return;
       flushEditorBackupToDB({
         userId: id,
         editorId
@@ -974,8 +976,8 @@ function Editor({ id, editorId, stateData }: EditorProps) {
         </button>
         {leftSidebarOpen && (
           <>
-            <Link href="/dashboard">
-              <img width="42" height="42" src="https://img.icons8.com/windows/32/rgb(126 122 196)/huawei-logo.png" alt="huawei-logo" />
+            <Link href="/dashboard" aria-label="Go to dashboard" title="Dashboard" className="grid h-11 w-11 place-items-center rounded-xl text-violet-300 transition-colors hover:bg-gray-700 hover:text-white">
+              <LayoutDashboard size={23} aria-hidden="true" />
             </Link>
 
             {[

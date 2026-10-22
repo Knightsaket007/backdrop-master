@@ -42,10 +42,14 @@ export interface EditorPayload {
   stickers?: Sticker[];
 }
 
-export function saveEditorState(payload: EditorPayload) {
+export function saveEditorState(payload: EditorPayload, isGuest = false) {
   try {
     console.log("inside saveeditor")
     const newJson = JSON.stringify(payload);
+    if (isGuest) {
+      localStorage.setItem("guestEditorState", newJson);
+      return;
+    }
     const lastJson = localStorage.getItem("unsavedEditorData");
 
     // Skip if no change in data

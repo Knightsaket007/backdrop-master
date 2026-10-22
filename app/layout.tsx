@@ -11,8 +11,8 @@ const IBMPlex = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Create Next App",
-  description: "AI powered image generator and editor",
+  title: "BackdropMaster — Creative Backdrop Studio",
+  description: "Build polished product and portrait visuals with a hands-on backdrop editor. Try it without signing in.",
 };
 
 export default function RootLayout({

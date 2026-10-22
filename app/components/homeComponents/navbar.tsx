@@ -2,84 +2,42 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { ArrowUpRight, Menu, X } from "lucide-react"
+
+const navLinks = [
+  { name: "Features", href: "#features" },
+  { name: "Gallery", href: "#gallery" },
+  { name: "Pricing", href: "/Pricing" },
+]
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
-  const [isScrolled, setIsScrolled] = React.useState(false)
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const navLinks = [
-    // { name: "Home", href: "/" },
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "/Pricing" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ]
 
   return (
-    <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-      isScrolled ? "bg-slate-900/90 backdrop-blur-md shadow-lg" : "bg-transparent"
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="#" className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  {/* <Command className="h-6 w-6 text-indigo-600" /> */}
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101014]/80 text-white backdrop-blur-xl">
+      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8">
+        <Link href="/" aria-label="BackdropMaster home" className="flex items-center gap-3 text-xl font-semibold tracking-[-0.04em]">
+          <span className="font-[family-name:var(--font-ibm-plex)]" style={{ fontFamily: "var(--font-ibm-plex), Arial, sans-serif" }}>BackdropMaster</span>
+          <span className="hidden rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-violet-200 sm:inline">Creative studio</span>
+        </Link>
 
-            Picfer <span className="text-white text-sm bg-green-500 rounded-md px-3 py-0.5">Beta</span>
-          </Link>
-
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors" >
-              <Link href="/sign-in">Login</Link>
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-gray-400 hover:text-white"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        <div className="hidden items-center gap-9 md:flex">
+          {navLinks.map((link) => <Link key={link.name} href={link.href} className="text-sm text-white/65 transition hover:text-white">{link.name}</Link>)}
+          <Link href="/sign-in" className="text-sm text-white/75 transition hover:text-white">Log in</Link>
+          <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#17151d] transition hover:bg-violet-100">Start creating <ArrowUpRight size={16} /></Link>
         </div>
 
-        {isOpen && (
-          <div className="md:hidden py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="block text-gray-300 hover:text-white py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <button 
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg mt-4 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Open Editor
-            </button>
-          </div>
-        )}
+        <button type="button" aria-label={isOpen ? "Close navigation" : "Open navigation"} aria-expanded={isOpen} onClick={() => setIsOpen(!isOpen)} className="rounded-lg border border-white/10 p-2 text-white md:hidden">
+          {isOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
+      {isOpen && <div className="border-t border-white/10 bg-[#101014] px-5 py-4 md:hidden">
+        <div className="mx-auto flex max-w-7xl flex-col gap-1">
+          {navLinks.map((link) => <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="rounded-lg px-3 py-3 text-sm text-white/75 hover:bg-white/5 hover:text-white">{link.name}</Link>)}
+          <Link href="/sign-in" onClick={() => setIsOpen(false)} className="rounded-lg px-3 py-3 text-sm text-white/75 hover:bg-white/5 hover:text-white">Log in</Link>
+          <Link href="/dashboard" onClick={() => setIsOpen(false)} className="mt-2 rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-[#17151d]">Start creating</Link>
+        </div>
+      </div>}
     </nav>
   )
 }

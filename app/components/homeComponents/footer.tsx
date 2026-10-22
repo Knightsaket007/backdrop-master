@@ -1,72 +1,22 @@
 import Link from "next/link"
-import { Facebook, Twitter, Instagram, Linkedin, Github } from "lucide-react"
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
-  
-  const footerLinks = [
-    { name: "About", href: "#" },
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#" },
-    { name: "Terms", href: "#" },
-    { name: "Privacy", href: "#" },
-    { name: "Contact", href: "#" },
-  ]
-  
-  const socialLinks = [
-    { name: "Facebook", icon: <Facebook className="h-5 w-5" />, href: "#" },
-    { name: "Twitter", icon: <Twitter className="h-5 w-5" />, href: "#" },
-    { name: "Instagram", icon: <Instagram className="h-5 w-5" />, href: "#" },
-    { name: "LinkedIn", icon: <Linkedin className="h-5 w-5" />, href: "#" },
-    { name: "GitHub", icon: <Github className="h-5 w-5" />, href: "#" },
-  ]
-
   return (
-    <footer className="bg-slate-900 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-          <div className="mb-6 md:mb-0">
-            <Link href="#" className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Picfer
-            </Link>
-            <p className="mt-2 text-gray-400 max-w-md">
-              Create stunning, professional backgrounds for your photos with our powerful editor.
-            </p>
-          </div>
-          
-          <div className="flex space-x-4">
-            {socialLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label={link.name}
-              >
-                {link.icon}
-              </Link>
-            ))}
-          </div>
+    <footer className="border-t border-white/[0.08] bg-[#101014] py-9 text-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <div>
+          <Link href="/" aria-label="BackdropMaster home" className="inline-flex items-center text-lg font-semibold tracking-[-0.04em]" style={{ fontFamily: "var(--font-ibm-plex), Arial, sans-serif" }}>BackdropMaster</Link>
+          <p className="mt-2 text-xs text-white/40">A creative studio for better product imagery.</p>
         </div>
-        
-        <div className="border-t border-slate-800 my-8"></div>
-        
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-4 md:mb-0">
-            {footerLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-          
-          <div className="text-gray-500 text-sm">
-            &copy; {currentYear} Picfer. All rights reserved.
-          </div>
-        </div>
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/55">
+          <Link href="#features" className="transition hover:text-white">Features</Link>
+          <Link href="#gallery" className="transition hover:text-white">Gallery</Link>
+          <Link href="/Pricing" className="transition hover:text-white">Pricing</Link>
+          <Link href="/sign-in" className="transition hover:text-white">Log in</Link>
+          <Link href="/dashboard" className="transition hover:text-white">Open studio</Link>
+          <a href="https://github.com/Knightsaket007/backdrop-master" target="_blank" rel="noreferrer" className="transition hover:text-white">GitHub</a>
+        </nav>
+        <p className="text-xs text-white/35">© {new Date().getFullYear()} BackdropMaster</p>
       </div>
     </footer>
   )
